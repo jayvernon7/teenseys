@@ -89,7 +89,7 @@
 <div class="page">
   <div class="shell">
     <div class="topbar">
-      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 0.4</span></div><div class="sub">A cozy pixel-art shopping district</div></div>
+      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 0.5</span></div><div class="sub">Now featuring CC0 pixel-art tiles</div></div>
       <div class="top-actions">
         <button id="browseBtn" class="pill" type="button" disabled>Browse all</button>
         <button id="cartBtn" class="pill" type="button" disabled>Bag <span id="cartCount">0</span></button>
@@ -115,6 +115,22 @@
 const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
 const overlay=document.getElementById('overlay'),hint=document.getElementById('hint'),hud=document.getElementById('hud'),toastEl=document.getElementById('toast');
 const T=32,W=704,H=448;
+ // CC0 pixel tiles from Kenney Tiny Town. The atlas is kept externally hosted
+ // for this first asset-integration test. The game keeps its drawn fallback if offline.
+ const townAtlas=new Image();
+ let atlasReady=false;
+ townAtlas.onload=()=>{atlasReady=true;};
+ townAtlas.onerror=()=>{atlasReady=false;};
+ townAtlas.src='https://raw.githubusercontent.com/GeorgeQLe/assets-2d-city/main/assets/kenney/tiny-town/Tilemap/tilemap_packed.png';
+ function atlasTile(col,row,x,y,size=32){
+   if(!atlasReady)return false;
+   ctx.drawImage(townAtlas,col*16,row*16,16,16,Math.round(x),Math.round(y),size,size);
+   return true;
+ }
+ function atlasSprite(col,row,x,y,size=32){
+   return atlasTile(col,row,x,y,size);
+ }
+
 const profiles=[
  {skin:'#b87953',hair:'#171a23',shirt:'#f2eee7',pants:'#20364c',style:0},
  {skin:'#744b39',hair:'#231c1e',shirt:'#99c7a2',pants:'#252c38',style:1},
@@ -211,6 +227,11 @@ function garden(x,y,w=58){
  for(let i=0;i<6;i++){const a=x+5+i*(w-12)/5;pix(a,y+((i%3)*2),9,7,i%2?'#74b67e':'#66a86f')}
  bloom(x+12,y+1,'#ffb7b5');bloom(x+w/2,y-2,'#f5d67e');bloom(x+w-15,y+2,'#fff0de');
 }
+function drawAssetVines(x,y){
+  // Tree/flower tiles from the sprite atlas, intentionally sparse and readable.
+  atlasSprite(0,0,x,y,32);
+  atlasSprite(0,1,x+24,y+14,32);
+}
 function streetlamp(x,y){
  pix(x+11,y+14,5,61,'#314950');pix(x+7,y+74,13,5,'#43575a');
  pix(x+4,y+12,19,6,'#293c42');pix(x+7,y,13,17,'#293c42');
@@ -256,12 +277,18 @@ function drawBuilding(b){
  ? {wall:'#b8c3ca',trim:'#354c5c',dark:'#284251',glass:'#8fbed3',stripe:'#5f8792',light:'#eacb9d',brand:'#f3eee1'}
  : {wall:'#d8ada1',trim:'#58464e',dark:'#45414d',glass:'#9fc1b5',stripe:'#b77872',light:'#efd3a2',brand:'#fff0de'};
  const p=(a,c,d,e,f)=>pix(a,c,d,e,f);
- // Strong rooftop silhouette + raised cornice casts a clear shadow.
+ // Tiny Town masonry tiles are actual sprite artwork, not procedural pixels.
+ // Displayed as texture accents around the shop roof and the back wall.
+  // Strong rooftop silhouette + raised cornice casts a clear shadow.
  p(X-9,Y+4,w+18,h+13,'#506067');
  p(X-3,Y-7,w+6,h+12,palette.wall);
  p(X-15,Y-28,w+30,27,palette.trim);
  p(X-12,Y-34,w+24,10,'#63717a');
  p(X-8,Y-31,w+16,6,'#344a56');
+ if(atlasReady){
+   // Sprite-textured upper facade; exact shop positions/doors are unchanged.
+   for(let ix=X+11;ix<X+w-24;ix+=32)atlasTile(b.id==='boutique'?4:2,4,ix,Y+9,32);
+ }
  for(let i=0;i<w-12;i+=17)p(X+6+i,Y-24,11,4,'#ffffff14');
  p(X-13,Y-3,w+26,5,'#e4d7bf');
  // Pixel-scale masonry visible across the wall, not flat fill.
@@ -371,6 +398,10 @@ function townScene(){
  pix(20*T+23,14*T-4,16,5,'#e1f5f3');
  pix(20*T+14,14*T+13,8,3,'#d4eee8');
  pix(20*T+51,14*T+45,9,3,'#c8e8ec');
+ // Original CC0 tile art in the landscaped corners and plaza.
+ if(atlasReady){
+   for(const [tx,ty] of [[1,10],[36,10],[3,19],[34,19],[10,12],[30,12]])drawAssetVines(tx*T,ty*T);
+ }
  for(const b of buildings)drawBuilding(b);
  // Two clusters of trees, not a wall of foliage.
  for(const [x,y] of [[2,3],[36,3],[3,15],[35,15],[4,19],[35,19]])tree(x,y);
@@ -414,6 +445,12 @@ function storeScene(){
   pix(xx+5,29,2*T-5,41,'#ffedcf');
   pix(xx+8,33,2*T-11,35,x%8===2?'#9ea9a3':'#d2b7a1');
   storeMannequin(xx+T+2,42,x%8===2?'#f7e7d0':'#4e7571');
+ }
+ // Original pixel-art merchandise and props from the same licensed asset pack.
+ if(atlasReady){
+  for(const xx of [4*T+8,10*T+8,16*T+8]){
+   atlasSprite(9,9,xx,3*T+10,32);
+  }
  }
  // Big fashion wordmark above the back wall.
  pix(8*T,3,8*T,44,'#2c4b4b');
