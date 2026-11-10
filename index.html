@@ -89,7 +89,7 @@
 <div class="page">
   <div class="shell">
     <div class="topbar">
-      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 0.6</span></div><div class="sub">Original Teenseys pixel-art storefronts</div></div>
+      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 0.7</span></div><div class="sub">A walkable pixel-art shopping town</div></div>
       <div class="top-actions">
         <button id="browseBtn" class="pill" type="button" disabled>Browse all</button>
         <button id="cartBtn" class="pill" type="button" disabled>Bag <span id="cartCount">0</span></button>
@@ -119,7 +119,8 @@ const T=32,W=704,H=448;
  const art={};
  for(const [key,file] of Object.entries({
   boutique:'threads.svg',shoes:'sole-house.svg',cafe:'corner-cafe.svg',
-  tree:'tree.svg',rack:'rack.svg',wood:'wood-floor.svg',stone:'stone.svg',grass:'grass.svg'
+  tree:'tree.svg',rack:'rack.svg',wood:'wood-floor.svg',stone:'stone.svg',grass:'grass.svg',
+  fountain:'fountain.svg',bench:'bench.svg',lamp:'lamp.svg',planter:'planter.svg',display:'display.svg'
  })){
   const img=new Image();
   img.onload=()=>{art[key]=img;};
@@ -137,6 +138,15 @@ const T=32,W=704,H=448;
  const atlasReady=false;
  function atlasTile(){return false;}
  function atlasSprite(){return false;}
+
+// Four-direction pixel animation sheets for every selectable character.
+const avatarSheets=[];
+for(let i=0;i<6;i++){
+ const img=new Image();
+ avatarSheets.push(img);
+ img.src='assets/teenseys/avatars/shopper-'+(i+1)+'.svg';
+}
+let walkTick=0;
 
 const profiles=[
  {skin:'#b87953',hair:'#171a23',shirt:'#f2eee7',pants:'#20364c',style:0},
@@ -183,6 +193,16 @@ function colorRect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.ro
 function textDraw(str,x,y,size=10,c='#1b3f42',align='center'){ctx.fillStyle=c;ctx.font=`900 ${size}px ui-sans-serif, system-ui, sans-serif`;ctx.textAlign=align;ctx.fillText(str,x,y)}
 function fillTile(x,y,c){colorRect(x*T,y*T,T,T,c)}
 function drawAvatar(x,y,p,scale=1,face='down'){
+ const ix=profiles.indexOf(p),img=avatarSheets[ix];
+ if(img && img.complete && img.naturalWidth){
+   const row=({down:0,left:1,right:2,up:3})[face]??0;
+   const moving=!!(started && activePanel==='none' && ((p!==profiles[character]) || Date.now()-lastMove<230));
+   const frame=moving?Math.floor(Date.now()/130)%4:0;
+   const ww=32*scale, hh=44*scale;
+   ctx.drawImage(img,frame*32,row*44,32,44,Math.round(x-ww/2),Math.round(y-26*scale),ww,hh);
+   return;
+ }
+
  // Small Gather-style shopper: 2D sprite with pixel outlines and direction-aware details.
  ctx.save();
  ctx.translate(Math.round(x),Math.round(y));
@@ -410,6 +430,8 @@ function townScene(){
  // Geometric courtyard border.
  for(let x=12;x<=29;x++){pix(x*T,12*T,32,4,'#bda18b');pix(x*T,19*T-4,32,4,'#bda18b')}
  for(let y=12;y<19;y++){pix(12*T,y*T,4,32,'#bda18b');pix(30*T-4,y*T,4,32,'#bda18b')}
+ // Illustrated fountain is the centerpiece of the public square.
+ if(!artDraw('fountain',20*T-36,14*T-18,130,97)){
  // Brick-lined fountain, aqua ripples and a tiny sparkling jet.
  pix(20*T-19,14*T-17,101,89,'#697f82');
  pix(20*T-14,14*T-12,91,79,'#e4dccb');
@@ -420,6 +442,8 @@ function townScene(){
  pix(20*T+23,14*T-4,16,5,'#e1f5f3');
  pix(20*T+14,14*T+13,8,3,'#d4eee8');
  pix(20*T+51,14*T+45,9,3,'#c8e8ec');
+
+ }
  // Original CC0 tile art in the landscaped corners and plaza.
  if(false && atlasReady){
    for(const [tx,ty] of [[1,10],[36,10],[3,19],[34,19],[10,12],[30,12]])drawAssetVines(tx*T,ty*T);
@@ -428,15 +452,18 @@ function townScene(){
  // Two clusters of trees, not a wall of foliage.
  for(const [x,y] of [[2,3],[36,3],[3,15],[35,15],[4,19],[35,19]])tree(x,y);
  // Planters mark the plaza corners and house edges.
- garden(11*T+7,11*T+20,59);garden(28*T+20,11*T+20,57);
- garden(11*T+7,18*T+26,59);garden(28*T+20,18*T+26,57);
- for(const x of [4,15,27,36])garden(x*T+2,9*T+3,37);
- // Benches and lamps add charm without visual overload.
+ for(const [xx,yy] of [[11*T,11*T+12],[28*T+5,11*T+12]]){if(!artDraw('planter',xx,yy,94,48))garden(xx,yy,80);}
+ for(const [xx,yy] of [[11*T,18*T+12],[28*T+5,18*T+12]]){if(!artDraw('planter',xx,yy,94,48))garden(xx,yy,80);}
+ for(const x of [4,15,27,36]){if(!artDraw('planter',x*T-8,9*T,52,30))garden(x*T+2,9*T+3,37);}
+ // Dedicated pixel assets: benches and street lamps.
  for(const x of [2,32]){
-  pix(x*T,11*T,36,11,'#654e44');pix(x*T+3,11*T-6,30,8,'#bc9973');
-  pix(x*T+5,11*T+11,5,8,'#6c5b4d');pix(x*T+28,11*T+11,5,8,'#6c5b4d');
+  if(!artDraw('bench',x*T,11*T-18,75,35)){
+   pix(x*T,11*T,36,11,'#654e44');pix(x*T+3,11*T-6,30,8,'#bc9973');
+  }
  }
- streetlamp(3*T,10*T-37);streetlamp(35*T,10*T-37);
+ for(const x of [3,35]){
+  if(!artDraw('lamp',x*T-17,10*T-82,68,107))streetlamp(x*T,10*T-37);
+ }
  // Thin banner for urban-but-cozy identity.
  pix(19*T,10*T+4,96,25,'#304e53');
  pix(19*T+4,10*T+8,88,17,'#e9d9b7');
@@ -478,7 +505,9 @@ if(art.wood){for(let y=0;y<17;y+=2)for(let x=0;x<24;x+=2)artDraw('wood',x*T,y*T,
    atlasSprite(9,9,xx,3*T+10,32);
   }
  }
- // Big fashion wordmark above the back wall.
+ // Curated display at the rear of the boutique, clear of customer pathways.
+ if(art.display)artDraw('display',8*T+22,3*T-6,110,84);
+  // Big fashion wordmark above the back wall.
  pix(8*T,3,8*T,44,'#2c4b4b');
  pix(8*T+5,8,8*T-10,34,'#f4e6cd');
  textDraw("THE THREADS SHOP",12*T,31,17,'#2b514d');
