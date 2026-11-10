@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#152e35" />
+  <title>Teenseys' | Virtual Shopping Town Demo</title>
+  <style>
+    :root{--ink:#163038;--muted:#647879;--line:#d9e3df;--cream:#f7f6ef;--surface:#fff;--teal:#246b63;--mint:#d9efe5;--gold:#f5cd7a;--shadow:0 24px 70px rgba(14,38,39,.2)}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink)}
+    button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.5}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #ffb84d;outline-offset:2px}
+    body{background:radial-gradient(circle at 10% 8%,#edf7ee,transparent 35%),linear-gradient(140deg,#f5f7ef,#e5ede7)}
+    .page{width:min(1140px,calc(100% - 26px));margin:16px auto 30px}
+    .shell{background:#fff;border:1px solid #d5e2dd;border-radius:20px;overflow:hidden;box-shadow:var(--shadow)}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;padding:14px 20px;border-bottom:1px solid var(--line)}
+    .brand{font-weight:900;letter-spacing:-.04em;font-size:21px;display:flex;align-items:center;gap:10px;white-space:nowrap}
+    .logo{width:29px;height:29px;display:inline-grid;place-items:center;background:#153b3a;color:#fff;border-radius:8px;font-size:16px;letter-spacing:0}
+    .sub{font-size:12px;color:#7c8d88;letter-spacing:.05em;text-transform:uppercase;font-weight:700}
+    .top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .pill{border:1px solid #d6e4db;border-radius:999px;padding:8px 12px;font-weight:750;background:#fff;color:var(--ink);font-size:12px}
+    .pill:hover{background:#f1f8f4}.pill.primary{background:#184c4b;border-color:#184c4b;color:#fff}
+    .badge{font-size:11px;background:#e1f3e8;color:#216657;border-radius:99px;padding:5px 8px;font-weight:800}
+    .game-wrap{position:relative;background:#afd2ad;min-height:350px;isolation:isolate}
+    #game{display:block;width:100%;aspect-ratio:22/14;max-height:650px;object-fit:contain;image-rendering:pixelated;background:#9ccf9a;touch-action:manipulation}
+    .hud{position:absolute;left:15px;top:13px;background:rgba(255,255,250,.95);border:1px solid #ffffff99;border-radius:11px;padding:8px 12px;box-shadow:0 4px 20px #154c4b21;font-size:12px;font-weight:850;max-width:70%;pointer-events:none}
+    .hud small{display:block;color:#698078;font-size:11px;font-weight:650;margin-top:2px}
+    .hint{position:absolute;bottom:17px;left:50%;transform:translateX(-50%);background:rgba(19,43,43,.94);color:#fff;border-radius:12px;padding:11px 15px;font-size:13px;font-weight:750;max-width:calc(100% - 25px);text-align:center;box-shadow:0 8px 25px #0f333b45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .hint kbd{border:1px solid #a1c9bc;padding:1px 6px;border-radius:4px;font-family:inherit;font-size:12px;background:#295d57}
+    .controls{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border-top:1px solid #d6e4db;padding:13px 18px;flex-wrap:wrap}
+    .instructions{font-size:12px;color:#647571;line-height:1.45}.instructions b{color:#1b4e4b}
+    .control-group{display:flex;gap:8px;align-items:center}.mobile-pad{display:grid;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(2,40px);gap:3px;align-items:center;justify-content:center}
+    .mobile-pad button{height:40px;width:44px;border-radius:9px;border:1px solid #d6e1dc;background:#eef5f0;font-size:18px;color:#184b48;font-weight:900}
+    .mobile-pad button:active,.pill:active,.btn:active{transform:translateY(1px)}.mobile-pad .up{grid-column:2;grid-row:1}.mobile-pad .left{grid-column:1;grid-row:2}.mobile-pad .down{grid-column:2;grid-row:2}.mobile-pad .right{grid-column:3;grid-row:2}
+    .btn{border:0;border-radius:12px;padding:12px 17px;background:#235b53;color:#fff;font-weight:800;transition:background .15s;min-height:43px}.btn:hover{background:#154941}.btn.secondary{background:#edf4ee;color:#214946}.btn.light{background:#fff;color:var(--ink);border:1px solid #d9e5dc}.btn.soft{background:#d5eee2;color:#1c5c4d}.btn.full{width:100%}
+    .footnote{color:#758681;font-size:12px;line-height:1.5;margin:14px 5px 0;text-align:center}
+    .overlay{position:absolute;inset:0;background:rgba(18,37,39,.42);display:flex;align-items:center;justify-content:center;padding:18px;z-index:5;overflow:auto}
+    .overlay.hidden,.hidden{display:none!important}
+    .card{background:var(--surface);border-radius:20px;box-shadow:0 22px 72px rgba(5,30,27,.25);width:min(100%,780px);max-height:98%;overflow:auto;position:relative}
+    .small-card{width:min(100%,485px);padding:28px}.big-card{width:min(100%,900px)}
+    .close{border:0;background:#eef4f1;color:#254c47;width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:23px;font-weight:500;line-height:1}
+    .close-corner{position:absolute;top:15px;right:15px;z-index:3}
+    .eyebrow{font-size:11px;text-transform:uppercase;font-weight:900;letter-spacing:.16em;color:#387665}
+    h1,h2,h3,p{margin-top:0}h1{font-size:clamp(30px,4.5vw,47px);line-height:1.07;letter-spacing:-.055em;margin:10px 0 13px}h2{font-size:clamp(22px,3vw,29px);letter-spacing:-.04em;margin:8px 0 9px}h3{font-size:17px;margin-bottom:8px}p{color:#647a76;line-height:1.54;font-size:14px}
+    .welcome{padding:40px 35px 35px;display:grid;grid-template-columns:1.1fr .9fr;gap:23px;align-items:center}
+    .welcome-actions{display:grid;gap:9px;margin-top:24px;max-width:310px}.welcome-actions button{text-align:center}
+    .welcome-art{border-radius:16px;overflow:hidden;background:#cce9cf;border:1px solid #d8e6df;position:relative;min-height:285px}
+    .welcome-art canvas{display:block;width:100%;height:100%;image-rendering:pixelated;object-fit:cover;position:absolute;inset:0}
+    .art-label{position:absolute;bottom:14px;left:14px;background:#fffdf3dd;padding:8px 12px;border-radius:7px;font-size:12px;font-weight:900}
+    .muted{font-size:12px;color:#7f948b}.centertxt{text-align:center}
+    .avatar-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:20px 0}
+    .avatar-choice{border:2px solid #e3eae4;background:#f7f9f4;border-radius:13px;padding:15px 8px 11px;display:grid;justify-items:center;gap:8px;font-size:12px;font-weight:800;color:#4b625b;min-height:107px}
+    .avatar-choice.selected{border-color:#32766c;background:#e5f5ea;box-shadow:inset 0 0 0 1px #32766c}
+    .avatar-choice canvas{width:56px;height:56px;image-rendering:pixelated}
+    .catalog{padding:26px 26px 20px}
+    .catalog-head{padding-right:50px;margin-bottom:15px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+    .filters{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0 17px}.filter{border:1px solid #d3e3d8;border-radius:99px;padding:7px 13px;color:#3f675b;background:#fff;font-size:12px;font-weight:800}.filter.active{background:#225d53;border-color:#225d53;color:#fff}
+    .product-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;max-height:355px;overflow:auto;padding:2px}
+    .product-tile{border:1px solid #dde6e0;background:#fff;border-radius:12px;overflow:hidden;text-align:left;padding:0}.product-tile:hover{border-color:#41806d;box-shadow:0 5px 18px #3c69511e}
+    .product-thumb{height:120px;display:grid;place-items:center;background:#f0f1ec}.product-thumb svg{width:80px;height:88px;filter:drop-shadow(0 5px 5px #18382720)}
+    .product-caption{padding:10px;font-size:12px;font-weight:800;line-height:1.3}.product-caption span{display:block;color:#73867d;margin-top:5px;font-weight:650}
+    .product-layout{display:grid;grid-template-columns:1fr 1fr;min-height:435px}
+    .viewer{background:radial-gradient(circle at 50% 45%,#fff,#e8eee9 65%);padding:26px;display:flex;flex-direction:column;justify-content:space-between;align-items:stretch;min-width:0}
+    .viewer-caption{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:900;color:#70857d}
+    .shirt-display{display:grid;place-items:center;flex:1;min-height:235px;touch-action:pan-y;user-select:none;cursor:grab}
+    .shirt-display svg{width:min(80%,300px);height:235px;max-height:100%;filter:drop-shadow(0 16px 12px #40514825);transition:transform .35s ease}
+    .shirt-display.back svg{transform:scaleX(-1) rotateY(20deg)}
+    .viewer-footer{display:flex;align-items:center;justify-content:space-between;gap:7px;font-size:12px;color:#5d726b}
+    .viewer-footer button{border:1px solid #d3ded7;background:#fff;border-radius:8px;padding:8px 12px;font-size:11px;font-weight:850;color:#2b5a50}
+    .details{padding:32px 28px 23px;display:flex;flex-direction:column;min-width:0}
+    .details h2{font-size:29px;margin-bottom:5px}.price{font-size:23px;font-weight:900;margin-bottom:12px;color:#214e48}
+    .divider{border-top:1px solid #e0e9e3;margin:14px 0}.sizes{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+    .size{border:1px solid #d9e3dc;border-radius:8px;padding:9px 12px;background:#fff;font-size:12px;font-weight:850;min-width:42px}
+    .size.active{border-color:#245e52;background:#e3f1e9;color:#195148}
+    .product-controls{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:20px}
+    .circle{height:40px;width:40px;display:grid;place-items:center;border-radius:50%;border:1px solid #cadfd2;background:#eef5ef;font-size:23px;color:#255b53}
+    .step{font-weight:900;color:#647c72;font-size:12px}.status{font-size:12px;min-height:18px;color:#2b7460;font-weight:750;margin:10px 0 0}
+    .cartitems{display:grid;gap:8px;margin:20px 0}.cartrow{display:flex;align-items:center;gap:11px;padding:11px;background:#f5f8f3;border-radius:11px;font-size:13px}.cartrow strong{display:block}.cartrow .delete{margin-left:auto;border:0;background:#fff;padding:8px 10px;border-radius:8px;color:#b14e45;font-size:12px;font-weight:850}
+    .carttotal{display:flex;justify-content:space-between;font-weight:900;border-top:1px solid #dfe9e1;padding-top:16px;margin:16px 0}
+    .dialogue-options{display:grid;gap:8px;margin-top:18px}
+    .toast{position:absolute;right:14px;bottom:17px;background:#175347;color:#fff;z-index:9;border-radius:10px;padding:12px 16px;box-shadow:0 5px 24px #163b3940;font-size:13px;font-weight:750;max-width:80%}
+    .toast.hidden{display:none!important}.welcome-info{margin-top:12px;max-width:370px;font-size:12px}
+    .demo-note{border-radius:10px;background:#e9f5ec;color:#246052;padding:12px;font-size:12px;line-height:1.5;font-weight:650}
+    @media(max-width:750px){.game-wrap.modal-open{min-height:680px}.welcome{grid-template-columns:1fr;padding:32px 22px 22px}.welcome-art{min-height:150px}.welcome-actions{max-width:none}.product-layout{grid-template-columns:1fr}.viewer{min-height:240px;padding:18px}.shirt-display{min-height:165px}.shirt-display svg{height:165px}.details{padding:20px}.product-grid{grid-template-columns:repeat(2,minmax(0,1fr));max-height:290px}.product-thumb{height:104px}.catalog{padding:22px 14px}.controls{align-items:center}.instructions{max-width:195px}.topbar{padding:11px 13px}.sub{display:none}.brand{font-size:18px}.badge{display:none}}
+    @media(max-width:440px){.page{width:100%;margin:0}.shell{border-radius:0;border:0}.top-actions{gap:5px}.pill{padding:8px 9px;font-size:11px}.game-wrap{min-height:235px}.hint{font-size:11px;bottom:8px}.controls{padding:9px 12px}.instructions{font-size:11px;max-width:128px}.mobile-pad{grid-template-columns:repeat(3,38px);grid-template-rows:repeat(2,36px)}.mobile-pad button{width:38px;height:36px}.btn{padding:11px 12px;font-size:12px}.overlay{padding:8px}.small-card{padding:22px 16px}.avatar-grid{gap:6px}.avatar-choice{padding:10px 3px}.details h2{font-size:24px}.viewer{min-height:210px}.shirt-display svg{height:150px}.topbar .pill:last-child{display:none}}
+    @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="shell">
+    <div class="topbar">
+      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 0.1</span></div><div class="sub">A virtual shopping town · working concept</div></div>
+      <div class="top-actions">
+        <button id="browseBtn" class="pill" type="button" disabled>Browse all</button>
+        <button id="cartBtn" class="pill" type="button" disabled>Bag <span id="cartCount">0</span></button>
+        <button id="menuBtn" class="pill primary" type="button" disabled>Menu</button>
+      </div>
+    </div>
+    <div class="game-wrap" id="gameWrap">
+      <canvas id="game" width="704" height="448" aria-label="Pixel-art shopping town game. Use arrow keys or WASD to move, E to interact."></canvas>
+      <div class="hud" id="hud">TOWN SQUARE <small>Explore the district</small></div>
+      <div class="hint" id="hint">Choose a character to enter the town</div>
+      <div id="overlay" class="overlay" aria-live="off"></div>
+      <div id="toast" class="toast hidden" role="status"></div>
+    </div>
+    <div class="controls">
+      <div class="instructions"><b>How to move</b><br/>WASD or arrow keys · <b>E</b> interact · <b>Esc</b> close<br/>On mobile, use the direction pad and Interact.</div>
+      <div class="control-group"><div class="mobile-pad" aria-label="Movement controls"><button class="up" data-dir="up" type="button" aria-label="Move up">↑</button><button class="left" data-dir="left" type="button" aria-label="Move left">←</button><button class="down" data-dir="down" type="button" aria-label="Move down">↓</button><button class="right" data-dir="right" type="button" aria-label="Move right">→</button></div><button class="btn" type="button" id="interactBtn" disabled>Interact (E)</button></div>
+    </div>
+  </div>
+  <div class="footnote">This is an interactive concept demo with sample products, simulated passersby and no real checkout, account system or live multiplayer. No chat or visitor-to-visitor features are included.</div>
+</div>
+<script>
+(()=>{'use strict';
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
+const overlay=document.getElementById('overlay'),hint=document.getElementById('hint'),hud=document.getElementById('hud'),toastEl=document.getElementById('toast');
+const T=32,W=704,H=448;
+const profiles=[
+ {skin:'#b87953',hair:'#171a23',shirt:'#f2eee7',pants:'#20364c',style:0},
+ {skin:'#744b39',hair:'#231c1e',shirt:'#99c7a2',pants:'#252c38',style:1},
+ {skin:'#e2a778',hair:'#5d3528',shirt:'#f6bb70',pants:'#53475f',style:2},
+ {skin:'#a76d50',hair:'#141b1e',shirt:'#bdc7ed',pants:'#283041',style:3},
+ {skin:'#ce8c65',hair:'#503d30',shirt:'#f4c6b7',pants:'#3b5064',style:1},
+ {skin:'#845642',hair:'#1c2420',shirt:'#d1c797',pants:'#35403c',style:2}
+];
+const products=[
+ {id:1,rack:'white',name:'Everyday White Tee',price:28,color:'#f7f7f3',type:'tee',desc:'Soft everyday cotton with an easy relaxed fit.'},
+ {id:2,rack:'white',name:'Oversized White Tee',price:36,color:'#fffdfa',type:'tee',desc:'Dropped shoulders and a roomy streetwear silhouette.'},
+ {id:3,rack:'white',name:'White Graphic Tee',price:42,color:'#f2f1ec',type:'tee',print:'TEENSEYS',desc:'Statement graphic on a heavyweight cotton tee.'},
+ {id:4,rack:'white',name:'Classic White Long Sleeve',price:38,color:'#f8f7f0',type:'long',desc:'A clean essential with full-length sleeves.'},
+ {id:5,rack:'black',name:'Essential Black Tee',price:30,color:'#24282b',type:'tee',desc:'Minimal short-sleeve staple in deep black.'},
+ {id:6,rack:'black',name:'Boxy Black Tee',price:39,color:'#29282c',type:'tee',desc:'Structured boxy fit for everyday wear.'},
+ {id:7,rack:'black',name:'Black Printed Tee',price:45,color:'#1b2222',type:'tee',print:'NORTH',desc:'Graphic cotton tee with a modern relaxed cut.'},
+ {id:8,rack:'brown',name:'Coffee Brown Tee',price:34,color:'#785039',type:'tee',desc:'Warm brown neutral with soft-touch fabric.'},
+ {id:9,rack:'brown',name:'Mocha Relaxed Tee',price:37,color:'#9c6b54',type:'tee',desc:'Easy-fit tee in a muted mocha tone.'},
+ {id:10,rack:'hoodies',name:'Cream Pullover',price:64,color:'#e6d5bc',type:'hoodie',desc:'Cozy oversized pullover with roomy sleeves.'},
+ {id:11,rack:'hoodies',name:'Forest Hoodie',price:68,color:'#4b725c',type:'hoodie',desc:'Soft fleece in a rich forest green.'},
+ {id:12,rack:'pants',name:'Wide Leg Trousers',price:72,color:'#746354',type:'pants',desc:'Tailored wide-leg trousers for an effortless look.'},
+ {id:13,rack:'pants',name:'Relaxed Black Pants',price:59,color:'#323338',type:'pants',desc:'Everyday comfort with an easy straight fit.'},
+ {id:14,rack:'accessories',name:'Canvas Tote',price:22,color:'#dfcdae',type:'bag',desc:'Minimal tote for daily essentials.'},
+ {id:15,rack:'accessories',name:'Classic Cap',price:26,color:'#333d35',type:'cap',desc:'A low-profile cap with an adjustable back.'}
+];
+const rackDefs=[
+ {id:'white',label:'WHITE SHIRTS',x:4,y:5,w:3,h:2,c:'#fbfaf4'},
+ {id:'black',label:'BLACK SHIRTS',x:10,y:5,w:3,h:2,c:'#262728'},
+ {id:'brown',label:'BROWN SHIRTS',x:16,y:5,w:3,h:2,c:'#967054'},
+ {id:'hoodies',label:'HOODIES',x:4,y:10,w:3,h:2,c:'#d5bd95'},
+ {id:'pants',label:'PANTS',x:10,y:10,w:3,h:2,c:'#566578'},
+ {id:'accessories',label:'ACCESSORIES',x:16,y:10,w:3,h:2,c:'#dcb97a'}
+];
+const buildings=[
+ {id:'boutique',name:'THE THREADS SHOP',x:4,y:2,w:10,h:6,doorX:8,doorY:8,c:'#dcaa79'},
+ {id:'shoes',name:'SOLE HOUSE',x:17,y:2,w:8,h:6,doorX:20,doorY:8,c:'#a9bdc9'},
+ {id:'cafe',name:'CORNER CAFÉ',x:28,y:2,w:7,h:6,doorX:31,doorY:8,c:'#d6a69e'}
+];
+let mode='town',started=false,character=0,player={x:8,y:11,dir:'down'},activePanel='welcome',selection=0,selectedSize='M',rackId='white',productIndex=0,fromCatalog=false,filter='all',bag=[],lastMove=0,animation=0,focusTarget=null,toastTimer=0;
+const npcs=[{x:21,y:5,c:profiles[4],kind:'clerk'}];
+const shoppers=[{x:16.5,y:14.5,c:profiles[1],step:0},{x:26.5,y:15.5,c:profiles[2],step:0},{x:15.5,y:11.5,c:profiles[5],step:0}];
+function colorRect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),w,h)}
+function textDraw(str,x,y,size=10,c='#1b3f42',align='center'){ctx.fillStyle=c;ctx.font=`900 ${size}px ui-sans-serif, system-ui, sans-serif`;ctx.textAlign=align;ctx.fillText(str,x,y)}
+function fillTile(x,y,c){colorRect(x*T,y*T,T,T,c)}
+function drawAvatar(x,y,p,scale=1,face='down'){
+ ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale(scale,scale);
+ const r=(a,b,w,h,c)=>colorRect(a,b,w,h,c);
+ r(-7,10,6,5,'#303a3a');r(1,10,6,5,'#303a3a');r(-7,6,6,5,p.pants);r(1,6,6,5,p.pants);
+ r(-10,-3,20,12,p.shirt);r(-10,0,4,7,p.skin);r(6,0,4,7,p.skin);
+ r(-7,-16,14,16,p.skin);r(-8,-16,16,5,p.hair);
+ if(p.style===1){r(-9,-19,18,6,p.hair);r(6,-15,4,8,p.hair)}
+ if(p.style===2){r(-9,-17,18,7,p.hair);r(-9,-13,4,11,p.hair)}
+ if(p.style===3){r(-8,-18,16,6,p.hair);r(-8,-12,4,5,p.hair)}
+ if(face!=='up'){r(-4,-8,2,2,'#342f2e');r(3,-8,2,2,'#342f2e')}
+ ctx.restore();
+}
+function grassPattern(){for(let y=0;y<24;y++)for(let x=0;x<39;x++){let v=(x*17+y*31)%7;fillTile(x,y,v===0?'#a7c997':v===3?'#b6d6a2':'#afd29e');if((x*7+y*13)%17===0){colorRect(x*T+9,y*T+13,3,8,'#82b784');colorRect(x*T+16,y*T+6,3,7,'#80b483')}}}
+function tree(x,y){colorRect(x*T+9,y*T+18,14,19,'#6e6651');colorRect(x*T+3,y*T-10,26,29,'#498b67');colorRect(x*T-3,y*T+1,38,16,'#539e6f');colorRect(x*T+5,y*T-14,22,11,'#6bab79');colorRect(x*T+5,y*T+8,9,4,'#9ecb95')}
+function drawBuilding(b){let X=b.x*T,Y=b.y*T,c=b.c;
+ colorRect(X-3,Y-5,b.w*T+6,b.h*T+10,'#4e645e');colorRect(X,Y,b.w*T,b.h*T,c);
+ colorRect(X-7,Y-17,b.w*T+14,20,'#344e53');colorRect(X-7,Y-14,b.w*T+14,8,'#537277');
+ for(let yy=Y+26;yy<Y+b.h*T-30;yy+=32)for(let xx=X+14;xx<X+b.w*T-15;xx+=75){colorRect(xx,yy,36,29,'#e6f1e6');colorRect(xx+4,yy+4,28,21,'#80b6a9');colorRect(xx+17,yy+4,3,21,'#ecf2e3')}
+ const dX=b.doorX*T+2,dY=(b.y+b.h-1)*T;
+ colorRect(dX,dY-21,29,55,'#304d46');colorRect(dX+4,dY-18,21,46,'#7eac9c');colorRect(dX+12,dY+4,3,3,'#dfcf87');
+ colorRect(X+18,Y-5,b.w*T-36,26,'#f1e5cd');textDraw(b.name,X+(b.w*T)/2,Y+14,Math.min(13,Math.max(10,120/b.name.length)), '#24453e');
+}
+function pavement(){for(let y=8;y<=20;y++)for(let x=1;x<38;x++)fillTile(x,y,(x+y)%2?'#d5d9c7':'#e0e2d2');
+ for(let y=21;y<=22;y++)for(let x=0;x<39;x++)fillTile(x,y,(x+y)%2?'#858c83':'#79887c');
+ for(let x=1;x<38;x++){colorRect(x*T,21*T,31,3,'#e1e4d6')}
+ for(let x=6;x<36;x+=6){colorRect(x*T+12,21*T+34,20,5,'#d5d6c6')}
+}
+function bush(x,y){colorRect(x*T+4,y*T+9,26,17,'#3e8e66');colorRect(x*T+1,y*T+14,30,11,'#6aaa70');colorRect(x*T+5,y*T+5,16,12,'#65a76c')}
+function townScene(){grassPattern();pavement();
+ // Plaza, carefully placed away from doors
+ for(let y=12;y<19;y++)for(let x=12;x<=29;x++)fillTile(x,y,(x+y)%2?'#ddd9bd':'#e9e4cb');
+ for(let x=11;x<=30;x++){if(x%3===0){bush(x,11);bush(x,19)}}
+ // fountain
+ colorRect(20*T-16,14*T-12,95,83,'#667f7d');colorRect(20*T-11,14*T-7,85,73,'#dcece3');colorRect(20*T-3,14*T+1,69,57,'#75b9c5');colorRect(20*T+19,14*T+17,25,21,'#a9d5da');colorRect(20*T+29,14*T+3,5,25,'#d1e9e9');
+ for(const b of buildings)drawBuilding(b);
+ tree(2,3);tree(36,3);tree(3,15);tree(34,15);tree(4,19);tree(35,19);
+ colorRect(2*T,11*T,26,9,'#c5a47f');colorRect(2*T+4,11*T+9,4,6,'#795f4a');colorRect(2*T+19,11*T+9,4,6,'#795f4a');
+ colorRect(32*T,11*T,26,9,'#c5a47f');colorRect(32*T+4,11*T+9,4,6,'#795f4a');colorRect(32*T+19,11*T+9,4,6,'#795f4a');
+ for(const s of shoppers)drawAvatar(s.x*T+16,s.y*T+18,s.c,.9);
+ drawAvatar(player.x*T+16,player.y*T+19,profiles[character],1.05,player.dir);
+ const focus=findFocus();if(focus?.kind==='building'){let b=focus.item;colorRect(b.doorX*T-3,b.doorY*T+18,40,4,'#f1d47a')}
+}
+function storeScene(){const ww=24,hh=17;
+ for(let y=0;y<hh;y++)for(let x=0;x<ww;x++){fillTile(x,y,(x+y)%2?'#dfd5bd':'#e6dcc7');colorRect(x*T+30,y*T,2,T,'#ccbfa9')}
+ colorRect(0,0,ww*T,3*T,'#b9cfbf');colorRect(0,2*T,ww*T,9,'#71958b');colorRect(0,0,ww*T,20,'#496960');
+ for(let x=0;x<ww;x+=3){colorRect(x*T+12,29,26,35,'#eaf5e9');colorRect(x*T+15,32,20,29,'#a4c9bc')}
+ colorRect(0,0,2*T,hh*T,'#77978b');colorRect((ww-2)*T,0,2*T,hh*T,'#77978b');
+ colorRect(0,(hh-2)*T,ww*T,2*T,'#769387');colorRect(11*T,15*T,2*T,2*T,'#c7d8c5');colorRect(11*T+3,15*T+10,2*T-6,2*T-17,'#93c1b9');
+ textDraw('↡ EXIT ↡',12*T,15*T+17,11,'#245b51');
+ // counter and NPC
+ colorRect(20*T,3*T+6,3*T,27,'#775d50');colorRect(20*T+3,3*T+2,3*T-6,14,'#ba9273');textDraw('HELP DESK',21.5*T,3*T-8,11,'#2f6357');
+ for(const r of rackDefs){let xx=r.x*T,yy=r.y*T;
+ colorRect(xx-3,yy+5,r.w*T+6,47,'#9b8672');colorRect(xx,yy+4,r.w*T,11,'#cbb59a');colorRect(xx+5,yy+15,r.w*T-10,29,'#c6b7a1');
+ for(let i=0;i<4;i++){let px=xx+9+i*20;colorRect(px,yy+20,15,19,r.c);colorRect(px+4,yy+17,6,5,'#d3bda5');colorRect(px+1,yy+26,13,3,r.c==='#fbfaf4'?'#d6d5d0':'#ffffff25')}
+ colorRect(xx-5,yy-18,r.w*T+10,19,'#f8f5eb');textDraw(r.label,xx+(r.w*T)/2,yy-4,10,'#365950');
+ }
+ for(const n of npcs)drawAvatar(n.x*T+16,n.y*T+19,n.c,1);
+ for(const s of shoppers.slice(0,2))drawAvatar((s.x-8)*T+16,(s.y-7)*T+19,s.c,.9);
+ drawAvatar(player.x*T+16,player.y*T+19,profiles[character],1.05,player.dir);
+ const focus=findFocus();if(focus?.kind==='rack'){let r=focus.item;ctx.strokeStyle='#f3c465';ctx.lineWidth=4;ctx.strokeRect(r.x*T-4,r.y*T+2,r.w*T+8,r.h*T-10)}
+ if(focus?.kind==='npc'){colorRect(21*T+10,4*T+9,14,4,'#eac264')}
+}
+function camera(){let mapw=mode==='town'?39*T:24*T,maph=mode==='town'?24*T:17*T;
+ return {x:Math.max(0,Math.min(mapw-W,player.x*T+16-W/2)),y:Math.max(0,Math.min(maph-H,player.y*T+16-H*(mode==='town'?.72:.56)))}}
+function draw(){ctx.save();const c=camera();ctx.translate(-Math.round(c.x),-Math.round(c.y));if(mode==='town')townScene();else storeScene();ctx.restore();requestAnimationFrame(draw)}
+function townSolid(x,y){if(x<1||x>=38||y<1||y>=23)return true;
+ for(const b of buildings)if(x>=b.x&&x<b.x+b.w&&y>=b.y&&y<b.y+b.h)return true;
+ if(x>=19&&x<=22&&y>=14&&y<=16)return true;
+ return false}
+function storeSolid(x,y){if(x<2||x>21||y<3||y>14)return true;
+ for(const r of rackDefs)if(x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h)return true;
+ if(x>=20&&x<=21&&y===3)return true;
+ return false}
+function step(dir){if(!started||activePanel!=='none')return;let now=Date.now();if(now-lastMove<95)return;lastMove=now;let delta={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]}[dir];if(!delta)return;
+ player.dir=dir;let x=player.x+delta[0],y=player.y+delta[1];if(!(mode==='town'?townSolid(x,y):storeSolid(x,y))){player.x=x;player.y=y}refreshHud()}
+function closestToRect(r){let dx=Math.max(r.x-player.x,0,player.x-(r.x+r.w-1)),dy=Math.max(r.y-player.y,0,player.y-(r.y+r.h-1));return dx+dy}
+function findFocus(){if(!started)return null;
+ if(mode==='town'){
+ let nearby=buildings.map(b=>({kind:'building',item:b,d:Math.abs(player.x-b.doorX)+Math.abs(player.y-b.doorY)})).filter(z=>z.d<=2).sort((a,b)=>a.d-b.d);return nearby[0]||null;
+ }
+ let candidates=rackDefs.map(r=>({kind:'rack',item:r,d:closestToRect(r)})).filter(v=>v.d<=2);
+ const npc=npcs[0];let nd=Math.abs(player.x-npc.x)+Math.abs(player.y-npc.y);if(nd<=2)candidates.push({kind:'npc',item:npc,d:nd});
+ let ed=Math.abs(player.x-12)+Math.abs(player.y-15);if(ed<=2)candidates.push({kind:'exit',d:ed});
+ candidates.sort((a,b)=>a.d-b.d);return candidates[0]||null;
+}
+function refreshHud(){let where=mode==='town'?'TOWN SQUARE':'THE THREADS SHOP';hud.innerHTML=`${where}<small>${mode==='town'?'Explore the shopping district':'Browse a rack, or choose Browse all'}</small>`;
+ const f=findFocus();let msg=mode==='town'?'Walk to THE THREADS SHOP to enter':'Walk to a rack to inspect its items';
+ if(f){if(f.kind==='building')msg=f.item.id==='boutique'?'Press E to enter THE THREADS SHOP':`Press E to check ${f.item.name}`;
+ else if(f.kind==='rack')msg=`Press E to browse ${f.item.label}`;
+ else if(f.kind==='npc')msg='Press E to talk to the store assistant';else if(f.kind==='exit')msg='Press E to leave the store';}
+ hint.innerHTML=activePanel==='none'?`<kbd>E</kbd> ${msg}`:'Shopping experience paused';
+}
+function enterStore(){mode='store';player={x:12,y:13,dir:'up'};refreshHud();toast('Welcome to The Threads Shop!');}
+function leaveStore(){mode='town';player={x:8,y:9,dir:'down'};refreshHud()}
+function interact(){if(activePanel!=='none'||!started)return;const f=findFocus();if(!f){toast('Move a little closer to a rack or doorway.');return}
+ if(f.kind==='building'){if(f.item.id==='boutique')enterStore();else toast('This storefront is coming soon!')}
+ if(f.kind==='rack')openProduct(f.item.id,0,false);
+ if(f.kind==='npc')showNpc();if(f.kind==='exit')leaveStore();
+}
+function toast(t){toastEl.textContent=t;toastEl.classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toastEl.classList.add('hidden'),2800)}
+function openPanel(type,html,wide=false){activePanel=type;document.getElementById('gameWrap').classList.add('modal-open');overlay.classList.remove('hidden');overlay.innerHTML=`<div class="card ${wide?'big-card':'small-card'}" role="dialog" aria-modal="true" aria-label="${type}">${html}</div>`;refreshHud()}
+function closePanel(){if(activePanel==='welcome'||activePanel==='character')return;activePanel='none';document.getElementById('gameWrap').classList.remove('modal-open');overlay.classList.add('hidden');overlay.innerHTML='';refreshHud();canvas.focus?.()}
+function openWelcome(){started=false;activePanel='welcome';document.getElementById('browseBtn').disabled=true;document.getElementById('cartBtn').disabled=true;document.getElementById('menuBtn').disabled=true;document.getElementById('interactBtn').disabled=true;
+ openPanel('welcome',`<div class="welcome"><div><div class="eyebrow">Welcome to Teenseys'</div><h1>Step inside<br>the shops.</h1><p>A little pixel-art town where exploring a store feels like playing a game. Browse the racks, inspect products, and enjoy the atmosphere.</p><div class="welcome-actions"><button class="btn" data-action="guest">Enter as guest →</button><button class="btn light" data-action="signin">Sign in</button><button class="btn light" data-action="signup">Create account</button></div><p class="welcome-info">Guests can explore and choose a character. Saved accounts, real stores and checkout will be added when the backend is connected.</p></div><div class="welcome-art"><canvas width="320" height="260" id="welcomeCanvas" aria-label="Preview of the pixel-art town"></canvas><div class="art-label">✦ Explore • Discover • Shop</div></div></div>`,true);
+ drawWelcomeArt()}
+function drawWelcomeArt(){let c=document.getElementById('welcomeCanvas');if(!c)return;let g=c.getContext('2d');g.imageSmoothingEnabled=false;
+ for(let y=0;y<260;y+=16)for(let x=0;x<320;x+=16){g.fillStyle=(x+y)%32?'#a6cca1':'#acd8a7';g.fillRect(x,y,16,16)}
+ g.fillStyle='#dddac4';g.fillRect(0,126,320,88);g.fillStyle='#415e5b';g.fillRect(30,54,105,76);g.fillRect(178,38,113,92);g.fillStyle='#d9a574';g.fillRect(33,62,99,65);g.fillStyle='#aabfc0';g.fillRect(181,47,107,80);
+ g.fillStyle='#f7e9ce';g.fillRect(42,56,83,25);g.fillRect(187,45,95,24);g.fillStyle='#1b4947';g.font='900 13px sans-serif';g.textAlign='center';g.fillText('THREADS',83,73);g.fillText('SOLE HOUSE',235,62);
+ g.fillStyle='#7eada2';for(let i=0;i<3;i++){g.fillRect(42+i*27,90,19,26);g.fillRect(193+i*28,80,19,26)}
+ g.fillStyle='#3b7553';g.fillRect(13,115,16,35);g.fillRect(292,118,16,35);g.fillStyle='#569b6a';g.fillRect(0,97,38,31);g.fillRect(281,100,39,31);
+ // small figure
+ g.fillStyle='#24211d';g.fillRect(151,134,18,12);g.fillStyle='#a26c4c';g.fillRect(154,145,12,12);g.fillStyle='#e5f2de';g.fillRect(151,157,18,17);g.fillStyle='#303a45';g.fillRect(153,174,6,13);g.fillRect(162,174,6,13)
+}
+function chooseCharacter(){selection=character;renderCharacters()}
+function renderCharacters(){let cards=profiles.map((_,i)=>`<button class="avatar-choice ${i===selection?'selected':''}" data-character="${i}" aria-pressed="${i===selection}"><canvas width="64" height="64" data-avatar="${i}" aria-hidden="true"></canvas>Look ${i+1}</button>`).join('');
+ openPanel('character',`<div class="centertxt"><div class="eyebrow">Make it yours</div><h2>Choose a character</h2><p>Pick a basic character to walk around town. All visitors look like simple pixel-art shoppers.</p></div><div class="avatar-grid">${cards}</div><button class="btn full" data-action="start">Enter town →</button><div class="muted centertxt" style="margin-top:12px">Guest character selections last for this visit. Account saving comes next.</div>`);
+ document.querySelectorAll('[data-avatar]').forEach(c=>{let i=+c.dataset.avatar;let a=c.getContext('2d');a.imageSmoothingEnabled=false;a.fillStyle='#e7efe4';a.fillRect(0,0,64,64);
+ let p=profiles[i],r=(x,y,w,h,color)=>{a.fillStyle=color;a.fillRect(x,y,w,h)};
+ r(23,44,8,8,p.pants);r(33,44,8,8,p.pants);r(23,30,18,17,p.shirt);r(20,34,4,10,p.skin);r(41,34,4,10,p.skin);r(25,14,14,19,p.skin);r(24,12,16,7,p.hair);if(p.style===1)r(38,17,4,12,p.hair);if(p.style===2)r(21,18,5,15,p.hair);r(29,24,2,2,'#352a24');r(36,24,2,2,'#352a24')
+ })}
+function startGame(){character=selection;started=true;mode='town';player={x:8,y:11,dir:'up'};activePanel='none';document.getElementById('gameWrap').classList.remove('modal-open');overlay.classList.add('hidden');overlay.innerHTML='';
+ for(const id of ['browseBtn','cartBtn','menuBtn','interactBtn'])document.getElementById(id).disabled=false;
+ refreshHud();toast('Head toward the THREADS SHOP. Use E to enter.');}
+function authUnavailable(isSignup){openPanel('auth',`<button class="close close-corner" data-action="close" aria-label="Close">×</button><div class="eyebrow">Account features · next phase</div><h2>${isSignup?'Create an account':'Sign in'}</h2><p>Real accounts will be powered by Supabase so you can return with your saved character, location, cart and favorites.</p><div class="demo-note">This prototype does not collect emails or passwords. Registration and saving are not connected yet.</div><div style="height:18px"></div><button class="btn full" data-action="guest">Try the guest experience →</button>`)}
+function showMenu(){openPanel('menu',`<button class="close close-corner" data-action="close" aria-label="Close">×</button><div class="eyebrow">Your visit</div><h2>Menu</h2><p>Explore freely. Guest mode does not save this visit after you close the page.</p><div class="dialogue-options"><button class="btn light" data-action="characters">Change character</button><button class="btn light" data-action="catalog">Browse all merchandise</button><button class="btn light" data-action="cart">View shopping bag</button><button class="btn light" data-action="restart">Return to welcome screen</button></div>`)}
+function showNpc(){openPanel('npc',`<button class="close close-corner" data-action="close" aria-label="Close">×</button><div class="eyebrow">Store assistant · NPC</div><h2>Welcome to Threads!</h2><p>Hey! Happy you're here. Looking for something specific?</p><div class="dialogue-options"><button class="btn light" data-npc="white">Show me white shirts</button><button class="btn light" data-npc="black">Show me black shirts</button><button class="btn light" data-action="catalog">Browse everything</button><button class="btn secondary" data-action="close">Just looking, thanks!</button></div>`)}
+function filteredProducts(){return filter==='all'?products:products.filter(p=>p.rack===filter)}
+function shirtSVG(p){const color=p.color,stroke=p.color==='#f7f7f3'||p.color==='#fffdfa'||p.color==='#f2f1ec'||p.color==='#f8f7f0'?'#babdb9':'#1e2a2a';
+ let shape='';
+ if(p.type==='pants')shape=`<path d="M51 19 H149 L143 160 L105 160 L101 83 L97 160 L57 160 Z" fill="${color}" stroke="${stroke}" stroke-width="2"/><path d="M101 20 V84 M55 40 H145" fill="none" stroke="${stroke}" opacity=".35"/>`;
+ else if(p.type==='bag')shape=`<rect x="43" y="55" width="114" height="93" rx="8" fill="${color}" stroke="${stroke}" stroke-width="3"/><path d="M70 58 Q70 3 100 3 Q130 3 130 58" fill="none" stroke="${stroke}" stroke-width="11"/>`;
+ else if(p.type==='cap')shape=`<path d="M35 98 Q29 41 100 38 Q172 41 164 98 L180 106 Q150 126 95 119 Q39 116 20 106 Z" fill="${color}" stroke="${stroke}" stroke-width="3"/><path d="M35 97 Q100 109 164 97" fill="none" stroke="${stroke}" stroke-width="3"/>`;
+ else {let hoodie=p.type==='hoodie',long=p.type==='long';shape=`<path d="M67 22 L51 30 L${hoodie?8:long?3:21} 68 L${hoodie?24:long?26:46} ${hoodie?112:long?145:88} L61 ${hoodie?98:long?147:92} L61 166 L139 166 L139 ${hoodie?98:long?147:92} L154 ${hoodie?112:long?145:88} L${hoodie?192:long?197:179} 68 L149 30 L133 22 Q100 39 67 22 Z" fill="${color}" stroke="${stroke}" stroke-width="2"/>`;
+ if(hoodie)shape+=`<path d="M70 21 Q73 1 100 2 Q127 1 131 21 Q119 58 100 56 Q81 58 70 21 Z" fill="${color}" stroke="${stroke}" stroke-width="2"/><rect x="77" y="105" width="46" height="23" rx="5" fill="none" stroke="${stroke}" opacity=".3"/>`;
+ else shape+=`<path d="M77 21 Q100 42 123 21" fill="none" stroke="${stroke}" stroke-width="3" opacity=".5"/>`;
+ if(p.print)shape+=`<rect x="72" y="75" width="56" height="29" fill="#ffffff22"/><text x="100" y="93" text-anchor="middle" font-size="11" font-weight="900" fill="${p.rack==='white'?'#1d4d42':'#eee8df'}">${p.print}</text>`;
+ }
+ return `<svg role="img" aria-label="Illustration of ${p.name}" viewBox="0 0 200 185" xmlns="http://www.w3.org/2000/svg"><ellipse cx="100" cy="174" rx="57" ry="6" fill="#456056" opacity=".13"/>${shape}</svg>`;
+}
+function openCatalog(){filter='all';renderCatalog()}
+function renderCatalog(){const filt=[['all','All'],['white','White shirts'],['black','Black shirts'],['brown','Brown shirts'],['hoodies','Hoodies'],['pants','Pants'],['accessories','Accessories']];
+ let tiles=filteredProducts().map(p=>`<button class="product-tile" data-pid="${p.id}" aria-label="View ${p.name}"><div class="product-thumb">${shirtSVG(p)}</div><div class="product-caption">${p.name}<span>$${p.price.toFixed(2)}</span></div></button>`).join('');
+ openPanel('catalog',`<button class="close close-corner" data-action="close" aria-label="Close catalog">×</button><div class="catalog"><div class="catalog-head"><div><div class="eyebrow">The Threads Shop</div><h2>Browse all products</h2><p>Shop inside the game. Your store stays right behind this window.</p></div></div><div class="filters">${filt.map(([k,v])=>`<button class="filter ${filter===k?'active':''}" data-filter="${k}">${v}</button>`).join('')}</div><div class="product-grid">${tiles}</div><div class="muted" style="margin-top:13px">Sample merchandise · Not connected to a real store</div></div>`,true)}
+function openProduct(rack,index=0,from=false){rackId=rack;const list=products.filter(p=>p.rack===rack);productIndex=Math.min(index,list.length-1);selectedSize='M';fromCatalog=from;renderProduct()}
+function renderProduct(){const arr=products.filter(p=>p.rack===rackId),p=arr[productIndex];if(!p)return;
+ let names={white:'White shirts',black:'Black shirts',brown:'Brown shirts',hoodies:'Hoodies',pants:'Pants',accessories:'Accessories'};
+ let sizes=['S','M','L','XL'];
+ openPanel('product',`<button class="close close-corner" data-action="productclose" aria-label="Close item card">×</button><div class="product-layout"><div class="viewer"><div class="viewer-caption">${names[rackId]} · Product preview</div><div class="shirt-display" id="shirtDisplay" title="Swipe sideways to browse">${shirtSVG(p)}</div><div class="viewer-footer"><span>Swipe or use arrows to browse</span><button data-action="flip" type="button">↻ Flip view</button></div></div><div class="details"><div class="eyebrow">The Threads Shop</div><h2>${p.name}</h2><div class="price">$${p.price.toFixed(2)}</div><p>${p.desc}</p><div class="divider"></div><div style="font-size:12px;font-weight:900">Size <span class="muted">${p.type==='bag'||p.type==='cap'?'· one size':''}</span></div><div class="sizes">${p.type==='bag'||p.type==='cap'?'<button class="size active" disabled>ONE SIZE</button>':sizes.map(s=>`<button class="size ${s===selectedSize?'active':''}" data-size="${s}">${s}</button>`).join('')}</div><div class="demo-note" style="margin-top:15px">Illustrated sample preview. True rotating 3D product files and live inventory come in the Shopify phase.</div><div class="product-controls"><button class="circle" data-nav="-1" aria-label="Previous product" type="button">‹</button><span class="step">ITEM ${productIndex+1} / ${arr.length}</span><button class="circle" data-nav="1" aria-label="Next product" type="button">›</button></div><button class="btn full" style="margin-top:14px" data-action="add" type="button">Add to demo bag</button><div class="status" id="itemStatus" role="status"></div>${fromCatalog?'<button class="btn secondary" data-action="catalog" type="button" style="margin-top:8px">← Back to Browse All</button>':''}</div></div>`,true);
+ const display=document.getElementById('shirtDisplay');let sx=0;display.addEventListener('touchstart',e=>{sx=e.changedTouches[0].screenX},{passive:true});display.addEventListener('touchend',e=>{const dx=e.changedTouches[0].screenX-sx;if(Math.abs(dx)>45)navigateProduct(dx<0?1:-1)},{passive:true});
+}
+function navigateProduct(n){const list=products.filter(p=>p.rack===rackId);productIndex=(productIndex+n+list.length)%list.length;selectedSize='M';renderProduct()}
+function showCart(){let total=bag.reduce((s,v)=>s+v.price,0);
+ let rows=bag.length?bag.map((item,i)=>`<div class="cartrow"><div style="width:46px;min-width:46px">${shirtSVG(item)}</div><div><strong>${item.name}</strong><span class="muted">${item.size} · $${item.price.toFixed(2)}</span></div><button class="delete" data-remove="${i}" type="button" aria-label="Remove ${item.name}">Remove</button></div>`).join(''):'<p>Your bag is empty. Try browsing a rack or Browse All.</p>';
+ openPanel('cart',`<button class="close close-corner" data-action="close" aria-label="Close bag">×</button><div class="eyebrow">Sample checkout</div><h2>Your shopping bag</h2><div class="cartitems">${rows}</div><div class="carttotal"><span>Subtotal</span><span>$${total.toFixed(2)}</span></div><div class="demo-note">This is a demonstration bag. No payment or checkout is available until a real Shopify store is connected.</div><button class="btn secondary full" style="margin-top:16px" data-action="close">Keep exploring</button>`)}
+function addToBag(){const p=products.find(q=>q.rack===rackId&&q.id===products.filter(q=>q.rack===rackId)[productIndex].id);bag.push({...p,size:p.type==='bag'||p.type==='cap'?'One size':selectedSize});document.getElementById('cartCount').textContent=bag.length;
+ const status=document.getElementById('itemStatus');if(status)status.textContent=`✓ Added ${p.name} to your demo bag`}
+function onCanvasClick(e){if(!started||activePanel!=='none')return;let b=canvas.getBoundingClientRect(),scX=W/b.width,scY=H/b.height,c=camera();let x=Math.floor(((e.clientX-b.left)*scX+c.x)/T),y=Math.floor(((e.clientY-b.top)*scY+c.y)/T);
+ if(mode==='store'){let r=rackDefs.find(r=>x>=r.x&&x<r.x+r.w&&y>=r.y-1&&y<r.y+r.h);if(r){if(closestToRect(r)<=2)openProduct(r.id,0,false);else toast('Walk closer to that rack, then click again.');return}
+ if(Math.abs(x-21)+Math.abs(y-5)<=2&&Math.abs(player.x-21)+Math.abs(player.y-5)<=2){showNpc();return}}
+ else{let bt=buildings.find(b=>x>=b.x&&x<b.x+b.w&&y>=b.y&&y<=b.y+b.h+1);if(bt){if(Math.abs(player.x-bt.doorX)+Math.abs(player.y-bt.doorY)<=2)bt.id==='boutique'?enterStore():toast('Coming soon!');else toast('Walk up to the storefront entrance.');return}}
+}
+const keyMap={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',a:'left',s:'down',d:'right',W:'up',A:'left',S:'down',D:'right'};
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape'){if(activePanel==='product'&&fromCatalog)renderCatalog();else if(activePanel!=='welcome'&&activePanel!=='character')closePanel();return}
+ if(activePanel==='product'&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){e.preventDefault();navigateProduct(e.key==='ArrowRight'?1:-1);return}
+ if(activePanel!=='none')return;
+ if(keyMap[e.key]){e.preventDefault();step(keyMap[e.key])}else if(e.key.toLowerCase()==='e'||e.key==='Enter'){e.preventDefault();interact()}
+});
+document.querySelectorAll('[data-dir]').forEach(b=>b.addEventListener('click',()=>step(b.dataset.dir)));
+canvas.addEventListener('click',onCanvasClick);
+document.getElementById('interactBtn').addEventListener('click',interact);
+document.getElementById('browseBtn').addEventListener('click',openCatalog);
+document.getElementById('cartBtn').addEventListener('click',showCart);
+document.getElementById('menuBtn').addEventListener('click',showMenu);
+overlay.addEventListener('click',e=>{let b=e.target.closest('button');if(!b)return;
+ if(b.dataset.character!==undefined){selection=+b.dataset.character;renderCharacters();return}
+ if(b.dataset.action){const a=b.dataset.action;
+ if(a==='guest')chooseCharacter();else if(a==='signin')authUnavailable(false);else if(a==='signup')authUnavailable(true);
+ else if(a==='start')startGame();else if(a==='close')closePanel();else if(a==='menu')showMenu();
+ else if(a==='characters')chooseCharacter();else if(a==='restart')openWelcome();else if(a==='catalog')openCatalog();else if(a==='cart')showCart();
+ else if(a==='productclose'){if(fromCatalog)renderCatalog();else closePanel()}
+ else if(a==='flip')document.getElementById('shirtDisplay')?.classList.toggle('back');else if(a==='add')addToBag();return}
+ if(b.dataset.npc){openProduct(b.dataset.npc,0,false);return}
+ if(b.dataset.filter){filter=b.dataset.filter;renderCatalog();return}
+ if(b.dataset.pid){let p=products.find(p=>p.id===+b.dataset.pid);openProduct(p.rack,products.filter(q=>q.rack===p.rack).findIndex(q=>q.id===p.id),true);return}
+ if(b.dataset.nav){navigateProduct(+b.dataset.nav);return}
+ if(b.dataset.size){selectedSize=b.dataset.size;document.querySelectorAll('[data-size]').forEach(x=>x.classList.toggle('active',x.dataset.size===selectedSize));return}
+ if(b.dataset.remove!==undefined){bag.splice(+b.dataset.remove,1);document.getElementById('cartCount').textContent=bag.length;showCart()}
+});
+// Decorative demo shoppers move only within safe, predetermined paths. They are not real online users.
+setInterval(()=>{if(!started)return;for(let i=0;i<shoppers.length;i++){const s=shoppers[i];s.step++;s.x+=(s.step%3===0?.25:-.12);if(s.x>29)s.x=23;if(s.x<13)s.x=18}},900);
+openWelcome();requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
