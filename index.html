@@ -89,7 +89,7 @@
 <div class="page">
   <div class="shell">
     <div class="topbar">
-      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 0.1</span></div><div class="sub">A virtual shopping town · working concept</div></div>
+      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 0.3</span></div><div class="sub">Explore the town · shop the stores</div></div>
       <div class="top-actions">
         <button id="browseBtn" class="pill" type="button" disabled>Browse all</button>
         <button id="cartBtn" class="pill" type="button" disabled>Bag <span id="cartCount">0</span></button>
@@ -247,25 +247,92 @@ function townScene(){
  drawAvatar(player.x*T+16,player.y*T+19,profiles[character],1.05,player.dir);
  const focus=findFocus();if(focus?.kind==='building'){let b=focus.item;colorRect(b.doorX*T-3,b.doorY*T+18,40,4,'#f1d47a')}
 }
-function storeScene(){const ww=24,hh=17;
- for(let y=0;y<hh;y++)for(let x=0;x<ww;x++){fillTile(x,y,(x+y)%2?'#dfd5bd':'#e6dcc7');colorRect(x*T+30,y*T,2,T,'#ccbfa9')}
- colorRect(0,0,ww*T,3*T,'#b9cfbf');colorRect(0,2*T,ww*T,9,'#71958b');colorRect(0,0,ww*T,20,'#496960');
- for(let x=0;x<ww;x+=3){colorRect(x*T+12,29,26,35,'#eaf5e9');colorRect(x*T+15,32,20,29,'#a4c9bc')}
- colorRect(0,0,2*T,hh*T,'#77978b');colorRect((ww-2)*T,0,2*T,hh*T,'#77978b');
- colorRect(0,(hh-2)*T,ww*T,2*T,'#769387');colorRect(11*T,15*T,2*T,2*T,'#c7d8c5');colorRect(11*T+3,15*T+10,2*T-6,2*T-17,'#93c1b9');
- textDraw('↡ EXIT ↡',12*T,15*T+17,11,'#245b51');
- // counter and NPC
- colorRect(20*T,3*T+6,3*T,27,'#775d50');colorRect(20*T+3,3*T+2,3*T-6,14,'#ba9273');textDraw('HELP DESK',21.5*T,3*T-8,11,'#2f6357');
- for(const r of rackDefs){let xx=r.x*T,yy=r.y*T;
- colorRect(xx-3,yy+5,r.w*T+6,47,'#9b8672');colorRect(xx,yy+4,r.w*T,11,'#cbb59a');colorRect(xx+5,yy+15,r.w*T-10,29,'#c6b7a1');
- for(let i=0;i<4;i++){let px=xx+9+i*20;colorRect(px,yy+20,15,19,r.c);colorRect(px+4,yy+17,6,5,'#d3bda5');colorRect(px+1,yy+26,13,3,r.c==='#fbfaf4'?'#d6d5d0':'#ffffff25')}
- colorRect(xx-5,yy-18,r.w*T+10,19,'#f8f5eb');textDraw(r.label,xx+(r.w*T)/2,yy-4,10,'#365950');
+function storeScene(){
+ const ww=24,hh=17;
+ const r=colorRect;
+ // Warm oak planks and subtle shadows, readable against 2D characters.
+ for(let y=0;y<hh;y++)for(let x=0;x<ww;x++){
+   fillTile(x,y,(x+y)%2?'#e7d7bd':'#f1e4cf');
+   r(x*T,y*T+T-2,T,2,'#cdbb9f');
+   if((x+y)%2===0)r(x*T+T-2,y*T+2,2,T-5,'#d6c3a8');
  }
+ // Back wall with trim, posters and long display windows.
+ r(0,0,ww*T,3*T,'#bdcfc3');
+ r(0,0,ww*T,15,'#344e4b');
+ r(0,2*T+17,ww*T,12,'#63877a');
+ r(0,3*T-4,ww*T,5,'#f5e7c9');
+ for(const x of [2,6,10,14,18]){
+   const xx=x*T;
+   r(xx,21,2*T+15,56,'#496b65');
+   r(xx+5,25,2*T+5,47,'#a7cac0');
+   r(xx+9,29,2*T-3,39,'#d3e3d4');
+   r(xx+9,62,2*T-3,4,'#7b9c87');
+ }
+ // Store brand header, with a restrained fashion-boutique feel.
+ r(9*T,9,6*T,35,'#254746');
+ r(9*T+5,13,6*T-10,27,'#f3e8d2');
+ textDraw("THE THREADS SHOP",12*T,31,15,'#294f4b');
+ // Side walls occupy the original blocked edge tiles.
+ r(0,0,2*T,hh*T,'#789b8b');
+ r((ww-2)*T,0,2*T,hh*T,'#789b8b');
+ for(const x of [0,(ww-2)*T]){
+   r(x+8,3*T,3,11*T,'#b9d0bc');
+   for(let y=4;y<14;y+=3){r(x+15,y*T,32,4,'#5f8076');r(x+19,y*T-16,24,16,'#d1d2bb')}
+ }
+ // Checkout counter is anchored to the existing help desk (collision preserved).
+ r(20*T,3*T+3,3*T,42,'#584a43');
+ r(20*T+2,3*T+3,3*T-4,12,'#c9a17e');
+ r(20*T+8,3*T+14,3*T-16,23,'#90705a');
+ r(20*T+25,3*T-22,46,18,'#f8f4e7');
+ textDraw('HELP',21.5*T,3*T-9,10,'#40645b');
+ r(21*T+5,3*T+17,19,10,'#354e50');
+ r(21*T+8,3*T+13,14,6,'#dce2d5');
+ // Color-coded merchandise racks with hanging garments and distinct labels.
+ for(const rack of rackDefs){
+   const xx=rack.x*T, yy=rack.y*T, w=rack.w*T;
+   r(xx-4,yy+8,w+8,46,'#a68b70'); // display shadow
+   r(xx,yy+8,w,40,'#826b57');
+   r(xx+3,yy+12,w-6,30,'#ddc4a5');
+   r(xx+7,yy+18,w-14,5,'#6d716b');
+   for(let i=0;i<4;i++){
+     const px=xx+10+i*20, tint=rack.c;
+     // Individual little hanger + shirt (pixels, not actual 3D).
+     r(px+5,yy+15,5,4,'#f8edd5');
+     r(px+3,yy+19,9,2,'#746c61');
+     r(px,yy+23,15,16,tint);
+     r(px-3,yy+23,5,9,tint);
+     r(px+13,yy+23,5,9,tint);
+     r(px+3,yy+34,9,2,'#00000019');
+   }
+   // Legible signage clearly ties interactions to one rack only.
+   r(xx-6,yy-21,w+12,23,'#f9f5e9');
+   r(xx-6,yy-21,w+12,3,'#7b9687');
+   textDraw(rack.label,xx+w/2,yy-5,10,'#254640');
+   r(xx-5,yy+48,w+10,5,'#675445');
+ }
+ // Small visual guide by the open central aisle; leaves all walking tiles clear.
+ r(8*T+5,8*T+12,8*T-10,2,'#d1bea5');
+ textDraw('BROWSE BY SECTION',12*T,8*T+8,10,'#957e67');
+ // Front wall and clear EXIT tile exactly where the original exit trigger sits.
+ r(0,(hh-2)*T,ww*T,2*T,'#78998a');
+ r(11*T,15*T,2*T,2*T,'#d8e2ca');
+ r(11*T+4,15*T+8,2*T-8,2*T-15,'#a3c6b7');
+ r(11*T+9,15*T+8,2*T-18,3,'#f6e5b9');
+ textDraw('EXIT',12*T,15*T+26,12,'#2b5850');
+ // Decorative mat guides the customer inward; never affects collision.
+ r(11*T,13*T+15,2*T,23,'#bfcec1');
+ r(11*T+5,13*T+19,2*T-10,15,'#7f9d8d');
+ // Characters render above the decorations.
  for(const n of npcs)drawAvatar(n.x*T+16,n.y*T+19,n.c,1);
- for(const s of shoppers.slice(0,2))drawAvatar((s.x-8)*T+16,(s.y-7)*T+19,s.c,.9);
+ for(const sh of shoppers.slice(0,2))drawAvatar((sh.x-8)*T+16,(sh.y-7)*T+19,sh.c,.9);
  drawAvatar(player.x*T+16,player.y*T+19,profiles[character],1.05,player.dir);
- const focus=findFocus();if(focus?.kind==='rack'){let r=focus.item;ctx.strokeStyle='#f3c465';ctx.lineWidth=4;ctx.strokeRect(r.x*T-4,r.y*T+2,r.w*T+8,r.h*T-10)}
- if(focus?.kind==='npc'){colorRect(21*T+10,4*T+9,14,4,'#eac264')}
+ const focus=findFocus();
+ if(focus?.kind==='rack'){
+   const rack=focus.item;
+   ctx.strokeStyle='#f9d56e';ctx.lineWidth=4;
+   ctx.strokeRect(rack.x*T-5,rack.y*T+4,rack.w*T+10,rack.h*T-8);
+ }
+ if(focus?.kind==='npc')r(21*T+10,4*T+9,14,4,'#f4d682');
 }
 function camera(){let mapw=mode==='town'?39*T:24*T,maph=mode==='town'?24*T:17*T;
  return {x:Math.max(0,Math.min(mapw-W,player.x*T+16-W/2)),y:Math.max(0,Math.min(maph-H,player.y*T+16-H*(mode==='town'?.72:.56)))}}
