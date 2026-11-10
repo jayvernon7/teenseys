@@ -1,6 +1,6 @@
 # Teenseys' — interactive shopping town starter
 
-This is a working **front-end prototype** (v0.6), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
+This is a working **front-end prototype** (v0.7), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
 
 ## Run it
 
@@ -65,3 +65,12 @@ This is a working **front-end prototype** (v0.6), built as a single self-contain
 Eight coordinated original SVG pixel-art files are included under `assets/teenseys/`: three distinct storefront facades, a tree, a clothing display rack, a wood floor tile, a stone pavement tile and grass. They are loaded as image assets directly from this repository and rendered with crisp pixel scaling on the existing canvas. The earlier external Kenney atlas is no longer requested by the page.
 
 The walkable maps, collisions, racks, NPC dialogue, product-card browsing, Browse All and guest entry remain unchanged. SVG assets have generated-drawing fallbacks if they cannot load. The visual set is an art foundation, not a finished full world tileset; further work can add matching animations, benches, fountain, custom character sprites and additional interior props. Public storefront browsing remains a demo, with no real Shopify checkout/accounts/multiplayer yet.
+
+
+## Visual update — Version 0.7
+
+Added six original 4-direction pixel-art avatar sprite sheets (`assets/teenseys/avatars/shopper-1.svg` through `shopper-6.svg`). Each sheet includes four walking phases for down, left, right, and up. The browser displays these instead of the original code-drawn character when the sprite loads, and the old drawing remains a fallback.
+
+The town square now uses matching original illustrated sprites for its central fountain, planters, benches, and lamps. The boutique adds a coordinated fashion display. All of these files are stored in this repository in `assets/teenseys/` with no external image dependencies. The visual changes do not modify map collision, store entrances, rack shopping, NPC dialogue, or the no-chat rule.
+
+The artwork remains an evolving pixel-art prototype, not a final commissioned environment. Gameplay and image loading should be checked in the deployed browser after this update.
