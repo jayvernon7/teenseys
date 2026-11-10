@@ -1,6 +1,6 @@
 # Teenseys' — interactive shopping town starter
 
-This is a working **front-end prototype** (v0.5), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
+This is a working **front-end prototype** (v0.6), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
 
 ## Run it
 
@@ -58,3 +58,10 @@ This is a working **front-end prototype** (v0.5), built as a single self-contain
 - If the atlas cannot load, the existing drawn backgrounds and decorations remain playable as fallbacks.
 - This is a first asset integration pass, **not** a complete visual overhaul. A coherent replacement of all buildings, interiors, paths, sprites and maps will require selecting a more complete commercial-use tileset or creating commissioned original art.
 - The game currently uses no player-to-player messaging or interaction, and players remain locally simulated.
+
+
+## Teenseys' original art pack — Version 0.6
+
+Eight coordinated original SVG pixel-art files are included under `assets/teenseys/`: three distinct storefront facades, a tree, a clothing display rack, a wood floor tile, a stone pavement tile and grass. They are loaded as image assets directly from this repository and rendered with crisp pixel scaling on the existing canvas. The earlier external Kenney atlas is no longer requested by the page.
+
+The walkable maps, collisions, racks, NPC dialogue, product-card browsing, Browse All and guest entry remain unchanged. SVG assets have generated-drawing fallbacks if they cannot load. The visual set is an art foundation, not a finished full world tileset; further work can add matching animations, benches, fountain, custom character sprites and additional interior props. Public storefront browsing remains a demo, with no real Shopify checkout/accounts/multiplayer yet.
