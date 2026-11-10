@@ -89,7 +89,7 @@
 <div class="page">
   <div class="shell">
     <div class="topbar">
-      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 0.9</span></div><div class="sub">Three-quarter view · now with working shopping</div></div>
+      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 1.0</span></div><div class="sub">Michigan downtown shopping district</div></div>
       <div class="top-actions">
         <button id="browseBtn" class="pill" type="button" disabled>Browse all</button>
         <button id="cartBtn" class="pill" type="button" disabled>Bag <span id="cartCount">0</span></button>
@@ -423,9 +423,9 @@ function bush(x,y){garden(x*T+3,y*T+5,28)}
  // 2.5D three-quarter world visually approved in the separate style preview.
  // These rendering methods are namespaced so boutique mechanics stay intact.
  const pv_shops=[
- {name:"THE THREADS SHOP",x:100,w:250,y:149,base:336,door:228,wall:"#ce998a",side:"#a16b67",roof:"#4e6d70",roofLight:"#789893",trim:"#284f56",awn:"#6eaa9b",glass:"#9ecbc2",sign:"#fff2d7"},
- {name:"SOLE HOUSE",x:398,w:229,y:136,base:336,door:498,wall:"#adc9cf",side:"#739da6",roof:"#47697b",roofLight:"#7eabb4",trim:"#35566b",awn:"#ddad7e",glass:"#a1d2d2",sign:"#fff2df"},
- {name:"CORNER CAFÉ",x:673,w:182,y:166,base:336,door:751,wall:"#d3a89d",side:"#a97977",roof:"#77636d",roofLight:"#a88a8b",trim:"#604e5c",awn:"#dc9a8d",glass:"#a3cdbd",sign:"#ffeddd"}
+ {name:"THE THREADS SHOP",x:100,w:250,y:149,base:336,door:228,wall:"#aa5f4f",side:"#7d443d",roof:"#525052",roofLight:"#756d67",trim:"#31505a",awn:"#3e746c",glass:"#9cc9c3",sign:"#f8e7c9",style:"redbrick"},
+ {name:"SOLE HOUSE",x:398,w:229,y:136,base:336,door:498,wall:"#c8a27d",side:"#987556",roof:"#58636a",roofLight:"#828990",trim:"#334c59",awn:"#be8267",glass:"#abd0d1",sign:"#f7eddc",style:"limestone"},
+ {name:"CORNER CAFÉ",x:673,w:182,y:166,base:336,door:751,wall:"#9f574f",side:"#784641",roof:"#51434d",roofLight:"#81717b",trim:"#594551",awn:"#ba826b",glass:"#abd0bd",sign:"#fff1da",style:"cafe"}
 ];
 
  let townPlayer={x:316,y:424,dir:'down'};
@@ -437,22 +437,40 @@ function pv_txt(v,x,y,size=14,c="#284950",align="center"){ctx.textAlign=align;ct
 function pv_star(x,y,color="#fff5da"){pv_rect(x-1,y-5,3,12,color);pv_rect(x-5,y-1,12,3,color)}
 function pv_grass(x,y,w,h){pv_rect(x,y,w,h,"#acd0a4");for(let i=0;i<130;i++){let a=x+(i*67+31)%w,b=y+(i*31+13)%h;pv_rect(a,b,4,2,i%3?"#93bf96":"#d1deae")}}
 function pv_horizon(){
-pv_rect(0,0,960,210,"#d5eada");pv_rect(0,0,960,98,"#c7e4db");
-pv_rect(0,77,960,12,"#d3e9de");
-for(let x=0;x<960;x+=35){pv_rect(x,105+(x%5)*2,28,68,"#afd1c1");pv_rect(x+3,98+(x%4)*3,19,76,"#bed8cc")}
-for(let i=0;i<12;i++){let x=22+i*91;pv_rect(x,93,32,80,"#99beae");pv_rect(x+7,100,5,9,"#dfedcd");pv_rect(x+19,117,5,9,"#dfedcd")}
-pv_grass(0,208,960,220);
+ pv_rect(0,0,960,235,"#cddfda");
+ pv_rect(0,0,960,92,"#c3dce0");
+ pv_rect(0,92,960,140,"#d9e3d9");
+ // A restrained skyline of older downtown blocks beyond Main Street.
+ for(let i=0;i<14;i++){
+   const x=i*83-34,hh=54+(i*17)%60;
+   pv_rect(x,220-hh,69,hh+18,i%3===0?"#aebbb3":i%3===1?"#b9c9be":"#c5cabe");
+   pv_rect(x-2,219-hh,73,5,"#869f9d");
+   for(let xx=x+10;xx<x+64;xx+=19)for(let yy=228-hh;yy<206;yy+=23)pv_rect(xx,yy,8,11,"#8faeaa");
+ }
+ pv_grass(0,215,960,235);
 }
 function pv_sidewalk(){
-pv_rect(0,330,960,158,"#d8c9ad");
-for(let y=342;y<480;y+=23){pv_rect(0,y,960,2,"#bbaa91");for(let x=(Math.floor(y/23)%2)*24;x<960;x+=48)pv_rect(x,y+2,2,20,"#c3b499")}
-pv_poly([[0,438],[960,438],[960,470],[0,462]],"#efe1c6");
-pv_rect(0,476,960,9,"#f9e9cc");pv_rect(0,484,960,4,"#bcab93");
-pv_rect(0,489,960,111,"#74868c");pv_rect(0,491,960,14,"#82969a");
-for(let x=0;x<960;x+=150)pv_rect(x+49,553,90,5,"#e2ddca");
-for(let x=213;x<336;x+=29)pv_rect(x,488,19,72,"#f5ebd7");
-pv_rect(0,568,960,32,"#83a493");
-for(let x=0;x<960;x+=50)pv_rect(x+6,584,30,3,"#9fc4a5");
+ // Downtown Michigan: warm concrete sidewalk, brick-paver bands, raised curb, gray asphalt.
+ pv_rect(0,330,960,157,"#d8c9b6");
+ for(let y=338;y<479;y+=25){
+   pv_rect(0,y,960,2,"#b6a693");
+   for(let x=(Math.floor(y/25)%2)*30;x<960;x+=60)pv_rect(x,y+2,2,23,"#bea995");
+ }
+ // Red clay paver accent strip along the storefronts.
+ pv_rect(0,338,960,26,"#a9735e");
+ for(let y=341;y<362;y+=10){
+   pv_rect(0,y,960,2,"#d1987c");
+   for(let x=(y%20?14:0);x<960;x+=27)pv_rect(x,y+2,2,8,"#845a51");
+ }
+ pv_rect(0,472,960,14,"#efe1c9");
+ pv_rect(0,483,960,6,"#b3a48f");
+ pv_rect(0,489,960,111,"#657a81");
+ pv_rect(0,492,960,17,"#7c8e92");
+ for(let x=0;x<960;x+=146)pv_rect(x+45,555,79,5,"#e7e3d4");
+ // Painted crossing to the flagship boutique.
+ for(let x=197;x<352;x+=30)pv_rect(x,494,18,69,"#e8e7dc");
+ pv_rect(0,569,960,31,"#8da594");
+ for(let x=0;x<960;x+=53)pv_rect(x+12,585,24,3,"#bad0ac");
 }
 function pv_tree(x,y,s=1){
 ctx.save();ctx.translate(x,y);ctx.scale(s,s);
@@ -495,52 +513,89 @@ pv_rect(x-4,y+h,w+8,7,"#e7d9bd");
 function pv_roofTiles(x,y,w,h,c){
 for(let row=0;row<4;row++){let yy=y+row*10;for(let col=0;col<Math.ceil(w/23);col++){let xx=x+col*23+(row%2)*11;pv_rect(xx,yy,18,2,c)}}}
 function pv_building(b){
-let x=b.x,y=b.y,w=b.w,base=b.base,dep=30,top=y-75;
-pv_rect(x+7,base-1,w+24,13,"#36514f3d");
-// visible building side-wall depth on the right
-pv_poly([[x+w,y+9],[x+w+dep,y-18],[x+w+dep,base-14],[x+w,base]],b.side);
-for(let j=0;j<7;j++)pv_rect(x+w+8,y+38+j*24,18,2,"#f5f1dc44");
-pv_rect(x,y,w,base-y,b.wall);
-for(let row=0;row<7;row++){let yy=y+15+row*25;pv_rect(x+4,yy,w-8,2,"#fff1dd48");for(let xx=x+18+(row%2)*29;xx<x+w;xx+=54)pv_rect(xx,yy+3,3,19,"#6b73702c")}
-pv_poly([[x-24,y+8],[x+15,top],[x+w+5,top],[x+w+dep+13,y+8]],b.roof);
-pv_poly([[x-24,y+8],[x+15,top],[x+w+5,top],[x+w+dep+13,y+8],[x+w+12,y+27],[x-15,y+27]],b.roof);
-pv_poly([[x-5,y+7],[x+22,top+13],[x+w-2,top+13],[x+w+9,y+7]],b.roofLight);
-pv_poly([[x+w+11,y+26],[x+w+dep+13,y+8],[x+w+dep+13,y+23],[x+w+11,y+40]],b.trim);
-pv_rect(x-19,y+24,w+33,11,b.trim);
-pv_rect(x-19,y+24,w+33,4,"#f3e6c23a");
-pv_roofTiles(x+17,top+24,w-17,42,"#31575c49");
-for(let i=0;i<Math.floor(w/37);i++){let xx=x+9+i*37;pv_rect(xx,y+31,25,3,"#ffffff20")}
-// balcony window set with fabric curtains
-let windows=b.w>=229?3:2;
-for(let i=0;i<windows;i++){let wx=x+22+i*(w-48)/windows;pv_windowFrame(wx,y+51,42,43,b.glass)}
-// store sign and blocky striped awning
-pv_rect(x+15,y+107,w-30,30,b.trim);
-pv_rect(x+19,y+111,w-38,22,b.sign);
-pv_txt(b.name,x+w/2,y+127,b.w<200?11:13,b.trim);
-pv_rect(x+7,y+137,w-14,18,b.sign);
-for(let i=0;i<w-20;i+=24){pv_rect(x+8+i,y+137,12,24,b.awn);pv_rect(x+8+i,y+156,12,8,b.awn)}
-pv_rect(x+8,y+164,w-16,5,b.trim);
-// tall window displays and glass doors
-const sy=y+171,fh=base-sy-6;
-if(fh>25){
- pv_windowFrame(x+16,sy,Math.max(43,b.door-x-37),fh,b.glass);
- const rightX=b.door+42;
- if(rightX<x+w-43)pv_windowFrame(rightX,sy,x+w-rightX-17,fh,b.glass);
- for(const xx of [x+43,x+w-51]){
-  pv_rect(xx-7,sy+fh-31,14,17,"#f1e5d6");
-  pv_rect(xx-10,sy+fh-23,20,8,"#d1b49b");
-  pv_rect(xx-1,sy+fh-6,3,9,"#517477");
+ const x=b.x,y=b.y,w=b.w,base=b.base,dep=27;
+ const brick=b.style!=="limestone",top=y-93;
+ const mortar=brick?"#d09987":"#f0d5b5";
+ const light=brick?"#c67b68":"#dcc5a6";
+ pv_rect(x+6,base-2,w+dep,16,"#334c4c3d");
+ // Visible right-side wall makes the shop a solid 2.5D volume.
+ pv_poly([[x+w,y],[x+w+dep,y-23],[x+w+dep,base-20],[x+w,base]],b.side);
+ for(let yy=y+9;yy<base-26;yy+=14){
+  pv_rect(x+w+5,yy,dep-8,2,"#f4d4ae45");
+  pv_rect(x+w+12,yy+3,2,9,"#493d3b33");
  }
-}
-pv_rect(b.door-15,base-85,42,85,b.trim);
-pv_rect(b.door-10,base-80,32,75,"#6eaaa0");
-pv_rect(b.door-6,base-76,24,65,"#add5c4");
-pv_rect(b.door+5,base-76,4,68,"#eef4dc");
-pv_rect(b.door+16,base-39,5,5,"#f3dea0");
-pv_rect(b.door-20,base-4,52,7,"#e6d1b3");
-// floor projecting toward the player is the dimensional contact shadow
-pv_poly([[b.door-22,base+3],[b.door+33,base+3],[b.door+60,base+23],[b.door-39,base+23]],"#d1b99d");
-for(const xx of [x+3,x+w-22])pv_planter(xx,base-36,30);
+ pv_rect(x,y,w,base-y,b.wall);
+ // Matching brick bonds/stone coursing, giving it Michigan main-street masonry.
+ for(let yy=y+6;yy<base-8;yy+=12){
+  pv_rect(x+3,yy,w-6,2,mortar);
+  for(let xx=x+9+(Math.floor(yy/12)%2)*20;xx<x+w-6;xx+=40)
+   pv_rect(xx,yy+2,2,10,brick?"#87493e":"#a98e70");
+ }
+ pv_rect(x+5,y+13,w-10,3,"#ffffff20");
+ // Raised historical parapet, not a plain pitched house roof.
+ pv_rect(x-9,top+15,w+17,58,b.roof);
+ pv_rect(x-12,top+10,w+24,12,b.roofLight);
+ pv_rect(x-14,top+7,w+28,7,b.trim);
+ pv_rect(x+7,top,w-14,19,b.roof);
+ for(let xx=x+16;xx<x+w-15;xx+=27){
+  pv_rect(xx,top-2,16,7,b.roofLight);
+  pv_rect(xx+3,top+8,9,4,"#d2b99d");
+ }
+ pv_rect(x-11,y-13,w+22,9,b.roofLight);
+ pv_rect(x-9,y-4,w+19,7,b.trim);
+ // Upper-story arched windows with limestone lintels.
+ const cols=b.w>=229?3:2;
+ const gap=(w-46)/cols;
+ for(let i=0;i<cols;i++){
+  const wx=x+20+i*gap,wy=y+24;
+  pv_rect(wx-5,wy+4,46,66,brick?"#e0bba2":"#eee0c6");
+  pv_rect(wx-2,wy+7,40,60,b.trim);
+  pv_rect(wx+2,wy+13,32,48,b.glass);
+  pv_rect(wx+2,wy+13,32,10,"#d9ece3");
+  pv_rect(wx+16,wy+10,3,53,"#eceadd");
+  pv_rect(wx+3,wy+35,30,3,"#e8e3d9");
+  pv_rect(wx+5,wy+17,4,36,"#ffffff63");
+  pv_rect(wx-8,wy+68,52,7,brick?"#e3bea5":"#f1dcc1");
+  pv_rect(wx-5,wy-1,46,6,brick?"#ddad95":"#efe1c9");
+ }
+ // Decorative horizontal cornice separating upper floor from shops.
+ pv_rect(x-5,y+107,w+10,12,b.trim);
+ pv_rect(x-4,y+105,w+8,5,"#e5cbac");
+ // Each shop gets a readable storefront, awning, and display windows.
+ const sy=y+120,signY=y+119;
+ pv_rect(x+11,signY,w-22,28,b.trim);
+ pv_rect(x+15,signY+4,w-30,19,b.sign);
+ pv_txt(b.name,x+w/2,signY+19,b.w<200?11:13,b.trim);
+ pv_rect(x+6,y+147,w-12,13,b.sign);
+ for(let j=0;j<w-15;j+=20){
+  pv_rect(x+7+j,y+147,10,20,b.awn);
+  pv_rect(x+7+j,y+163,10,6,b.awn);
+ }
+ pv_rect(x+7,y+167,w-14,5,b.trim);
+ // Glass windows arranged around a recessed entrance.
+ const glassY=y+176;
+ const glassH=Math.max(24,base-glassY-7);
+ const leftW=Math.max(29,b.door-x-36);
+ const rightX=b.door+40;
+ const rightW=Math.max(29,x+w-rightX-15);
+ if(glassH>22){
+  pv_windowFrame(x+11,glassY,leftW,glassH,b.glass);
+  if(rightX+rightW<x+w)pv_windowFrame(rightX,glassY,rightW,glassH,b.glass);
+  // Merchandise silhouettes and café tables visible behind the glass.
+  for(const px of [x+38,x+w-42]){
+   pv_rect(px-11,glassY+glassH-28,22,6,b.style==="cafe"?"#674c43":"#ddd5c2");
+   pv_rect(px-7,glassY+glassH-23,14,15,b.style==="cafe"?"#b79070":b.awn);
+  }
+ }
+ pv_rect(b.door-16,base-80,43,81,b.trim);
+ pv_rect(b.door-11,base-75,33,70,"#547c7a");
+ pv_rect(b.door-7,base-71,25,62,b.glass);
+ pv_rect(b.door+4,base-72,4,64,"#f2e5cb");
+ pv_rect(b.door+16,base-33,4,4,"#f0da8a");
+ pv_rect(b.door-20,base-4,52,6,"#e2c5a7");
+ // Sidewalk threshold and entrance mat remain aligned with game interaction.
+ pv_poly([[b.door-21,base+3],[b.door+31,base+3],[b.door+46,base+19],[b.door-36,base+19]],"#c6b6a1");
+ for(const xx of [x+4,x+w-20])pv_planter(xx,base-33,25);
 }
 function pv_fountain(t){
 const cx=535,cy=409;
@@ -589,16 +644,58 @@ ctx.restore();
    if(cx*cx/(95*95)+cy*cy/(44*44)<1.25)return;
    townPlayer.x=nx;townPlayer.y=ny;townWalkStep=(townWalkStep+1)%4;
  }
- function drawTown25d(){
+ function pv_michiganBanner(x,y,label){
+ pv_rect(x+9,y+31,6,89,"#36474a");
+ pv_rect(x+2,y+5,20,26,"#43545a");
+ pv_rect(x+6,y+8,12,18,"#ffe0a3");
+ pv_rect(x+3,y,19,6,"#31454a");
+ pv_rect(x+14,y+42,35,48,"#315e69");
+ pv_rect(x+18,y+46,27,39,"#f5e9ce");
+ pv_txt(label,x+31,y+64,8,"#3e6764");
+ pv_rect(x+13,y+115,10,6,"#455e61");
+}
+function pv_bikeRack(x,y){
+ for(let i=0;i<3;i++){
+  const xx=x+i*27;
+  pv_rect(xx,y+2,5,25,"#617d7b");
+  pv_rect(xx+3,y-4,18,5,"#617d7b");
+  pv_rect(xx+19,y+1,5,25,"#617d7b");
+ }
+ pv_rect(x-4,y+25,87,3,"#526f6c48");
+}
+function pv_patio(x,y){
+ // Small café patio in the far-right sidewalk area: tables and lightweight chairs.
+ pv_rect(x+15,y+2,53,5,"#6d6b5d33");
+ pv_rect(x+25,y-8,34,10,"#d8b991");
+ pv_rect(x+38,y+2,7,26,"#716756");
+ pv_rect(x+7,y+9,17,6,"#8b6f5e");
+ pv_rect(x+9,y+14,6,12,"#6b5851");
+ pv_rect(x+64,y+9,17,6,"#8b6f5e");
+ pv_rect(x+69,y+14,6,12,"#6b5851");
+}
+function pv_chalkboard(x,y){
+ pv_rect(x,y,30,45,"#80634d");
+ pv_rect(x+4,y+4,22,31,"#2a4844");
+ pv_txt("CAFÉ",x+15,y+17,8,"#fff0d5");
+ pv_txt("OPEN",x+15,y+27,8,"#e6cf97");
+ pv_rect(x+5,y+36,5,15,"#785d4a");
+ pv_rect(x+20,y+36,5,15,"#785d4a");
+}
+function drawTown25d(){
    ctx.save();
    ctx.scale(W/960,H/600);
    const t=performance.now();
    pv_horizon();pv_sidewalk();
-   pv_tree(54,301,1.15);pv_tree(905,297,1.06);
+   // Michigan downtown storefront row with pedestrian-friendly Main Street details.
    for(const b of pv_shops)pv_building(b);
-   pv_planter(120,370,76);pv_planter(815,377,92);
+   pv_tree(54,304,1.08);pv_tree(899,294,1.0);
+   pv_planter(120,370,76);pv_planter(817,377,85);
    pv_bench(664,426);pv_bench(107,419);
-   pv_lamp(38,290);pv_lamp(897,292);
+   pv_michiganBanner(36,266,"SHOP");
+   pv_michiganBanner(894,262,"LOCAL");
+   pv_bikeRack(378,391);
+   pv_patio(826,415);
+   pv_chalkboard(778,354);
    pv_fountain(t);
    pv_tree(32,455,.66);pv_tree(917,453,.72);
    pv_person(705,422,'#f5e6d3','#49343c','left',Math.floor(t/330)%2);
