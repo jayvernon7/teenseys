@@ -133,21 +133,10 @@ const T=32,W=704,H=448;
   return true;
  }
 
- // CC0 pixel tiles from Kenney Tiny Town. The atlas is kept externally hosted
- // for this first asset-integration test. The game keeps its drawn fallback if offline.
- const townAtlas=new Image();
- let atlasReady=false;
- townAtlas.onload=()=>{atlasReady=true;};
- townAtlas.onerror=()=>{atlasReady=false;};
- townAtlas.src='https://raw.githubusercontent.com/GeorgeQLe/assets-2d-city/main/assets/kenney/tiny-town/Tilemap/tilemap_packed.png';
- function atlasTile(col,row,x,y,size=32){
-   if(!atlasReady)return false;
-   ctx.drawImage(townAtlas,col*16,row*16,16,16,Math.round(x),Math.round(y),size,size);
-   return true;
- }
- function atlasSprite(col,row,x,y,size=32){
-   return atlasTile(col,row,x,y,size);
- }
+ // Legacy atlas compatibility routines remain inert; all active assets are local.
+ const atlasReady=false;
+ function atlasTile(){return false;}
+ function atlasSprite(){return false;}
 
 const profiles=[
  {skin:'#b87953',hair:'#171a23',shirt:'#f2eee7',pants:'#20364c',style:0},
