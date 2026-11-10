@@ -1,6 +1,6 @@
 # Teenseys' — interactive shopping town starter
 
-This is a working **front-end prototype** (v1.0), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
+This is a working **front-end prototype** (v1.1), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
 
 ## Run it
 
@@ -91,3 +91,8 @@ The original town rendering is retained in code as `legacyTownScene` for referen
 ## Version 1.0 — Michigan downtown main-street style
 
 The approved three-quarter-view shopping town now uses a Michigan-inspired downtown shopping-district look: red-brick and buff-stone restored storefronts with parapets and masonry courses, decorative upper windows, deep window displays, sidewalk brick bands, a wider-looking pedestrian edge, lamp banners, bike rack, café patio/chalkboard, planters, benches and a crosswalk. This is **fictional downtown architecture inspired by southeastern Michigan**, not an exact recreation of Ann Arbor or Ypsilanti. The underlying store/rack interactions, controls, product catalog and demo bag are unchanged. The user can compare revisions with the separate `town-style-preview.html`.
+
+
+## Version 1.1 — Distinct Michigan downtown storefronts
+
+Three original detailed SVG illustrations now replace the procedural storefronts in the live main canvas. `assets/teenseys/downtown-threads.svg` is a heritage red-brick Italianate-style clothing shop with arched upper windows, dentil cornice, displays and a recessed entrance. `downtown-sole-house.svg` is a buff-brick/stone Art Deco-inspired shoe store with stepped parapet and footwear windows. `downtown-corner-cafe.svg` is a warm brick café with a decorative medallion, projecting café sign and coffee-shop display. All have 2.5D side-wall depth, brickwork, awnings, glass reflections, and sidewalk thresholds. The artwork is fictional and loosely inspired by Ann Arbor/Ypsilanti downtown architecture, not an exact recreation or use of specific brands or locations. When assets fail to load, the earlier procedural storefronts remain as fallback. Existing store triggers, guest choice, navigation, rack shopping and bag are left intact. JavaScript syntax validation was performed; browser gameplay and visual rendering should be verified after deployment.
