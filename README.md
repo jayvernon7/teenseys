@@ -1,6 +1,6 @@
 # Teenseys' — interactive shopping town starter
 
-This is a working **front-end prototype** (v0.1), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
+This is a working **front-end prototype** (v0.5), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
 
 ## Run it
 
@@ -48,3 +48,13 @@ This is a working **front-end prototype** (v0.1), built as a single self-contain
 4. Connect a single live Shopify catalog, product media, stock/variants, cart and checkout.
 5. Replace the illustrated sample preview with actual GLB/USDZ models for products where available.
 6. Expand into the town and introduce merchant-specific stores and administration.
+
+
+## Pixel-art asset pass (v0.5)
+
+- Started integrating **Kenney Tiny Town**, a 16×16-pixel **CC0** tile pack, as real sprite artwork in the town and boutique.
+- Pack: https://kenney.nl/assets/tiny-town
+- Current prototype loads its atlas from a public raw-GitHub mirror (a dependency that should be replaced with files stored in this repository before launch): https://github.com/GeorgeQLe/assets-2d-city/tree/main/assets/kenney/tiny-town
+- If the atlas cannot load, the existing drawn backgrounds and decorations remain playable as fallbacks.
+- This is a first asset integration pass, **not** a complete visual overhaul. A coherent replacement of all buildings, interiors, paths, sprites and maps will require selecting a more complete commercial-use tileset or creating commissioned original art.
+- The game currently uses no player-to-player messaging or interaction, and players remain locally simulated.
