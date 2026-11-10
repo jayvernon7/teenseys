@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teenseys' | 2.5D Town Style Preview</title>
+<style>
+:root{color-scheme:light;--ink:#203a3d;--muted:#687a77;--cream:#f9f4e9;--jade:#2e665e;--sand:#e7d5bb}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#f4f0e7;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+header{max-width:1150px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:22px 18px 16px}
+.brand{font-size:25px;font-weight:900;letter-spacing:-.07em}
+.brand span{display:block;font-size:11px;letter-spacing:.12em;color:#718781;margin-top:3px;text-transform:uppercase}
+a.button{display:inline-flex;align-items:center;justify-content:center;padding:11px 16px;border:1px solid #b4c7bd;border-radius:12px;text-decoration:none;font-weight:800;color:var(--jade);background:#fff;min-height:44px}
+main{max-width:1150px;padding:0 18px 25px;margin:0 auto}
+.headline{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:1px 0 14px}
+.headline h1{font-size:clamp(21px,3.5vw,32px);letter-spacing:-.05em;line-height:1.1;margin:0}
+.chip{background:#d9ebdd;color:#2c6258;font-weight:900;text-transform:uppercase;letter-spacing:.09em;font-size:11px;padding:9px 12px;border-radius:99px}
+.frame{border:8px solid #fff;border-radius:22px;box-shadow:0 18px 50px #30534d25;position:relative;overflow:hidden;background:#b8dbc8}
+#world{display:block;width:100%;height:auto;aspect-ratio:960/600;image-rendering:pixelated;touch-action:none;outline-offset:-8px}
+.map-name{position:absolute;left:20px;top:17px;background:#fffaf0ef;padding:11px 15px;border:1px solid #fff;border-radius:10px;box-shadow:0 5px 15px #2f555522;pointer-events:none}
+.map-name strong{font-size:15px;letter-spacing:-.04em;display:block}
+.map-name span{font-size:11px;color:#506862}
+.message{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);border-radius:10px;background:#223f40f0;color:#fff;font-size:13px;font-weight:750;text-align:center;padding:11px 17px;max-width:calc(100% - 26px);width:max-content;box-shadow:0 6px 17px #16333530;pointer-events:none}
+.controls{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:13px}
+.controls p{font-size:13px;line-height:1.5;color:#617775;margin:0}
+.pad{display:grid;grid-template-columns:repeat(3,46px);grid-template-rows:repeat(2,44px);gap:4px;grid-template-areas:". up ." "left down right"}
+.pad button,.action{background:white;border:1px solid #b7c9be;border-radius:11px;min-height:44px;min-width:44px;font-weight:900;color:#2b6057;font-size:18px;cursor:pointer}
+.pad [data-dir=up]{grid-area:up}.pad [data-dir=left]{grid-area:left}.pad [data-dir=down]{grid-area:down}.pad [data-dir=right]{grid-area:right}
+.actions{display:flex;gap:9px;align-items:center}
+.action{font-size:13px;padding:12px 18px;background:#2e665e;color:white;border-color:#2e665e}
+.action:disabled{background:#91a8a1;border-color:#91a8a1;cursor:default}
+.note{margin:16px 0 0;background:#e8f1e9;border-left:4px solid #5e9883;padding:13px 16px;border-radius:8px;color:#34534c;font-size:13px;line-height:1.6}
+.dialog{position:absolute;inset:0;background:#183437bd;z-index:8;display:none;align-items:center;justify-content:center;padding:20px}
+.dialog.open{display:flex}
+.dialog-card{background:#fdfaf3;border:5px solid #fff;width:min(500px,100%);padding:25px;border-radius:16px;box-shadow:0 18px 55px #12282880}
+.dialog-card h2{font-size:25px;letter-spacing:-.06em;margin:8px 0}
+.dialog-card p{color:#64756e;line-height:1.5}
+.dialog-card .mini-shop{height:130px;margin:16px 0 20px;border-radius:10px;background:linear-gradient(#d4e3d5 0 45%,#e7c9a6 46% 100%);display:flex;align-items:end;justify-content:space-evenly;padding:16px;border:1px solid #b6cbbd}
+.mini-shop .rack{background:#c2a17a;box-shadow:inset 0 8px #8b6a54;width:24%;height:69px;display:flex;justify-content:space-around;padding:13px 4px}
+.mini-shop .rack i{width:10px;height:29px;background:#f4f0e8;clip-path:polygon(20% 0,80% 0,100% 25%,85% 35%,85% 100%,15% 100%,15% 35%,0 25%)}
+.mini-shop .rack:nth-child(2) i{background:#303c3f}.mini-shop .rack:nth-child(3) i{background:#9e7965}
+.modal-actions{display:flex;gap:10px;flex-wrap:wrap}
+.modal-actions button,.modal-actions a{min-height:44px;display:inline-flex;align-items:center;border-radius:9px;border:0;padding:11px 15px;font-size:13px;font-weight:850;text-decoration:none;cursor:pointer}
+.modal-actions a{color:#fff;background:#29625c}.modal-actions button{color:#2e5a52;background:#e9f0ea}
+@media(max-width:700px){header{padding:14px 12px}.brand{font-size:21px}main{padding:0 8px 25px}.frame{border-width:4px;border-radius:13px}.map-name{left:6px;top:6px;padding:6px 7px;border-radius:6px}.map-name strong{font-size:11px}.map-name span{font-size:9px}.message{bottom:7px;font-size:10px;padding:7px 9px}.controls p{max-width:180px;font-size:11px}.pad{grid-template-columns:repeat(3,42px);grid-template-rows:repeat(2,40px)}.pad button{min-height:40px;min-width:40px}}
+</style>
+</head>
+<body>
+<header><div class="brand">TEENSEYS' <span>Town art direction studio</span></div><a href="./?v=0.8" class="button">← Working game</a></header>
+<main>
+<section class="headline"><h1>A new look for the town</h1><span class="chip">Three-quarter view · Style test</span></section>
+<div class="frame">
+<canvas id="world" width="960" height="600" tabindex="0" aria-label="Interactive three-quarter-view town. Move with arrow keys or WASD. Press E at a shop entrance."></canvas>
+<div class="map-name"><strong>THE SHOPPING DISTRICT</strong><span>A different angle on Teenseys'</span></div>
+<div class="message" id="message" aria-live="polite">Walk toward The Threads Shop · WASD / arrow keys</div>
+<div class="dialog" id="dialog" aria-hidden="true">
+  <section class="dialog-card" role="dialog" aria-modal="true" aria-labelledby="dlgtitle">
+   <div class="chip" style="display:inline-block">Entrance preview</div><h2 id="dlgtitle">The Threads Shop</h2>
+   <p>This is a separate visual test of the town. Your existing store and shopping features are still in the working game.</p>
+   <div class="mini-shop" aria-hidden="true"><div class="rack"><i></i><i></i><i></i></div><div class="rack"><i></i><i></i><i></i></div><div class="rack"><i></i><i></i><i></i></div></div>
+   <div class="modal-actions"><a href="./?v=0.8">Open existing shopping game ↗</a><button id="close" type="button">Back to town</button></div>
+  </section>
+</div>
+</div>
+<div class="controls">
+<p><strong>Movement:</strong> Arrow keys or WASD<br><strong>Interact:</strong> E at a storefront · no complex camera controls</p>
+<div class="actions"><div class="pad" aria-label="Touch movement controls"><button data-dir="up" type="button">↑</button><button data-dir="left" type="button">←</button><button data-dir="down" type="button">↓</button><button data-dir="right" type="button">→</button></div><button id="interact" class="action" type="button">Enter shop (E)</button></div>
+</div>
+<p class="note"><strong>What you're looking at:</strong> A rebuilt visual direction—not another roof-detail update. The buildings have visible roof planes and side walls, the street has layers and perspective, and characters remain simple to control. This preview does <strong>not</strong> replace the working shopping game.</p>
+</main>
+<script>
+(function(){
+"use strict";
+const canvas=document.getElementById("world"),ctx=canvas.getContext("2d");
+ctx.imageSmoothingEnabled=false;
+const dialog=document.getElementById("dialog"),msg=document.getElementById("message");
+const enter=document.getElementById("interact");
+let player={x:316,y:424,dir:"down"},lastStep=0,stepCount=0,lastFocus="",inside=false;
+const shops=[
+ {name:"THE THREADS SHOP",x:100,w:250,y:149,base:336,door:228,wall:"#ce998a",side:"#a16b67",roof:"#4e6d70",roofLight:"#789893",trim:"#284f56",awn:"#6eaa9b",glass:"#9ecbc2",sign:"#fff2d7"},
+ {name:"SOLE HOUSE",x:398,w:229,y:136,base:336,door:498,wall:"#adc9cf",side:"#739da6",roof:"#47697b",roofLight:"#7eabb4",trim:"#35566b",awn:"#ddad7e",glass:"#a1d2d2",sign:"#fff2df"},
+ {name:"CORNER CAFÉ",x:673,w:182,y:166,base:336,door:751,wall:"#d3a89d",side:"#a97977",roof:"#77636d",roofLight:"#a88a8b",trim:"#604e5c",awn:"#dc9a8d",glass:"#a3cdbd",sign:"#ffeddd"}
+];
+function rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));}
+function poly(points,c){ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);ctx.closePath();ctx.fill()}
+function line(x1,y1,x2,y2,c,w=2){ctx.strokeStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
+function txt(v,x,y,size=14,c="#284950",align="center"){ctx.textAlign=align;ctx.fillStyle=c;ctx.font="900 "+size+"px sans-serif";ctx.fillText(v,x,y);}
+function star(x,y,color="#fff5da"){rect(x-1,y-5,3,12,color);rect(x-5,y-1,12,3,color)}
+function grass(x,y,w,h){rect(x,y,w,h,"#acd0a4");for(let i=0;i<130;i++){let a=x+(i*67+31)%w,b=y+(i*31+13)%h;rect(a,b,4,2,i%3?"#93bf96":"#d1deae")}}
+function horizon(){
+rect(0,0,960,210,"#d5eada");rect(0,0,960,98,"#c7e4db");
+rect(0,77,960,12,"#d3e9de");
+for(let x=0;x<960;x+=35){rect(x,105+(x%5)*2,28,68,"#afd1c1");rect(x+3,98+(x%4)*3,19,76,"#bed8cc")}
+for(let i=0;i<12;i++){let x=22+i*91;rect(x,93,32,80,"#99beae");rect(x+7,100,5,9,"#dfedcd");rect(x+19,117,5,9,"#dfedcd")}
+grass(0,208,960,220);
+}
+function sidewalk(){
+rect(0,330,960,158,"#d8c9ad");
+for(let y=342;y<480;y+=23){rect(0,y,960,2,"#bbaa91");for(let x=(Math.floor(y/23)%2)*24;x<960;x+=48)rect(x,y+2,2,20,"#c3b499")}
+poly([[0,438],[960,438],[960,470],[0,462]],"#efe1c6");
+rect(0,476,960,9,"#f9e9cc");rect(0,484,960,4,"#bcab93");
+rect(0,489,960,111,"#74868c");rect(0,491,960,14,"#82969a");
+for(let x=0;x<960;x+=150)rect(x+49,553,90,5,"#e2ddca");
+for(let x=213;x<336;x+=29)rect(x,488,19,72,"#f5ebd7");
+rect(0,568,960,32,"#83a493");
+for(let x=0;x<960;x+=50)rect(x+6,584,30,3,"#9fc4a5");
+}
+function tree(x,y,s=1){
+ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+rect(-6,0,13,77,"#78614e");rect(-2,1,6,66,"#a07c5b");
+poly([[-32,22],[-42,0],[-36,-28],[-16,-37],[11,-41],[35,-19],[40,12],[25,28],[-12,32]],"#396f58");
+poly([[-39,-1],[-31,-29],[-10,-48],[18,-48],[35,-26],[28,6],[-9,16]],"#4e936d");
+poly([[-22,-25],[-10,-54],[12,-54],[28,-36],[16,-20]],"#83bc85");
+for(let i=0;i<15;i++){let a=-34+(i*17)%65,b=-33+(i*13)%43;rect(a,b,7,4,i%2?"#a3cd93":"#77b47e")}
+rect(-25,74,54,5,"#4f775e55");
+ctx.restore();
+}
+function planter(x,y,w=90){
+rect(x,y+14,w,22,"#8d6d57");rect(x+4,y+17,w-8,12,"#b48b6c");
+for(let i=0;i<8;i++){let xx=x+4+i*(w-10)/8;rect(xx,y+3-(i%3)*4,22,16,i%3?"#639e74":"#4b8f70")}
+for(let i=0;i<7;i++){let xx=x+10+i*(w-20)/7;rect(xx,y-3-(i%2)*5,5,5,i%2?"#f4cf9c":"#f5b5b5")}
+rect(x+2,y+35,w-4,3,"#674f44");
+}
+function bench(x,y){
+rect(x-6,y+28,105,5,"#4d6b5f33");
+rect(x,y+1,91,13,"#8a624f");
+rect(x+4,y+1,83,5,"#d3a178");
+rect(x,y+16,91,10,"#b88862");
+rect(x+5,y+24,7,12,"#5a5349");rect(x+81,y+24,7,12,"#5a5349");
+}
+function lamp(x,y){
+rect(x+9,y+35,10,101,"#394e51");rect(x+13,y+39,2,93,"#667c76");
+rect(x+1,y+26,27,17,"#4b5960");rect(x+5,y+4,20,33,"#3a4c50");
+rect(x+8,y+9,14,23,"#ffe4aa");rect(x+10,y+11,4,18,"#fff7d6");
+rect(x+4,y+1,22,7,"#273e46");
+rect(x+6,y+132,16,7,"#435354");
+}
+function windowFrame(x,y,w,h,glass){
+rect(x-4,y-4,w+8,h+10,"#304b50");
+rect(x,y,w,h,glass);
+rect(x+5,y+5,w-10,8,"#c6e6d9");
+rect(x+6,y+16,7,h-23,"#ffffff6a");rect(x+w-14,y+13,5,h-20,"#dff3e6");
+rect(x+Math.floor(w/2)-2,y,4,h,"#e8e2d2");
+rect(x-4,y+h,w+8,7,"#e7d9bd");
+}
+function roofTiles(x,y,w,h,c){
+for(let row=0;row<4;row++){let yy=y+row*10;for(let col=0;col<Math.ceil(w/23);col++){let xx=x+col*23+(row%2)*11;rect(xx,yy,18,2,c)}}}
+function building(b){
+let x=b.x,y=b.y,w=b.w,base=b.base,dep=30,top=y-75;
+rect(x+7,base-1,w+24,13,"#36514f3d");
+// visible building side-wall depth on the right
+poly([[x+w,y+9],[x+w+dep,y-18],[x+w+dep,base-14],[x+w,base]],b.side);
+for(let j=0;j<7;j++)rect(x+w+8,y+38+j*24,18,2,"#f5f1dc44");
+rect(x,y,w,base-y,b.wall);
+for(let row=0;row<7;row++){let yy=y+15+row*25;rect(x+4,yy,w-8,2,"#fff1dd48");for(let xx=x+18+(row%2)*29;xx<x+w;xx+=54)rect(xx,yy+3,3,19,"#6b73702c")}
+poly([[x-24,y+8],[x+15,top],[x+w+5,top],[x+w+dep+13,y+8]],b.roof);
+poly([[x-24,y+8],[x+15,top],[x+w+5,top],[x+w+dep+13,y+8],[x+w+12,y+27],[x-15,y+27]],b.roof);
+poly([[x-5,y+7],[x+22,top+13],[x+w-2,top+13],[x+w+9,y+7]],b.roofLight);
+poly([[x+w+11,y+26],[x+w+dep+13,y+8],[x+w+dep+13,y+23],[x+w+11,y+40]],b.trim);
+rect(x-19,y+24,w+33,11,b.trim);
+rect(x-19,y+24,w+33,4,"#f3e6c23a");
+roofTiles(x+17,top+24,w-17,42,"#31575c49");
+for(let i=0;i<Math.floor(w/37);i++){let xx=x+9+i*37;rect(xx,y+31,25,3,"#ffffff20")}
+// balcony window set with fabric curtains
+let windows=b.w>=229?3:2;
+for(let i=0;i<windows;i++){let wx=x+22+i*(w-48)/windows;windowFrame(wx,y+51,42,43,b.glass)}
+// store sign and blocky striped awning
+rect(x+15,y+107,w-30,30,b.trim);
+rect(x+19,y+111,w-38,22,b.sign);
+txt(b.name,x+w/2,y+127,b.w<200?11:13,b.trim);
+rect(x+7,y+137,w-14,18,b.sign);
+for(let i=0;i<w-20;i+=24){rect(x+8+i,y+137,12,24,b.awn);rect(x+8+i,y+156,12,8,b.awn)}
+rect(x+8,y+164,w-16,5,b.trim);
+// tall window displays and glass doors
+const sy=y+171,fh=base-sy-6;
+if(fh>25){
+ windowFrame(x+16,sy,Math.max(43,b.door-x-37),fh,b.glass);
+ const rightX=b.door+42;
+ if(rightX<x+w-43)windowFrame(rightX,sy,x+w-rightX-17,fh,b.glass);
+ for(const xx of [x+43,x+w-51]){
+  rect(xx-7,sy+fh-31,14,17,"#f1e5d6");
+  rect(xx-10,sy+fh-23,20,8,"#d1b49b");
+  rect(xx-1,sy+fh-6,3,9,"#517477");
+ }
+}
+rect(b.door-15,base-85,42,85,b.trim);
+rect(b.door-10,base-80,32,75,"#6eaaa0");
+rect(b.door-6,base-76,24,65,"#add5c4");
+rect(b.door+5,base-76,4,68,"#eef4dc");
+rect(b.door+16,base-39,5,5,"#f3dea0");
+rect(b.door-20,base-4,52,7,"#e6d1b3");
+// floor projecting toward the player is the dimensional contact shadow
+poly([[b.door-22,base+3],[b.door+33,base+3],[b.door+60,base+23],[b.door-39,base+23]],"#d1b99d");
+for(const xx of [x+3,x+w-22])planter(xx,base-36,30);
+}
+function fountain(t){
+const cx=535,cy=409;
+ctx.save();ctx.translate(cx,cy);
+rect(-81,34,164,9,"#354e4e22");
+poly([[-85,0],[-66,-25],[68,-25],[88,0],[68,25],[-66,25]],"#657f81");
+poly([[-76,-2],[-60,-18],[61,-18],[77,-2],[60,18],[-60,18]],"#d9d3b9");
+poly([[-65,-2],[-51,-12],[52,-12],[66,-2],[52,12],[-51,12]],"#6baeb9");
+poly([[-53,-1],[-38,-7],[41,-7],[55,-1],[40,9],[-39,9]],"#8ed8df");
+rect(-14,-5,30,12,"#587a76");rect(-10,-14,22,13,"#c5d7bf");
+rect(-4,-39,8,27,"#eff3d6");
+rect(-11,-25,4,14,"#a9e4dd");rect(10,-25,4,14,"#b8eeea");
+rect(-10,-40,22,5,"#edf8de");
+rect(-14,-49+Math.round(Math.sin(t/530)*3),8,5,"#fff8e0");
+rect(6,-53+Math.round(Math.cos(t/450)*4),5,5,"#fff8e0");
+ctx.restore();
+}
+function person(x,y,shirt,hair,dir,walk=0){
+ctx.save();ctx.translate(Math.round(x),Math.round(y));
+rect(-11,3,24,5,"#1b3e3d29");
+rect(-8,-3,7,10,"#34404b");rect(2,-3,7,10,"#34404b");
+rect(-7,-3+(walk%2)*3,6,8,"#3d5362");
+rect(2,-3-(walk%2)*3,6,8,"#3d5362");
+rect(-12,-24,24,24,"#293c41");
+rect(-10,-23,20,20,shirt);
+rect(-13,-21,5,14,"#b88869");rect(8,-21,5,14,"#b88869");
+rect(-9,-43,18,21,"#a97459");
+rect(-10,-46,20,9,hair);
+if(dir==="up")rect(-8,-38,17,8,hair);
+else if(dir==="left")rect(-8,-32,3,3,"#233339");
+else if(dir==="right")rect(5,-32,3,3,"#233339");
+else{rect(-5,-32,3,3,"#25323b");rect(4,-32,3,3,"#25323b")}
+ctx.restore();
+}
+function focus(){return shops.find(b=>Math.abs(b.door-player.x)<65 && player.y<402 && player.y>330)}
+function draw(ts){
+const t=ts||0;
+horizon();sidewalk();
+tree(54,301,1.15);tree(905,297,1.06);
+for(const b of shops)building(b);
+// decorative shop signage and market objects in the walkway
+planter(120,370,76);planter(815,377,92);
+bench(664,426);bench(107,419);
+lamp(38,290);lamp(897,292);
+fountain(t);
+tree(32,455,.66);tree(917,453,.72);
+person(705,422,"#f5e6d3","#49343c","left",Math.floor(t/330)%2);
+person(806,467,"#b8c4e2","#3a302d","right",Math.floor(t/330)%2);
+person(player.x,player.y,"#e7f0e7","#243d44",player.dir,stepCount);
+const f=focus();
+const next=f?"Press E to check "+f.name:"Walk toward The Threads Shop · WASD / arrow keys";
+if(next!==lastFocus){msg.textContent=next;lastFocus=next}
+enter.disabled=!f;
+if(f){
+ rect(f.door-24,342,60,5,"#ffe4a7");
+ txt("E",f.door+5,324,18,"#fff0cb");
+}
+if(!inside)requestAnimationFrame(draw);
+}
+function move(dir){
+if(inside)return;
+let dx=0,dy=0;const velocity=10;
+if(dir==="up")dy=-velocity;if(dir==="down")dy=velocity;if(dir==="left")dx=-velocity;if(dir==="right")dx=velocity;
+player.dir=dir;player.x=Math.max(27,Math.min(924,player.x+dx));player.y=Math.max(353,Math.min(535,player.y+dy));
+const c=player.x-535, d=player.y-409;
+if(c*c/(95*95)+d*d/(44*44)<1.25){player.x-=dx;player.y-=dy;}
+stepCount=(stepCount+1)%4;
+}
+function openShop(){
+const f=focus();if(!f||inside)return;
+inside=true;
+document.getElementById("dlgtitle").textContent=f.name;
+dialog.classList.add("open");dialog.setAttribute("aria-hidden","false");
+document.getElementById("close").focus();
+}
+function closeShop(){
+if(!inside)return;inside=false;
+dialog.classList.remove("open");dialog.setAttribute("aria-hidden","true");
+canvas.focus({preventScroll:true});requestAnimationFrame(draw);
+}
+window.addEventListener("keydown",ev=>{
+if(!document.body.contains(canvas)||ev.target===document.querySelector("a"))return;
+if(inside){if(ev.key==="Escape"){closeShop();ev.preventDefault()}return}
+if(ev.ctrlKey||ev.metaKey||ev.altKey||ev.target.tagName==="INPUT")return;
+const dirs={ArrowUp:"up",w:"up",W:"up",ArrowDown:"down",s:"down",S:"down",ArrowLeft:"left",a:"left",A:"left",ArrowRight:"right",d:"right",D:"right"};
+if(dirs[ev.key]){ev.preventDefault();move(dirs[ev.key])}
+else if(ev.key==="e"||ev.key==="E"){ev.preventDefault();openShop()}
+});
+document.querySelectorAll("[data-dir]").forEach(b=>b.addEventListener("click",()=>move(b.dataset.dir)));
+enter.addEventListener("click",openShop);
+document.getElementById("close").addEventListener("click",closeShop);
+dialog.addEventListener("click",ev=>{if(ev.target===dialog)closeShop()});
+requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
