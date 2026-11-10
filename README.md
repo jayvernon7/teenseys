@@ -1,6 +1,6 @@
 # Teenseys' — interactive shopping town starter
 
-This is a working **front-end prototype** (v0.9), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
+This is a working **front-end prototype** (v1.0), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
 
 ## Run it
 
@@ -86,3 +86,8 @@ The town is moving toward a **three-quarter 2.5D pixel-art perspective**. The th
 The main `index.html` now renders the actual three-quarter-view town from the approved `town-style-preview.html` (not just a modified rooftop). Town walking remains four-direction WASD / arrow / touch pad. Approaching **THE THREADS SHOP** and pressing E enters the original functional boutique; exiting returns to the redesigned town without restarting the session. The bag, rack browsing, product cards, catalog, NPC and six avatar choices remain in the same page. The two other storefronts are still marked coming soon.
 
 The original town rendering is retained in code as `legacyTownScene` for reference, but the new visual scene is the default. The separate style preview remains available for comparison. This has been JavaScript syntax-checked; full manual browser testing of the deployed build is still needed.
+
+
+## Version 1.0 — Michigan downtown main-street style
+
+The approved three-quarter-view shopping town now uses a Michigan-inspired downtown shopping-district look: red-brick and buff-stone restored storefronts with parapets and masonry courses, decorative upper windows, deep window displays, sidewalk brick bands, a wider-looking pedestrian edge, lamp banners, bike rack, café patio/chalkboard, planters, benches and a crosswalk. This is **fictional downtown architecture inspired by southeastern Michigan**, not an exact recreation of Ann Arbor or Ypsilanti. The underlying store/rack interactions, controls, product catalog and demo bag are unchanged. The user can compare revisions with the separate `town-style-preview.html`.
