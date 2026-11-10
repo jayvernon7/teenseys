@@ -1,6 +1,6 @@
 # Teenseys' — interactive shopping town starter
 
-This is a working **front-end prototype** (v0.8), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
+This is a working **front-end prototype** (v0.9), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
 
 ## Run it
 
@@ -79,3 +79,10 @@ The artwork remains an evolving pixel-art prototype, not a final commissioned en
 ## Style choice — Version 0.8: three-quarter-view 2.5D
 
 The town is moving toward a **three-quarter 2.5D pixel-art perspective**. The three storefront facade assets have a visible pitched roof, upper shading, cornice and side-depth strip, giving stronger building volume while remaining 2D drawings. The map coordinates, four-direction controls, shop entrance triggers, product cards and existing safety design are untouched. This is the first structural 2.5D pass, not a full environment replacement. Next visual tasks include consistent furniture depth, occlusion ordering, coordinated lighting and a polished layout; no 3D engine is required for this style.
+
+
+## Version 0.9 — Approved 2.5D town integrated with the shopping experience
+
+The main `index.html` now renders the actual three-quarter-view town from the approved `town-style-preview.html` (not just a modified rooftop). Town walking remains four-direction WASD / arrow / touch pad. Approaching **THE THREADS SHOP** and pressing E enters the original functional boutique; exiting returns to the redesigned town without restarting the session. The bag, rack browsing, product cards, catalog, NPC and six avatar choices remain in the same page. The two other storefronts are still marked coming soon.
+
+The original town rendering is retained in code as `legacyTownScene` for reference, but the new visual scene is the default. The separate style preview remains available for comparison. This has been JavaScript syntax-checked; full manual browser testing of the deployed build is still needed.
