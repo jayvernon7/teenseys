@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#152e35" />
-  <title>Teenseys' | Virtual Shopping Town Demo</title>
+  <title>Teenseys' | Virtual Shopping Town</title>
   <style>
     :root{--ink:#163038;--muted:#647879;--line:#d9e3df;--cream:#f7f6ef;--surface:#fff;--teal:#246b63;--mint:#d9efe5;--gold:#f5cd7a;--shadow:0 24px 70px rgba(14,38,39,.2)}
     *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink)}
@@ -173,30 +173,76 @@ function drawAvatar(x,y,p,scale=1,face='down'){
 }
 function grassPattern(){for(let y=0;y<24;y++)for(let x=0;x<39;x++){let v=(x*17+y*31)%7;fillTile(x,y,v===0?'#a7c997':v===3?'#b6d6a2':'#afd29e');if((x*7+y*13)%17===0){colorRect(x*T+9,y*T+13,3,8,'#82b784');colorRect(x*T+16,y*T+6,3,7,'#80b483')}}}
 function tree(x,y){colorRect(x*T+9,y*T+18,14,19,'#6e6651');colorRect(x*T+3,y*T-10,26,29,'#498b67');colorRect(x*T-3,y*T+1,38,16,'#539e6f');colorRect(x*T+5,y*T-14,22,11,'#6bab79');colorRect(x*T+5,y*T+8,9,4,'#9ecb95')}
-function drawBuilding(b){let X=b.x*T,Y=b.y*T,c=b.c;
- colorRect(X-3,Y-5,b.w*T+6,b.h*T+10,'#4e645e');colorRect(X,Y,b.w*T,b.h*T,c);
- colorRect(X-7,Y-17,b.w*T+14,20,'#344e53');colorRect(X-7,Y-14,b.w*T+14,8,'#537277');
- for(let yy=Y+26;yy<Y+b.h*T-30;yy+=32)for(let xx=X+14;xx<X+b.w*T-15;xx+=75){colorRect(xx,yy,36,29,'#e6f1e6');colorRect(xx+4,yy+4,28,21,'#80b6a9');colorRect(xx+17,yy+4,3,21,'#ecf2e3')}
- const dX=b.doorX*T+2,dY=(b.y+b.h-1)*T;
- colorRect(dX,dY-21,29,55,'#304d46');colorRect(dX+4,dY-18,21,46,'#7eac9c');colorRect(dX+12,dY+4,3,3,'#dfcf87');
- colorRect(X+18,Y-5,b.w*T-36,26,'#f1e5cd');textDraw(b.name,X+(b.w*T)/2,Y+14,Math.min(13,Math.max(10,120/b.name.length)), '#24453e');
+function drawBuilding(b){
+ const X=b.x*T,Y=b.y*T,w=b.w*T,h=b.h*T;
+ // Layered slate roof and restrained brick storefront; original collision/doors stay fixed.
+ colorRect(X-5,Y-7,w+10,h+10,'#4d5d5e');
+ colorRect(X,Y,w,h,b.c);
+ for(let yy=Y+9;yy<Y+h-20;yy+=19){colorRect(X+2,yy,w-4,1,'#ffffff35');for(let xx=X+11+((yy-Y)%38);xx<X+w-6;xx+=36)colorRect(xx,yy+1,1,16,'#ffffff23')}
+ colorRect(X-8,Y-20,w+16,21,'#334750');
+ colorRect(X-8,Y-19,w+16,5,'#59717a');
+ colorRect(X-7,Y-4,w+14,5,'#354e54');
+ // Shop window bays intentionally stop before the central doorway.
+ const doorPx=b.doorX*T+2;
+ for(let xx=X+13;xx<X+w-21;xx+=61){
+   if(Math.abs((xx+18)-(doorPx+15))<40)continue;
+   colorRect(xx,Y+48,42,h-103,'#3e5959');
+   colorRect(xx+4,Y+52,34,h-111,'#a6c7bc');
+   colorRect(xx+6,Y+55,30,h-117,'#85aaa2');
+   colorRect(xx+19,Y+52,2,h-111,'#edf2dc');
+   colorRect(xx+6,Y+h-70,30,3,'#f2dcb4');
+   // Small clothing silhouettes in windows.
+   colorRect(xx+12,Y+h-98,17,4,'#e9e5d7');
+   colorRect(xx+15,Y+h-94,11,19,'#f4efe0');
+ }
+ // Simple striped awning, one clear sign and an unmistakable entrance.
+ const awnY=Y+35;
+ colorRect(X+6,awnY,w-12,10,'#f3e9d3');
+ for(let i=0;i<Math.floor((w-12)/18);i++)colorRect(X+6+i*18,awnY,9,10,b.id==='boutique'?'#5f827c':b.id==='shoes'?'#668c9d':'#b7776d');
+ colorRect(X+8,Y+3,w-16,24,'#fff4df');
+ textDraw(b.name,X+w/2,Y+20,Math.min(13,Math.max(10,140/b.name.length)),'#2f4b50');
+ const dY=(b.y+b.h-1)*T;
+ colorRect(doorPx-2,dY-26,33,59,'#243e41');
+ colorRect(doorPx+2,dY-23,25,51,'#83b8ac');
+ colorRect(doorPx+14,dY-20,2,46,'#eaf4ec');
+ colorRect(doorPx+8,dY+2,4,4,'#e7d79a');
+ colorRect(doorPx+3,dY+27,23,4,'#f4e0ac');
+ if(b.id!=='boutique'){colorRect(X+w-72,Y+31,66,15,'#f3e9d3');textDraw('COMING SOON',X+w-39,Y+42,8,'#526467')}
 }
-function pavement(){for(let y=8;y<=20;y++)for(let x=1;x<38;x++)fillTile(x,y,(x+y)%2?'#d5d9c7':'#e0e2d2');
- for(let y=21;y<=22;y++)for(let x=0;x<39;x++)fillTile(x,y,(x+y)%2?'#858c83':'#79887c');
- for(let x=1;x<38;x++){colorRect(x*T,21*T,31,3,'#e1e4d6')}
- for(let x=6;x<36;x+=6){colorRect(x*T+12,21*T+34,20,5,'#d5d6c6')}
+function pavement(){
+ // Open pedestrian boulevard: neutral paving, two unobtrusive kerbs and a road below.
+ for(let y=8;y<=20;y++)for(let x=1;x<38;x++)fillTile(x,y,(x+y)%2?'#d9d9ca':'#e4e3d7');
+ for(let y=21;y<=23;y++)for(let x=0;x<39;x++)fillTile(x,y,(x+y)%2?'#829391':'#879995');
+ colorRect(T,21*T,37*T,5,'#f4eee0');
+ for(let x=2;x<37;x+=5)colorRect(x*T+9,22*T+24,29,3,'#e5e6d5');
+ // Small brick joins communicate texture without busy checkerboarding.
+ for(let y=9;y<=20;y+=3)for(let x=2;x<38;x+=4)colorRect(x*T+5,y*T+13,19,1,'#c7c7bb');
 }
 function bush(x,y){colorRect(x*T+4,y*T+9,26,17,'#3e8e66');colorRect(x*T+1,y*T+14,30,11,'#6aaa70');colorRect(x*T+5,y*T+5,16,12,'#65a76c')}
-function townScene(){grassPattern();pavement();
- // Plaza, carefully placed away from doors
- for(let y=12;y<19;y++)for(let x=12;x<=29;x++)fillTile(x,y,(x+y)%2?'#ddd9bd':'#e9e4cb');
- for(let x=11;x<=30;x++){if(x%3===0){bush(x,11);bush(x,19)}}
- // fountain
- colorRect(20*T-16,14*T-12,95,83,'#667f7d');colorRect(20*T-11,14*T-7,85,73,'#dcece3');colorRect(20*T-3,14*T+1,69,57,'#75b9c5');colorRect(20*T+19,14*T+17,25,21,'#a9d5da');colorRect(20*T+29,14*T+3,5,25,'#d1e9e9');
+function townScene(){
+ grassPattern();pavement();
+ // A calm central plaza, with wide clear paths to each shop.
+ for(let y=12;y<19;y++)for(let x=12;x<=29;x++)fillTile(x,y,(x+y)%2?'#e3dec9':'#ede8d7');
+ for(let x=12;x<=29;x++){colorRect(x*T,12*T,32,2,'#c4c4ae');colorRect(x*T,19*T,32,2,'#c4c4ae')}
+ // Compact fountain: anchor landmark without obscuring nearby shoppers.
+ colorRect(20*T-16,14*T-12,95,83,'#718586');
+ colorRect(20*T-11,14*T-7,85,73,'#dce6de');
+ colorRect(20*T-3,14*T+1,69,57,'#80baca');
+ colorRect(20*T+19,14*T+17,25,21,'#b8d9e3');
+ colorRect(20*T+29,14*T+3,5,25,'#e0f1ee');
+ // Buildings keep exact prior locations so door triggers and map controls still work.
  for(const b of buildings)drawBuilding(b);
+ // Limited greenery keeps the shopping areas readable.
  tree(2,3);tree(36,3);tree(3,15);tree(34,15);tree(4,19);tree(35,19);
- colorRect(2*T,11*T,26,9,'#c5a47f');colorRect(2*T+4,11*T+9,4,6,'#795f4a');colorRect(2*T+19,11*T+9,4,6,'#795f4a');
- colorRect(32*T,11*T,26,9,'#c5a47f');colorRect(32*T+4,11*T+9,4,6,'#795f4a');colorRect(32*T+19,11*T+9,4,6,'#795f4a');
+ bush(11,12);bush(30,12);bush(11,18);bush(30,18);
+ // Repeated small planters give each storefront some atmosphere.
+ for(const x of [5,13,18,24,29,34]){colorRect(x*T,9*T+5,27,10,'#947b68');colorRect(x*T+3,9*T-2,21,11,'#639e71')}
+ // Benches at plaza edges, separated from walkway and player spawn.
+ for(const x of [2,32]){colorRect(x*T,11*T,30,8,'#aa8061');colorRect(x*T+3,11*T+7,4,7,'#795e4d');colorRect(x*T+23,11*T+7,4,7,'#795e4d')}
+ // Warm lampposts; decorative only and never block movement.
+ for(const x of [3,35]){colorRect(x*T+14,12*T-15,4,51,'#536165');colorRect(x*T+8,12*T-16,16,17,'#f5d9a0');colorRect(x*T+6,12*T-19,20,4,'#576b69')}
+ // A single simple pedestrian crossing on the street.
+ for(let i=0;i<6;i++)colorRect((7+i)*T,21*T+9,19,17,'#e7e9df');
  for(const s of shoppers)drawAvatar(s.x*T+16,s.y*T+18,s.c,.9);
  drawAvatar(player.x*T+16,player.y*T+19,profiles[character],1.05,player.dir);
  const focus=findFocus();if(focus?.kind==='building'){let b=focus.item;colorRect(b.doorX*T-3,b.doorY*T+18,40,4,'#f1d47a')}
