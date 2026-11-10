@@ -6,10 +6,10 @@
   <meta name="theme-color" content="#152e35" />
   <title>Teenseys' | Virtual Shopping Town</title>
   <style>
-    :root{--ink:#163038;--muted:#647879;--line:#d9e3df;--cream:#f7f6ef;--surface:#fff;--teal:#246b63;--mint:#d9efe5;--gold:#f5cd7a;--shadow:0 24px 70px rgba(14,38,39,.2)}
+    :root{--ink:#163038;--muted:#647879;--line:#d9e3df;--cream:#f8eee0;--surface:#fff;--teal:#246b63;--mint:#d9efe5;--gold:#f5cd7a;--shadow:0 24px 70px rgba(14,38,39,.2)}
     *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink)}
     button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.5}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #ffb84d;outline-offset:2px}
-    body{background:radial-gradient(circle at 10% 8%,#edf7ee,transparent 35%),linear-gradient(140deg,#f5f7ef,#e5ede7)}
+    body{background:radial-gradient(circle at 10% 8%,#f9eee0,transparent 35%),linear-gradient(140deg,#f9f5eb,#e0ece3)}
     .page{width:min(1140px,calc(100% - 26px));margin:16px auto 30px}
     .shell{background:#fff;border:1px solid #d5e2dd;border-radius:20px;overflow:hidden;box-shadow:var(--shadow)}
     .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;padding:14px 20px;border-bottom:1px solid var(--line)}
@@ -89,7 +89,7 @@
 <div class="page">
   <div class="shell">
     <div class="topbar">
-      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 0.3</span></div><div class="sub">Explore the town · shop the stores</div></div>
+      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 0.4</span></div><div class="sub">A cozy pixel-art shopping district</div></div>
       <div class="top-actions">
         <button id="browseBtn" class="pill" type="button" disabled>Browse all</button>
         <button id="cartBtn" class="pill" type="button" disabled>Bag <span id="cartCount">0</span></button>
@@ -160,179 +160,327 @@ function colorRect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.ro
 function textDraw(str,x,y,size=10,c='#1b3f42',align='center'){ctx.fillStyle=c;ctx.font=`900 ${size}px ui-sans-serif, system-ui, sans-serif`;ctx.textAlign=align;ctx.fillText(str,x,y)}
 function fillTile(x,y,c){colorRect(x*T,y*T,T,T,c)}
 function drawAvatar(x,y,p,scale=1,face='down'){
- ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale(scale,scale);
- const r=(a,b,w,h,c)=>colorRect(a,b,w,h,c);
- r(-7,10,6,5,'#303a3a');r(1,10,6,5,'#303a3a');r(-7,6,6,5,p.pants);r(1,6,6,5,p.pants);
- r(-10,-3,20,12,p.shirt);r(-10,0,4,7,p.skin);r(6,0,4,7,p.skin);
- r(-7,-16,14,16,p.skin);r(-8,-16,16,5,p.hair);
- if(p.style===1){r(-9,-19,18,6,p.hair);r(6,-15,4,8,p.hair)}
- if(p.style===2){r(-9,-17,18,7,p.hair);r(-9,-13,4,11,p.hair)}
- if(p.style===3){r(-8,-18,16,6,p.hair);r(-8,-12,4,5,p.hair)}
- if(face!=='up'){r(-4,-8,2,2,'#342f2e');r(3,-8,2,2,'#342f2e')}
+ // Small Gather-style shopper: 2D sprite with pixel outlines and direction-aware details.
+ ctx.save();
+ ctx.translate(Math.round(x),Math.round(y));
+ ctx.scale(scale,scale);
+ const P=(a,b,w,h,c)=>pix(a,b,w,h,c);
+ P(-8,13,18,4,'#00000025');
+ let stride=(started&&activePanel==='none')?Math.floor(Date.now()/170)%2:0;
+ P(-8,5,7,9,'#293438');P(1,5,7,9,'#293438');
+ P(-7,6+(stride?1:0),5,7,p.pants);P(2,6+(stride?-1:0),5,7,p.pants);
+ P(-8,12+(stride?1:0),7,3,'#252d31');P(1,12+(stride?-1:0),7,3,'#252d31');
+ P(-11,-5,22,14,'#253a3d');
+ P(-9,-5,18,13,p.shirt);
+ P(-8,4,16,3,'#00000020');
+ P(-12,-2,4,9,p.skin);P(8,-2,4,9,p.skin);
+ P(-11,-5,5,6,p.shirt);P(6,-5,5,6,p.shirt);
+ P(-9,-18,18,16,'#333438');P(-8,-17,16,14,p.skin);
+ P(-9,-18,18,5,p.hair);
+ if(p.style===1){P(-10,-21,20,7,p.hair);P(7,-14,4,11,p.hair);P(-10,-9,4,9,p.hair)}
+ if(p.style===2){P(-10,-20,20,8,p.hair);P(-10,-13,5,14,p.hair)}
+ if(p.style===3){P(-9,-20,18,8,p.hair);P(-9,-12,4,6,p.hair)}
+ if(face==='up'){
+   P(-7,-11,14,6,p.hair);P(-5,-7,10,4,'#ffffff1c');
+ }else{
+   P(-5,-10,2,2,'#3b2f30');P(3,-10,2,2,'#3b2f30');
+   P(-1,-6,2,1,'#b7655b');
+ }
+ P(-6,-4,12,2,'#ffffff35');
  ctx.restore();
 }
-function grassPattern(){for(let y=0;y<24;y++)for(let x=0;x<39;x++){let v=(x*17+y*31)%7;fillTile(x,y,v===0?'#a7c997':v===3?'#b6d6a2':'#afd29e');if((x*7+y*13)%17===0){colorRect(x*T+9,y*T+13,3,8,'#82b784');colorRect(x*T+16,y*T+6,3,7,'#80b483')}}}
-function tree(x,y){colorRect(x*T+9,y*T+18,14,19,'#6e6651');colorRect(x*T+3,y*T-10,26,29,'#498b67');colorRect(x*T-3,y*T+1,38,16,'#539e6f');colorRect(x*T+5,y*T-14,22,11,'#6bab79');colorRect(x*T+5,y*T+8,9,4,'#9ecb95')}
+
+// Hand-painted-style pixel-art primitives. All draw at native canvas resolution.
+function pix(x,y,w,h,c){colorRect(Math.round(x),Math.round(y),w,h,c)}
+function speck(x,y,w,h,n,palette){
+ for(let i=0;i<n;i++){
+  const px=(i*67+i*i*13+17)%Math.max(1,w-2);
+  const py=(i*37+i*i*7+11)%Math.max(1,h-2);
+  pix(x+px,y+py,i%5===0?5:2,i%4===0?2:1,palette[i%palette.length]);
+ }
+}
+function bloom(x,y,c){
+ pix(x-2,y-1,5,4,c);pix(x-1,y-3,3,8,c);pix(x-2,y-2,5,5,'#ffffff9a');
+ pix(x,y-1,2,3,'#e9c678');
+}
+function garden(x,y,w=58){
+ pix(x-3,y+11,w+6,13,'#856d59');
+ pix(x,y+14,w,7,'#ad8e71');
+ pix(x-2,y+1,w+4,15,'#2e6957');
+ pix(x+2,y-2,w-4,16,'#4c936d');
+ for(let i=0;i<6;i++){const a=x+5+i*(w-12)/5;pix(a,y+((i%3)*2),9,7,i%2?'#74b67e':'#66a86f')}
+ bloom(x+12,y+1,'#ffb7b5');bloom(x+w/2,y-2,'#f5d67e');bloom(x+w-15,y+2,'#fff0de');
+}
+function streetlamp(x,y){
+ pix(x+11,y+14,5,61,'#314950');pix(x+7,y+74,13,5,'#43575a');
+ pix(x+4,y+12,19,6,'#293c42');pix(x+7,y,13,17,'#293c42');
+ pix(x+9,y+3,9,11,'#ffe3a2');pix(x+8,y+5,2,9,'#e7b46e');
+ pix(x+7,y-4,13,5,'#354b50');pix(x+11,y-9,5,6,'#354b50');
+ pix(x+22,y+12,4,5,'#ffe1a0');
+}
+function pixelTree(tx,ty){
+ const x=tx*T+16,y=ty*T+16;
+ // Chunky, rounded canopy clusters with limited highlight colors.
+ pix(x-7,y+12,14,39,'#675a46');pix(x-4,y+14,7,33,'#89725a');
+ for(const [dx,dy,w,h] of [[-23,-17,35,30],[-8,-26,33,32],[6,-12,27,26],[-28,-1,28,23],[-5,3,39,22]]){
+  pix(x+dx+3,y+dy+4,w,h,'#316d55');
+  pix(x+dx,y+dy,w,h,'#4d956b');
+  pix(x+dx+4,y+dy+3,w-10,7,'#7db67d');
+  pix(x+dx+w-8,y+dy+12,6,7,'#397d5f');
+ }
+ for(let i=0;i<11;i++)pix(x-24+(i*17)%46,y-25+(i*13)%35,4,3,i%2?'#a2ca90':'#6eae77');
+}
+function storeMannequin(x,y,shirt){
+ pix(x-8,y+25,16,2,'#364e4d');pix(x-1,y+8,3,18,'#546564');
+ pix(x-4,y-7,8,7,'#e5c3a4');pix(x-10,y,20,4,shirt);
+ pix(x-7,y+3,14,19,shirt);pix(x-11,y+3,5,12,shirt);
+ pix(x+7,y+3,5,12,shirt);pix(x-6,y+19,12,4,'#d6d6cb');
+ pix(x-2,y+8,3,9,'#ffffff2b');
+}
+function grassPattern(){
+ for(let y=0;y<24;y++)for(let x=0;x<39;x++){
+  const v=(x*17+y*31)%9;
+  fillTile(x,y,v===0?'#b9d8aa':v===4?'#a8cca0':'#b1d4a7');
+  if((x*7+y*13)%11===0){
+    pix(x*T+8,y*T+13,4,3,'#7eb986');
+    pix(x*T+14,y*T+9,3,6,'#8dc08d');
+  }
+ }
+}
+function tree(x,y){pixelTree(x,y)}
 function drawBuilding(b){
  const X=b.x*T,Y=b.y*T,w=b.w*T,h=b.h*T;
- // Layered slate roof and restrained brick storefront; original collision/doors stay fixed.
- colorRect(X-5,Y-7,w+10,h+10,'#4d5d5e');
- colorRect(X,Y,w,h,b.c);
- for(let yy=Y+9;yy<Y+h-20;yy+=19){colorRect(X+2,yy,w-4,1,'#ffffff35');for(let xx=X+11+((yy-Y)%38);xx<X+w-6;xx+=36)colorRect(xx,yy+1,1,16,'#ffffff23')}
- colorRect(X-8,Y-20,w+16,21,'#334750');
- colorRect(X-8,Y-19,w+16,5,'#59717a');
- colorRect(X-7,Y-4,w+14,5,'#354e54');
- // Shop window bays intentionally stop before the central doorway.
- const doorPx=b.doorX*T+2;
- for(let xx=X+13;xx<X+w-21;xx+=61){
-   if(Math.abs((xx+18)-(doorPx+15))<40)continue;
-   colorRect(xx,Y+48,42,h-103,'#3e5959');
-   colorRect(xx+4,Y+52,34,h-111,'#a6c7bc');
-   colorRect(xx+6,Y+55,30,h-117,'#85aaa2');
-   colorRect(xx+19,Y+52,2,h-111,'#edf2dc');
-   colorRect(xx+6,Y+h-70,30,3,'#f2dcb4');
-   // Small clothing silhouettes in windows.
-   colorRect(xx+12,Y+h-98,17,4,'#e9e5d7');
-   colorRect(xx+15,Y+h-94,11,19,'#f4efe0');
+ const palette=b.id==='boutique'
+ ? {wall:'#d9b596',trim:'#263b45',dark:'#243844',glass:'#87b2ac',stripe:'#426d68',light:'#f3dba8',brand:'#f5e8d4'}
+ : b.id==='shoes'
+ ? {wall:'#b8c3ca',trim:'#354c5c',dark:'#284251',glass:'#8fbed3',stripe:'#5f8792',light:'#eacb9d',brand:'#f3eee1'}
+ : {wall:'#d8ada1',trim:'#58464e',dark:'#45414d',glass:'#9fc1b5',stripe:'#b77872',light:'#efd3a2',brand:'#fff0de'};
+ const p=(a,c,d,e,f)=>pix(a,c,d,e,f);
+ // Strong rooftop silhouette + raised cornice casts a clear shadow.
+ p(X-9,Y+4,w+18,h+13,'#506067');
+ p(X-3,Y-7,w+6,h+12,palette.wall);
+ p(X-15,Y-28,w+30,27,palette.trim);
+ p(X-12,Y-34,w+24,10,'#63717a');
+ p(X-8,Y-31,w+16,6,'#344a56');
+ for(let i=0;i<w-12;i+=17)p(X+6+i,Y-24,11,4,'#ffffff14');
+ p(X-13,Y-3,w+26,5,'#e4d7bf');
+ // Pixel-scale masonry visible across the wall, not flat fill.
+ for(let ry=15;ry<h-8;ry+=14){
+   p(X+1,Y+ry,w-2,1,'#fcf0dc44');
+   for(let rx=10+(Math.floor(ry/14)%2)*20;rx<w-6;rx+=40)p(X+rx,Y+ry+1,2,11,'#ffffff28');
  }
- // Simple striped awning, one clear sign and an unmistakable entrance.
- const awnY=Y+35;
- colorRect(X+6,awnY,w-12,10,'#f3e9d3');
- for(let i=0;i<Math.floor((w-12)/18);i++)colorRect(X+6+i*18,awnY,9,10,b.id==='boutique'?'#5f827c':b.id==='shoes'?'#668c9d':'#b7776d');
- colorRect(X+8,Y+3,w-16,24,'#fff4df');
- textDraw(b.name,X+w/2,Y+20,Math.min(13,Math.max(10,140/b.name.length)),'#2f4b50');
- const dY=(b.y+b.h-1)*T;
- colorRect(doorPx-2,dY-26,33,59,'#243e41');
- colorRect(doorPx+2,dY-23,25,51,'#83b8ac');
- colorRect(doorPx+14,dY-20,2,46,'#eaf4ec');
- colorRect(doorPx+8,dY+2,4,4,'#e7d79a');
- colorRect(doorPx+3,dY+27,23,4,'#f4e0ac');
- if(b.id!=='boutique'){colorRect(X+w-72,Y+31,66,15,'#f3e9d3');textDraw('COMING SOON',X+w-39,Y+42,8,'#526467')}
+ // Architecturally distinct upstairs windows with sills and curtains.
+ for(let rx=18;rx<w-27;rx+=70){
+   const xx=X+rx;
+   p(xx-3,Y+8,49,47,'#7e918b');
+   p(xx,Y+11,43,39,palette.dark);
+   p(xx+4,Y+15,35,29,palette.glass);
+   p(xx+4,Y+15,35,7,'#d3e4d0');
+   p(xx+19,Y+15,3,29,'#eaece1');
+   p(xx,Y+49,43,4,'#f1e0c2');
+   p(xx+29,Y+28,7,14,'#f5e8d04b');
+ }
+ // Big shop nameplate over awning.
+ const boardW=w-34;
+ p(X+17,Y+56,boardW,33,palette.dark);
+ p(X+20,Y+59,boardW-6,27,palette.brand);
+ textDraw(b.name,X+w/2,Y+78,Math.min(13,Math.max(9,146/b.name.length)),palette.trim);
+ // Alternating fabric awning and shadow; distinctive instead of a flat line.
+ p(X+7,Y+91,w-14,17,'#00000035');
+ p(X+4,Y+87,w-8,18,palette.brand);
+ for(let i=0;i<w-12;i+=18){
+    p(X+7+i,Y+87,9,24,palette.stripe);
+    p(X+7+i,Y+106,9,7,palette.stripe);
+    p(X+16+i,Y+105,9,6,'#fff3d8');
+ }
+ p(X+7,Y+112,w-14,5,palette.dark);
+ // Tall glass windows display miniature clothes and soft golden shop lighting.
+ const sy=Y+119,sh=h-133;
+ const doorX=b.doorX*T+2,doorW=30;
+ const segments=[{x:X+12,w:doorX-X-21},{x:doorX+doorW+9,w:X+w-(doorX+doorW+21)}];
+ for(const seg of segments)if(seg.w>30){
+    p(seg.x-3,sy-2,seg.w+6,sh+11,palette.dark);
+    p(seg.x,sy,seg.w,sh+5,palette.light);
+    p(seg.x+3,sy+3,seg.w-6,sh-1,'#82aca6');
+    p(seg.x+6,sy+6,seg.w-12,sh-7,palette.glass);
+    p(seg.x+8,sy+8,6,sh-13,'#ffffff65');
+    p(seg.x+seg.w-12,sy+8,3,sh-13,'#e9f6ed');
+    p(seg.x+3,sy+sh-15,seg.w-6,12,'#8f725c');
+    const mid=seg.x+seg.w/2;
+    storeMannequin(mid,sy+sh-45,b.id==='cafe'?'#e6d0bd':b.id==='shoes'?'#e2eee9':'#faf4df');
+    if(seg.w>94)storeMannequin(mid-38,sy+sh-45,palette.stripe);
+ }
+ // Recessed entrance aligned with preexisting entrance trigger.
+ const doorY=Y+111;
+ p(doorX-5,doorY,doorW+10,h-112,palette.dark);
+ p(doorX,doorY+4,doorW,h-122,'#467c80');
+ p(doorX+3,doorY+6,doorW-6,h-127,'#7db6ab');
+ p(doorX+13,doorY+4,3,h-120,'#f4eddc');
+ p(doorX+20,doorY+48,4,4,'#eed395');
+ p(doorX-7,Y+h-4,doorW+14,6,'#e6cfa9');
+ // Side foliage softens urban storefronts, not the walkable aisle.
+ p(X-6,Y+h-24,12,24,'#997b65');
+ p(X-8,Y+h-32,16,14,'#478c65');
+ p(X+w-6,Y+h-24,12,24,'#997b65');
+ p(X+w-8,Y+h-32,16,14,'#478c65');
+ if(b.id!=='boutique'){
+  p(X+w-103,Y+118,93,15,'#fff2dc');
+  textDraw('COMING SOON',X+w-56,Y+129,9,'#384f4e');
+ }
 }
 function pavement(){
- // Open pedestrian boulevard: neutral paving, two unobtrusive kerbs and a road below.
- for(let y=8;y<=20;y++)for(let x=1;x<38;x++)fillTile(x,y,(x+y)%2?'#d9d9ca':'#e4e3d7');
- for(let y=21;y<=23;y++)for(let x=0;x<39;x++)fillTile(x,y,(x+y)%2?'#829391':'#879995');
- colorRect(T,21*T,37*T,5,'#f4eee0');
- for(let x=2;x<37;x+=5)colorRect(x*T+9,22*T+24,29,3,'#e5e6d5');
- // Small brick joins communicate texture without busy checkerboarding.
- for(let y=9;y<=20;y+=3)for(let x=2;x<38;x+=4)colorRect(x*T+5,y*T+13,19,1,'#c7c7bb');
+ // Broad, warm stone walking boulevard and deliberate brick pattern.
+ for(let y=8;y<=20;y++)for(let x=1;x<38;x++){
+  const base=((x+y)%3===0)?'#d7c6b2':((x+y)%3===1)?'#e6d7c4':'#dfceba';
+  fillTile(x,y,base);
+  pix(x*T,y*T+31,T,1,'#bca995');
+  pix(x*T+31,y*T,1,T,'#c1af9c');
+  if((x+y)%2===0)pix(x*T+11,y*T+8,8,1,'#f3e8d8');
+ }
+ // Raised edge to the street.
+ pix(0,21*T-3,39*T,8,'#f3e7ce');
+ pix(0,21*T+5,39*T,2,'#ad9f88');
+ for(let y=21;y<24;y++)for(let x=0;x<39;x++){
+  fillTile(x,y,(x+y)%2?'#78888b':'#7f9091');
+  if(y===21)pix(x*T+3,y*T+6,26,2,'#8e9c9d');
+ }
+ // Parking street dashed line in muted warm white.
+ for(let x=3;x<38;x+=5)pix(x*T,22*T+12,63,4,'#e2e2cf');
+ // A painted crossing opposite the boutique entrance.
+ for(let x=6;x<=10;x++)pix(x*T+5,21*T+6,17,26,'#f2ecdf');
 }
-function bush(x,y){colorRect(x*T+4,y*T+9,26,17,'#3e8e66');colorRect(x*T+1,y*T+14,30,11,'#6aaa70');colorRect(x*T+5,y*T+5,16,12,'#65a76c')}
+function bush(x,y){garden(x*T+3,y*T+5,28)}
 function townScene(){
  grassPattern();pavement();
- // A calm central plaza, with wide clear paths to each shop.
- for(let y=12;y<19;y++)for(let x=12;x<=29;x++)fillTile(x,y,(x+y)%2?'#e3dec9':'#ede8d7');
- for(let x=12;x<=29;x++){colorRect(x*T,12*T,32,2,'#c4c4ae');colorRect(x*T,19*T,32,2,'#c4c4ae')}
- // Compact fountain: anchor landmark without obscuring nearby shoppers.
- colorRect(20*T-16,14*T-12,95,83,'#718586');
- colorRect(20*T-11,14*T-7,85,73,'#dce6de');
- colorRect(20*T-3,14*T+1,69,57,'#80baca');
- colorRect(20*T+19,14*T+17,25,21,'#b8d9e3');
- colorRect(20*T+29,14*T+3,5,25,'#e0f1ee');
- // Buildings keep exact prior locations so door triggers and map controls still work.
+ // A neat, welcoming pedestrian plaza, immediately recognizable from the camera.
+ for(let y=12;y<19;y++)for(let x=12;x<=29;x++){
+  fillTile(x,y,(x+y)%2?'#f0e0c8':'#e7d3b7');
+  pix(x*T,y*T+30,32,2,'#d1bca6');
+  if((x+y)%3===0)pix(x*T+14,y*T+7,5,2,'#fff0d8');
+ }
+ // Geometric courtyard border.
+ for(let x=12;x<=29;x++){pix(x*T,12*T,32,4,'#bda18b');pix(x*T,19*T-4,32,4,'#bda18b')}
+ for(let y=12;y<19;y++){pix(12*T,y*T,4,32,'#bda18b');pix(30*T-4,y*T,4,32,'#bda18b')}
+ // Brick-lined fountain, aqua ripples and a tiny sparkling jet.
+ pix(20*T-19,14*T-17,101,89,'#697f82');
+ pix(20*T-14,14*T-12,91,79,'#e4dccb');
+ pix(20*T-6,14*T-4,75,63,'#73b9c8');
+ pix(20*T+1,14*T+4,61,47,'#83ced8');
+ pix(20*T+22,14*T+22,22,14,'#d3e9e1');
+ pix(20*T+28,14*T+3,6,35,'#d4ece9');
+ pix(20*T+23,14*T-4,16,5,'#e1f5f3');
+ pix(20*T+14,14*T+13,8,3,'#d4eee8');
+ pix(20*T+51,14*T+45,9,3,'#c8e8ec');
  for(const b of buildings)drawBuilding(b);
- // Limited greenery keeps the shopping areas readable.
- tree(2,3);tree(36,3);tree(3,15);tree(34,15);tree(4,19);tree(35,19);
- bush(11,12);bush(30,12);bush(11,18);bush(30,18);
- // Repeated small planters give each storefront some atmosphere.
- for(const x of [5,13,18,24,29,34]){colorRect(x*T,9*T+5,27,10,'#947b68');colorRect(x*T+3,9*T-2,21,11,'#639e71')}
- // Benches at plaza edges, separated from walkway and player spawn.
- for(const x of [2,32]){colorRect(x*T,11*T,30,8,'#aa8061');colorRect(x*T+3,11*T+7,4,7,'#795e4d');colorRect(x*T+23,11*T+7,4,7,'#795e4d')}
- // Warm lampposts; decorative only and never block movement.
- for(const x of [3,35]){colorRect(x*T+14,12*T-15,4,51,'#536165');colorRect(x*T+8,12*T-16,16,17,'#f5d9a0');colorRect(x*T+6,12*T-19,20,4,'#576b69')}
- // A single simple pedestrian crossing on the street.
- for(let i=0;i<6;i++)colorRect((7+i)*T,21*T+9,19,17,'#e7e9df');
- for(const s of shoppers)drawAvatar(s.x*T+16,s.y*T+18,s.c,.9);
+ // Two clusters of trees, not a wall of foliage.
+ for(const [x,y] of [[2,3],[36,3],[3,15],[35,15],[4,19],[35,19]])tree(x,y);
+ // Planters mark the plaza corners and house edges.
+ garden(11*T+7,11*T+20,59);garden(28*T+20,11*T+20,57);
+ garden(11*T+7,18*T+26,59);garden(28*T+20,18*T+26,57);
+ for(const x of [4,15,27,36])garden(x*T+2,9*T+3,37);
+ // Benches and lamps add charm without visual overload.
+ for(const x of [2,32]){
+  pix(x*T,11*T,36,11,'#654e44');pix(x*T+3,11*T-6,30,8,'#bc9973');
+  pix(x*T+5,11*T+11,5,8,'#6c5b4d');pix(x*T+28,11*T+11,5,8,'#6c5b4d');
+ }
+ streetlamp(3*T,10*T-37);streetlamp(35*T,10*T-37);
+ // Thin banner for urban-but-cozy identity.
+ pix(19*T,10*T+4,96,25,'#304e53');
+ pix(19*T+4,10*T+8,88,17,'#e9d9b7');
+ textDraw("TEENSEYS'",20.5*T,10*T+21,11,'#365a52');
+ for(const sh of shoppers)drawAvatar(sh.x*T+16,sh.y*T+18,sh.c,.9);
  drawAvatar(player.x*T+16,player.y*T+19,profiles[character],1.05,player.dir);
- const focus=findFocus();if(focus?.kind==='building'){let b=focus.item;colorRect(b.doorX*T-3,b.doorY*T+18,40,4,'#f1d47a')}
+ const f=findFocus();if(f?.kind==='building'){
+  const b=f.item;pix(b.doorX*T-4,b.doorY*T+19,41,5,'#ffe1a0');
+ }
 }
 function storeScene(){
  const ww=24,hh=17;
- const r=colorRect;
- // Warm oak planks and subtle shadows, readable against 2D characters.
+ // Boutique-grade parquet wood, micro-textured instead of plain squares.
  for(let y=0;y<hh;y++)for(let x=0;x<ww;x++){
-   fillTile(x,y,(x+y)%2?'#e7d7bd':'#f1e4cf');
-   r(x*T,y*T+T-2,T,2,'#cdbb9f');
-   if((x+y)%2===0)r(x*T+T-2,y*T+2,2,T-5,'#d6c3a8');
+   fillTile(x,y,(x+y)%2?'#e4c6a5':'#efd5b8');
+   pix(x*T,y*T+29,32,3,'#c09c7e');
+   pix(x*T+((y%2)*12),y*T+8,2,20,'#d6b08f');
+   pix(x*T+3,y*T+4,8,2,'#f7e6cb');
  }
- // Back wall with trim, posters and long display windows.
- r(0,0,ww*T,3*T,'#bdcfc3');
- r(0,0,ww*T,15,'#344e4b');
- r(0,2*T+17,ww*T,12,'#63877a');
- r(0,3*T-4,ww*T,5,'#f5e7c9');
- for(const x of [2,6,10,14,18]){
-   const xx=x*T;
-   r(xx,21,2*T+15,56,'#496b65');
-   r(xx+5,25,2*T+5,47,'#a7cac0');
-   r(xx+9,29,2*T-3,39,'#d3e3d4');
-   r(xx+9,62,2*T-3,4,'#7b9c87');
+ // Warm shop wall with wainscot and framed clothing lookbook prints.
+ pix(0,0,ww*T,3*T,'#e4dfca');
+ pix(0,0,ww*T,20,'#415a53');
+ pix(0,2*T+13,ww*T,14,'#728c75');
+ pix(0,3*T-6,ww*T,7,'#f5e5c9');
+ for(let x=2;x<20;x+=4){
+  const xx=x*T;
+  pix(xx,24,2*T+5,51,'#866a5e');
+  pix(xx+5,29,2*T-5,41,'#ffedcf');
+  pix(xx+8,33,2*T-11,35,x%8===2?'#9ea9a3':'#d2b7a1');
+  storeMannequin(xx+T+2,42,x%8===2?'#f7e7d0':'#4e7571');
  }
- // Store brand header, with a restrained fashion-boutique feel.
- r(9*T,9,6*T,35,'#254746');
- r(9*T+5,13,6*T-10,27,'#f3e8d2');
- textDraw("THE THREADS SHOP",12*T,31,15,'#294f4b');
- // Side walls occupy the original blocked edge tiles.
- r(0,0,2*T,hh*T,'#789b8b');
- r((ww-2)*T,0,2*T,hh*T,'#789b8b');
- for(const x of [0,(ww-2)*T]){
-   r(x+8,3*T,3,11*T,'#b9d0bc');
-   for(let y=4;y<14;y+=3){r(x+15,y*T,32,4,'#5f8076');r(x+19,y*T-16,24,16,'#d1d2bb')}
+ // Big fashion wordmark above the back wall.
+ pix(8*T,3,8*T,44,'#2c4b4b');
+ pix(8*T+5,8,8*T-10,34,'#f4e6cd');
+ textDraw("THE THREADS SHOP",12*T,31,17,'#2b514d');
+ pix(0,0,2*T,hh*T,'#809c89');
+ pix((ww-2)*T,0,2*T,hh*T,'#809c89');
+ for(const xx of [0,(ww-2)*T]){
+  pix(xx+4,3*T,2*T-8,2,'#4d6c60');
+  pix(xx+10,5*T,2*T-20,3,'#547366');
+  pix(xx+10,10*T,2*T-20,3,'#547366');
+  pix(xx+15,6*T,26,58,'#a9baa6');
+  pix(xx+15,11*T,26,56,'#c0c2a3');
  }
- // Checkout counter is anchored to the existing help desk (collision preserved).
- r(20*T,3*T+3,3*T,42,'#584a43');
- r(20*T+2,3*T+3,3*T-4,12,'#c9a17e');
- r(20*T+8,3*T+14,3*T-16,23,'#90705a');
- r(20*T+25,3*T-22,46,18,'#f8f4e7');
- textDraw('HELP',21.5*T,3*T-9,10,'#40645b');
- r(21*T+5,3*T+17,19,10,'#354e50');
- r(21*T+8,3*T+13,14,6,'#dce2d5');
- // Color-coded merchandise racks with hanging garments and distinct labels.
+ // Back-right checkout counter with warm wood top.
+ pix(20*T-3,3*T+6,3*T+6,43,'#605347');
+ pix(20*T+3,3*T+7,3*T-6,10,'#d6ad80');
+ pix(20*T+5,3*T+17,3*T-10,27,'#a78060');
+ pix(20*T+17,3*T+20,11,9,'#8d9c88');
+ pix(20*T+26,3*T+17,21,5,'#394b47');
+ pix(20*T+21,3*T-16,60,15,'#f8eedc');
+ textDraw('CHECKOUT',21.5*T,3*T-5,9,'#38625a');
+ // Varied individual hanging garments and carefully spaced category headers.
  for(const rack of rackDefs){
-   const xx=rack.x*T, yy=rack.y*T, w=rack.w*T;
-   r(xx-4,yy+8,w+8,46,'#a68b70'); // display shadow
-   r(xx,yy+8,w,40,'#826b57');
-   r(xx+3,yy+12,w-6,30,'#ddc4a5');
-   r(xx+7,yy+18,w-14,5,'#6d716b');
-   for(let i=0;i<4;i++){
-     const px=xx+10+i*20, tint=rack.c;
-     // Individual little hanger + shirt (pixels, not actual 3D).
-     r(px+5,yy+15,5,4,'#f8edd5');
-     r(px+3,yy+19,9,2,'#746c61');
-     r(px,yy+23,15,16,tint);
-     r(px-3,yy+23,5,9,tint);
-     r(px+13,yy+23,5,9,tint);
-     r(px+3,yy+34,9,2,'#00000019');
-   }
-   // Legible signage clearly ties interactions to one rack only.
-   r(xx-6,yy-21,w+12,23,'#f9f5e9');
-   r(xx-6,yy-21,w+12,3,'#7b9687');
-   textDraw(rack.label,xx+w/2,yy-5,10,'#254640');
-   r(xx-5,yy+48,w+10,5,'#675445');
+  const xx=rack.x*T,yy=rack.y*T,w=rack.w*T;
+  pix(xx-6,yy+7,w+12,53,'#9c7b5f');
+  pix(xx-3,yy+4,w+6,52,'#5e5149');
+  pix(xx+1,yy+7,w-2,44,'#c6a383');
+  pix(xx+4,yy+12,w-8,4,'#4d5651');
+  for(let i=0;i<4;i++){
+   const px=xx+10+i*20, c=rack.c;
+   pix(px+6,yy+14,3,6,'#eee4d0');
+   pix(px+3,yy+19,10,2,'#6d655f');
+   pix(px+1,yy+21,14,22,c);
+   pix(px-3,yy+21,5,13,c);
+   pix(px+14,yy+21,5,13,c);
+   pix(px+4,yy+38,8,2,'#0000001b');
+   pix(px+5,yy+23,2,10,'#ffffff28');
+  }
+  pix(xx-7,yy-22,w+14,25,'#f6eada');
+  pix(xx-7,yy-22,w+14,5,rack.c);
+  textDraw(rack.label,xx+w/2,yy-5,10,'#2e504b');
+  pix(xx-3,yy+55,w+6,5,'#755d4c');
  }
- // Small visual guide by the open central aisle; leaves all walking tiles clear.
- r(8*T+5,8*T+12,8*T-10,2,'#d1bea5');
- textDraw('BROWSE BY SECTION',12*T,8*T+8,10,'#957e67');
- // Front wall and clear EXIT tile exactly where the original exit trigger sits.
- r(0,(hh-2)*T,ww*T,2*T,'#78998a');
- r(11*T,15*T,2*T,2*T,'#d8e2ca');
- r(11*T+4,15*T+8,2*T-8,2*T-15,'#a3c6b7');
- r(11*T+9,15*T+8,2*T-18,3,'#f6e5b9');
- textDraw('EXIT',12*T,15*T+26,12,'#2b5850');
- // Decorative mat guides the customer inward; never affects collision.
- r(11*T,13*T+15,2*T,23,'#bfcec1');
- r(11*T+5,13*T+19,2*T-10,15,'#7f9d8d');
- // Characters render above the decorations.
+ // Ornamental rug and centered path; purely cosmetic and safe for walking.
+ pix(8*T+9,8*T+17,8*T-18,16,'#c7ae96');
+ pix(8*T+15,8*T+21,8*T-30,8,'#e4d5bf');
+ textDraw('FIND YOUR STYLE',12*T,8*T+31,10,'#8a725c');
+ // Open central exit exactly at original trigger tile.
+ pix(0,(hh-2)*T,ww*T,2*T,'#779689');
+ pix(11*T,15*T,2*T,2*T,'#e6e4cb');
+ pix(11*T+5,15*T+6,2*T-10,2*T-11,'#8dbbaa');
+ pix(11*T+9,15*T+10,2*T-18,4,'#f9ecb9');
+ textDraw('EXIT',12*T,15*T+29,11,'#28584e');
+ // A small counter mat adds depth without changing collision coordinates.
+ pix(10*T+18,13*T+21,3*T-4,23,'#a9baaa');
+ pix(10*T+23,13*T+25,3*T-14,15,'#d4ddd0');
  for(const n of npcs)drawAvatar(n.x*T+16,n.y*T+19,n.c,1);
  for(const sh of shoppers.slice(0,2))drawAvatar((sh.x-8)*T+16,(sh.y-7)*T+19,sh.c,.9);
  drawAvatar(player.x*T+16,player.y*T+19,profiles[character],1.05,player.dir);
- const focus=findFocus();
- if(focus?.kind==='rack'){
-   const rack=focus.item;
-   ctx.strokeStyle='#f9d56e';ctx.lineWidth=4;
-   ctx.strokeRect(rack.x*T-5,rack.y*T+4,rack.w*T+10,rack.h*T-8);
+ const f=findFocus();
+ if(f?.kind==='rack'){
+  const rack=f.item;
+  ctx.strokeStyle='#ffe0a1';ctx.lineWidth=4;
+  ctx.strokeRect(rack.x*T-7,rack.y*T+3,rack.w*T+14,rack.h*T-6);
  }
- if(focus?.kind==='npc')r(21*T+10,4*T+9,14,4,'#f4d682');
+ if(f?.kind==='npc')pix(21*T+10,4*T+9,14,4,'#ffe0a1');
 }
 function camera(){let mapw=mode==='town'?39*T:24*T,maph=mode==='town'?24*T:17*T;
  return {x:Math.max(0,Math.min(mapw-W,player.x*T+16-W/2)),y:Math.max(0,Math.min(maph-H,player.y*T+16-H*(mode==='town'?.72:.56)))}}
