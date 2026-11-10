@@ -547,33 +547,33 @@ function pv_building(b){
  const cols=b.w>=229?3:2;
  const gap=(w-46)/cols;
  for(let i=0;i<cols;i++){
-  const wx=x+20+i*gap,wy=y+24;
-  pv_rect(wx-5,wy+4,46,66,brick?"#e0bba2":"#eee0c6");
-  pv_rect(wx-2,wy+7,40,60,b.trim);
-  pv_rect(wx+2,wy+13,32,48,b.glass);
+  const wx=x+20+i*gap,wy=y+12;
+  pv_rect(wx-5,wy+4,46,53,brick?"#e0bba2":"#eee0c6");
+  pv_rect(wx-2,wy+7,40,47,b.trim);
+  pv_rect(wx+2,wy+13,32,35,b.glass);
   pv_rect(wx+2,wy+13,32,10,"#d9ece3");
-  pv_rect(wx+16,wy+10,3,53,"#eceadd");
-  pv_rect(wx+3,wy+35,30,3,"#e8e3d9");
-  pv_rect(wx+5,wy+17,4,36,"#ffffff63");
-  pv_rect(wx-8,wy+68,52,7,brick?"#e3bea5":"#f1dcc1");
+  pv_rect(wx+16,wy+10,3,39,"#eceadd");
+  pv_rect(wx+3,wy+32,30,3,"#e8e3d9");
+  pv_rect(wx+5,wy+17,4,27,"#ffffff63");
+  pv_rect(wx-8,wy+54,52,6,brick?"#e3bea5":"#f1dcc1");
   pv_rect(wx-5,wy-1,46,6,brick?"#ddad95":"#efe1c9");
  }
  // Decorative horizontal cornice separating upper floor from shops.
- pv_rect(x-5,y+107,w+10,12,b.trim);
- pv_rect(x-4,y+105,w+8,5,"#e5cbac");
+ pv_rect(x-5,base-121,w+10,12,b.trim);
+ pv_rect(x-4,base-123,w+8,5,"#e5cbac");
  // Each shop gets a readable storefront, awning, and display windows.
- const sy=y+120,signY=y+119;
+ const signY=base-109;
  pv_rect(x+11,signY,w-22,28,b.trim);
  pv_rect(x+15,signY+4,w-30,19,b.sign);
  pv_txt(b.name,x+w/2,signY+19,b.w<200?11:13,b.trim);
- pv_rect(x+6,y+147,w-12,13,b.sign);
+ pv_rect(x+6,base-80,w-12,13,b.sign);
  for(let j=0;j<w-15;j+=20){
-  pv_rect(x+7+j,y+147,10,20,b.awn);
-  pv_rect(x+7+j,y+163,10,6,b.awn);
+  pv_rect(x+7+j,base-80,10,20,b.awn);
+  pv_rect(x+7+j,base-64,10,6,b.awn);
  }
- pv_rect(x+7,y+167,w-14,5,b.trim);
+ pv_rect(x+7,base-60,w-14,5,b.trim);
  // Glass windows arranged around a recessed entrance.
- const glassY=y+176;
+ const glassY=base-54;
  const glassH=Math.max(24,base-glassY-7);
  const leftW=Math.max(29,b.door-x-36);
  const rightX=b.door+40;
