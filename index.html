@@ -89,7 +89,7 @@
 <div class="page">
   <div class="shell">
     <div class="topbar">
-      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 0.5</span></div><div class="sub">Now featuring CC0 pixel-art tiles</div></div>
+      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 0.6</span></div><div class="sub">Original Teenseys pixel-art storefronts</div></div>
       <div class="top-actions">
         <button id="browseBtn" class="pill" type="button" disabled>Browse all</button>
         <button id="cartBtn" class="pill" type="button" disabled>Bag <span id="cartCount">0</span></button>
@@ -115,6 +115,24 @@
 const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');ctx.imageSmoothingEnabled=false;
 const overlay=document.getElementById('overlay'),hint=document.getElementById('hint'),hud=document.getElementById('hud'),toastEl=document.getElementById('toast');
 const T=32,W=704,H=448;
+ // Original Teenseys sprite set: image assets live inside this GitHub repository.
+ const art={};
+ for(const [key,file] of Object.entries({
+  boutique:'threads.svg',shoes:'sole-house.svg',cafe:'corner-cafe.svg',
+  tree:'tree.svg',rack:'rack.svg',wood:'wood-floor.svg',stone:'stone.svg',grass:'grass.svg'
+ })){
+  const img=new Image();
+  img.onload=()=>{art[key]=img;};
+  img.onerror=()=>{delete art[key];};
+  img.src='assets/teenseys/'+file;
+ }
+ function artDraw(key,x,y,w,h){
+  const img=art[key];
+  if(!img||!img.complete||!img.naturalWidth)return false;
+  ctx.drawImage(img,Math.round(x),Math.round(y),w,h);
+  return true;
+ }
+
  // CC0 pixel tiles from Kenney Tiny Town. The atlas is kept externally hosted
  // for this first asset-integration test. The game keeps its drawn fallback if offline.
  const townAtlas=new Image();
@@ -259,6 +277,8 @@ function storeMannequin(x,y,shirt){
  pix(x-2,y+8,3,9,'#ffffff2b');
 }
 function grassPattern(){
+if(art.grass){for(let y=0;y<24;y+=2)for(let x=0;x<39;x+=2)artDraw('grass',x*T,y*T,64,64);return;}
+
  for(let y=0;y<24;y++)for(let x=0;x<39;x++){
   const v=(x*17+y*31)%9;
   fillTile(x,y,v===0?'#b9d8aa':v===4?'#a8cca0':'#b1d4a7');
@@ -268,8 +288,12 @@ function grassPattern(){
   }
  }
 }
-function tree(x,y){pixelTree(x,y)}
+function tree(x,y){
+if(artDraw('tree',x*T-11,y*T-32,68,82))return;
+pixelTree(x,y)}
 function drawBuilding(b){
+if(artDraw(b.id,b.x*T,b.y*T,b.w*T,b.h*T))return;
+
  const X=b.x*T,Y=b.y*T,w=b.w*T,h=b.h*T;
  const palette=b.id==='boutique'
  ? {wall:'#d9b596',trim:'#263b45',dark:'#243844',glass:'#87b2ac',stripe:'#426d68',light:'#f3dba8',brand:'#f5e8d4'}
@@ -285,7 +309,7 @@ function drawBuilding(b){
  p(X-15,Y-28,w+30,27,palette.trim);
  p(X-12,Y-34,w+24,10,'#63717a');
  p(X-8,Y-31,w+16,6,'#344a56');
- if(atlasReady){
+ if(false && atlasReady){
    // Sprite-textured upper facade; exact shop positions/doors are unchanged.
    for(let ix=X+11;ix<X+w-24;ix+=32)atlasTile(b.id==='boutique'?4:2,4,ix,Y+9,32);
  }
@@ -356,6 +380,15 @@ function drawBuilding(b){
  }
 }
 function pavement(){
+if(art.stone){
+ for(let y=8;y<=20;y+=2)for(let x=0;x<39;x+=2)artDraw('stone',x*T,y*T,64,64);
+ for(let y=21;y<24;y++)for(let x=0;x<39;x++)fillTile(x,y,(x+y)%2?'#778b91':'#819398');
+ for(let x=1;x<38;x++)colorRect(x*T,21*T,32,5,'#f3ecdb');
+ for(let x=3;x<38;x+=5)colorRect(x*T,22*T+14,52,3,'#e7e6da');
+ for(let x=6;x<11;x++)colorRect(x*T+5,21*T+7,19,22,'#f2e9da');
+ return;
+}
+
  // Broad, warm stone walking boulevard and deliberate brick pattern.
  for(let y=8;y<=20;y++)for(let x=1;x<38;x++){
   const base=((x+y)%3===0)?'#d7c6b2':((x+y)%3===1)?'#e6d7c4':'#dfceba';
@@ -399,7 +432,7 @@ function townScene(){
  pix(20*T+14,14*T+13,8,3,'#d4eee8');
  pix(20*T+51,14*T+45,9,3,'#c8e8ec');
  // Original CC0 tile art in the landscaped corners and plaza.
- if(atlasReady){
+ if(false && atlasReady){
    for(const [tx,ty] of [[1,10],[36,10],[3,19],[34,19],[10,12],[30,12]])drawAssetVines(tx*T,ty*T);
  }
  for(const b of buildings)drawBuilding(b);
@@ -426,13 +459,17 @@ function townScene(){
  }
 }
 function storeScene(){
+if(art.wood){for(let y=0;y<17;y+=2)for(let x=0;x<24;x+=2)artDraw('wood',x*T,y*T,64,64);}
+
  const ww=24,hh=17;
  // Boutique-grade parquet wood, micro-textured instead of plain squares.
  for(let y=0;y<hh;y++)for(let x=0;x<ww;x++){
-   fillTile(x,y,(x+y)%2?'#e4c6a5':'#efd5b8');
-   pix(x*T,y*T+29,32,3,'#c09c7e');
-   pix(x*T+((y%2)*12),y*T+8,2,20,'#d6b08f');
-   pix(x*T+3,y*T+4,8,2,'#f7e6cb');
+   if(!art.wood){
+    fillTile(x,y,(x+y)%2?'#e4c6a5':'#efd5b8');
+    pix(x*T,y*T+29,32,3,'#c09c7e');
+    pix(x*T+((y%2)*12),y*T+8,2,20,'#d6b08f');
+    pix(x*T+3,y*T+4,8,2,'#f7e6cb');
+   }
  }
  // Warm shop wall with wainscot and framed clothing lookbook prints.
  pix(0,0,ww*T,3*T,'#e4dfca');
@@ -447,7 +484,7 @@ function storeScene(){
   storeMannequin(xx+T+2,42,x%8===2?'#f7e7d0':'#4e7571');
  }
  // Original pixel-art merchandise and props from the same licensed asset pack.
- if(atlasReady){
+ if(false && atlasReady){
   for(const xx of [4*T+8,10*T+8,16*T+8]){
    atlasSprite(9,9,xx,3*T+10,32);
   }
@@ -495,6 +532,8 @@ function storeScene(){
   textDraw(rack.label,xx+w/2,yy-5,10,'#2e504b');
   pix(xx-3,yy+55,w+6,5,'#755d4c');
  }
+ // Matching pixel-art display racks sit exactly on the original interaction spots.
+ if(art.rack)for(const rr of rackDefs)artDraw('rack',rr.x*T-5,rr.y*T-2,rr.w*T+10,rr.h*T+2);
  // Ornamental rug and centered path; purely cosmetic and safe for walking.
  pix(8*T+9,8*T+17,8*T-18,16,'#c7ae96');
  pix(8*T+15,8*T+21,8*T-30,8,'#e4d5bf');
