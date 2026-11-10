@@ -89,7 +89,7 @@
 <div class="page">
   <div class="shell">
     <div class="topbar">
-      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 0.8</span></div><div class="sub">A three-quarter-view shopping town</div></div>
+      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 0.9</span></div><div class="sub">Three-quarter view · now with working shopping</div></div>
       <div class="top-actions">
         <button id="browseBtn" class="pill" type="button" disabled>Browse all</button>
         <button id="cartBtn" class="pill" type="button" disabled>Bag <span id="cartCount">0</span></button>
@@ -419,7 +419,199 @@ if(art.stone){
  for(let x=6;x<=10;x++)pix(x*T+5,21*T+6,17,26,'#f2ecdf');
 }
 function bush(x,y){garden(x*T+3,y*T+5,28)}
-function townScene(){
+
+ // 2.5D three-quarter world visually approved in the separate style preview.
+ // These rendering methods are namespaced so boutique mechanics stay intact.
+ const pv_shops=[
+ {name:"THE THREADS SHOP",x:100,w:250,y:149,base:336,door:228,wall:"#ce998a",side:"#a16b67",roof:"#4e6d70",roofLight:"#789893",trim:"#284f56",awn:"#6eaa9b",glass:"#9ecbc2",sign:"#fff2d7"},
+ {name:"SOLE HOUSE",x:398,w:229,y:136,base:336,door:498,wall:"#adc9cf",side:"#739da6",roof:"#47697b",roofLight:"#7eabb4",trim:"#35566b",awn:"#ddad7e",glass:"#a1d2d2",sign:"#fff2df"},
+ {name:"CORNER CAFÉ",x:673,w:182,y:166,base:336,door:751,wall:"#d3a89d",side:"#a97977",roof:"#77636d",roofLight:"#a88a8b",trim:"#604e5c",awn:"#dc9a8d",glass:"#a3cdbd",sign:"#ffeddd"}
+];
+
+ let townPlayer={x:316,y:424,dir:'down'};
+ let townWalkStep=0;
+ function pv_rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));}
+function pv_poly(points,c){ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);ctx.closePath();ctx.fill()}
+function pv_line(x1,y1,x2,y2,c,w=2){ctx.strokeStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();}
+function pv_txt(v,x,y,size=14,c="#284950",align="center"){ctx.textAlign=align;ctx.fillStyle=c;ctx.font="900 "+size+"px sans-serif";ctx.fillText(v,x,y);}
+function pv_star(x,y,color="#fff5da"){pv_rect(x-1,y-5,3,12,color);pv_rect(x-5,y-1,12,3,color)}
+function pv_grass(x,y,w,h){pv_rect(x,y,w,h,"#acd0a4");for(let i=0;i<130;i++){let a=x+(i*67+31)%w,b=y+(i*31+13)%h;pv_rect(a,b,4,2,i%3?"#93bf96":"#d1deae")}}
+function pv_horizon(){
+pv_rect(0,0,960,210,"#d5eada");pv_rect(0,0,960,98,"#c7e4db");
+pv_rect(0,77,960,12,"#d3e9de");
+for(let x=0;x<960;x+=35){pv_rect(x,105+(x%5)*2,28,68,"#afd1c1");pv_rect(x+3,98+(x%4)*3,19,76,"#bed8cc")}
+for(let i=0;i<12;i++){let x=22+i*91;pv_rect(x,93,32,80,"#99beae");pv_rect(x+7,100,5,9,"#dfedcd");pv_rect(x+19,117,5,9,"#dfedcd")}
+pv_grass(0,208,960,220);
+}
+function pv_sidewalk(){
+pv_rect(0,330,960,158,"#d8c9ad");
+for(let y=342;y<480;y+=23){pv_rect(0,y,960,2,"#bbaa91");for(let x=(Math.floor(y/23)%2)*24;x<960;x+=48)pv_rect(x,y+2,2,20,"#c3b499")}
+pv_poly([[0,438],[960,438],[960,470],[0,462]],"#efe1c6");
+pv_rect(0,476,960,9,"#f9e9cc");pv_rect(0,484,960,4,"#bcab93");
+pv_rect(0,489,960,111,"#74868c");pv_rect(0,491,960,14,"#82969a");
+for(let x=0;x<960;x+=150)pv_rect(x+49,553,90,5,"#e2ddca");
+for(let x=213;x<336;x+=29)pv_rect(x,488,19,72,"#f5ebd7");
+pv_rect(0,568,960,32,"#83a493");
+for(let x=0;x<960;x+=50)pv_rect(x+6,584,30,3,"#9fc4a5");
+}
+function pv_tree(x,y,s=1){
+ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+pv_rect(-6,0,13,77,"#78614e");pv_rect(-2,1,6,66,"#a07c5b");
+pv_poly([[-32,22],[-42,0],[-36,-28],[-16,-37],[11,-41],[35,-19],[40,12],[25,28],[-12,32]],"#396f58");
+pv_poly([[-39,-1],[-31,-29],[-10,-48],[18,-48],[35,-26],[28,6],[-9,16]],"#4e936d");
+pv_poly([[-22,-25],[-10,-54],[12,-54],[28,-36],[16,-20]],"#83bc85");
+for(let i=0;i<15;i++){let a=-34+(i*17)%65,b=-33+(i*13)%43;pv_rect(a,b,7,4,i%2?"#a3cd93":"#77b47e")}
+pv_rect(-25,74,54,5,"#4f775e55");
+ctx.restore();
+}
+function pv_planter(x,y,w=90){
+pv_rect(x,y+14,w,22,"#8d6d57");pv_rect(x+4,y+17,w-8,12,"#b48b6c");
+for(let i=0;i<8;i++){let xx=x+4+i*(w-10)/8;pv_rect(xx,y+3-(i%3)*4,22,16,i%3?"#639e74":"#4b8f70")}
+for(let i=0;i<7;i++){let xx=x+10+i*(w-20)/7;pv_rect(xx,y-3-(i%2)*5,5,5,i%2?"#f4cf9c":"#f5b5b5")}
+pv_rect(x+2,y+35,w-4,3,"#674f44");
+}
+function pv_bench(x,y){
+pv_rect(x-6,y+28,105,5,"#4d6b5f33");
+pv_rect(x,y+1,91,13,"#8a624f");
+pv_rect(x+4,y+1,83,5,"#d3a178");
+pv_rect(x,y+16,91,10,"#b88862");
+pv_rect(x+5,y+24,7,12,"#5a5349");pv_rect(x+81,y+24,7,12,"#5a5349");
+}
+function pv_lamp(x,y){
+pv_rect(x+9,y+35,10,101,"#394e51");pv_rect(x+13,y+39,2,93,"#667c76");
+pv_rect(x+1,y+26,27,17,"#4b5960");pv_rect(x+5,y+4,20,33,"#3a4c50");
+pv_rect(x+8,y+9,14,23,"#ffe4aa");pv_rect(x+10,y+11,4,18,"#fff7d6");
+pv_rect(x+4,y+1,22,7,"#273e46");
+pv_rect(x+6,y+132,16,7,"#435354");
+}
+function pv_windowFrame(x,y,w,h,glass){
+pv_rect(x-4,y-4,w+8,h+10,"#304b50");
+pv_rect(x,y,w,h,glass);
+pv_rect(x+5,y+5,w-10,8,"#c6e6d9");
+pv_rect(x+6,y+16,7,h-23,"#ffffff6a");pv_rect(x+w-14,y+13,5,h-20,"#dff3e6");
+pv_rect(x+Math.floor(w/2)-2,y,4,h,"#e8e2d2");
+pv_rect(x-4,y+h,w+8,7,"#e7d9bd");
+}
+function pv_roofTiles(x,y,w,h,c){
+for(let row=0;row<4;row++){let yy=y+row*10;for(let col=0;col<Math.ceil(w/23);col++){let xx=x+col*23+(row%2)*11;pv_rect(xx,yy,18,2,c)}}}
+function pv_building(b){
+let x=b.x,y=b.y,w=b.w,base=b.base,dep=30,top=y-75;
+pv_rect(x+7,base-1,w+24,13,"#36514f3d");
+// visible building side-wall depth on the right
+pv_poly([[x+w,y+9],[x+w+dep,y-18],[x+w+dep,base-14],[x+w,base]],b.side);
+for(let j=0;j<7;j++)pv_rect(x+w+8,y+38+j*24,18,2,"#f5f1dc44");
+pv_rect(x,y,w,base-y,b.wall);
+for(let row=0;row<7;row++){let yy=y+15+row*25;pv_rect(x+4,yy,w-8,2,"#fff1dd48");for(let xx=x+18+(row%2)*29;xx<x+w;xx+=54)pv_rect(xx,yy+3,3,19,"#6b73702c")}
+pv_poly([[x-24,y+8],[x+15,top],[x+w+5,top],[x+w+dep+13,y+8]],b.roof);
+pv_poly([[x-24,y+8],[x+15,top],[x+w+5,top],[x+w+dep+13,y+8],[x+w+12,y+27],[x-15,y+27]],b.roof);
+pv_poly([[x-5,y+7],[x+22,top+13],[x+w-2,top+13],[x+w+9,y+7]],b.roofLight);
+pv_poly([[x+w+11,y+26],[x+w+dep+13,y+8],[x+w+dep+13,y+23],[x+w+11,y+40]],b.trim);
+pv_rect(x-19,y+24,w+33,11,b.trim);
+pv_rect(x-19,y+24,w+33,4,"#f3e6c23a");
+pv_roofTiles(x+17,top+24,w-17,42,"#31575c49");
+for(let i=0;i<Math.floor(w/37);i++){let xx=x+9+i*37;pv_rect(xx,y+31,25,3,"#ffffff20")}
+// balcony window set with fabric curtains
+let windows=b.w>=229?3:2;
+for(let i=0;i<windows;i++){let wx=x+22+i*(w-48)/windows;pv_windowFrame(wx,y+51,42,43,b.glass)}
+// store sign and blocky striped awning
+pv_rect(x+15,y+107,w-30,30,b.trim);
+pv_rect(x+19,y+111,w-38,22,b.sign);
+pv_txt(b.name,x+w/2,y+127,b.w<200?11:13,b.trim);
+pv_rect(x+7,y+137,w-14,18,b.sign);
+for(let i=0;i<w-20;i+=24){pv_rect(x+8+i,y+137,12,24,b.awn);pv_rect(x+8+i,y+156,12,8,b.awn)}
+pv_rect(x+8,y+164,w-16,5,b.trim);
+// tall window displays and glass doors
+const sy=y+171,fh=base-sy-6;
+if(fh>25){
+ pv_windowFrame(x+16,sy,Math.max(43,b.door-x-37),fh,b.glass);
+ const rightX=b.door+42;
+ if(rightX<x+w-43)pv_windowFrame(rightX,sy,x+w-rightX-17,fh,b.glass);
+ for(const xx of [x+43,x+w-51]){
+  pv_rect(xx-7,sy+fh-31,14,17,"#f1e5d6");
+  pv_rect(xx-10,sy+fh-23,20,8,"#d1b49b");
+  pv_rect(xx-1,sy+fh-6,3,9,"#517477");
+ }
+}
+pv_rect(b.door-15,base-85,42,85,b.trim);
+pv_rect(b.door-10,base-80,32,75,"#6eaaa0");
+pv_rect(b.door-6,base-76,24,65,"#add5c4");
+pv_rect(b.door+5,base-76,4,68,"#eef4dc");
+pv_rect(b.door+16,base-39,5,5,"#f3dea0");
+pv_rect(b.door-20,base-4,52,7,"#e6d1b3");
+// floor projecting toward the player is the dimensional contact shadow
+pv_poly([[b.door-22,base+3],[b.door+33,base+3],[b.door+60,base+23],[b.door-39,base+23]],"#d1b99d");
+for(const xx of [x+3,x+w-22])pv_planter(xx,base-36,30);
+}
+function pv_fountain(t){
+const cx=535,cy=409;
+ctx.save();ctx.translate(cx,cy);
+pv_rect(-81,34,164,9,"#354e4e22");
+pv_poly([[-85,0],[-66,-25],[68,-25],[88,0],[68,25],[-66,25]],"#657f81");
+pv_poly([[-76,-2],[-60,-18],[61,-18],[77,-2],[60,18],[-60,18]],"#d9d3b9");
+pv_poly([[-65,-2],[-51,-12],[52,-12],[66,-2],[52,12],[-51,12]],"#6baeb9");
+pv_poly([[-53,-1],[-38,-7],[41,-7],[55,-1],[40,9],[-39,9]],"#8ed8df");
+pv_rect(-14,-5,30,12,"#587a76");pv_rect(-10,-14,22,13,"#c5d7bf");
+pv_rect(-4,-39,8,27,"#eff3d6");
+pv_rect(-11,-25,4,14,"#a9e4dd");pv_rect(10,-25,4,14,"#b8eeea");
+pv_rect(-10,-40,22,5,"#edf8de");
+pv_rect(-14,-49+Math.round(Math.sin(t/530)*3),8,5,"#fff8e0");
+pv_rect(6,-53+Math.round(Math.cos(t/450)*4),5,5,"#fff8e0");
+ctx.restore();
+}
+function pv_person(x,y,shirt,hair,dir,walk=0){
+ctx.save();ctx.translate(Math.round(x),Math.round(y));
+pv_rect(-11,3,24,5,"#1b3e3d29");
+pv_rect(-8,-3,7,10,"#34404b");pv_rect(2,-3,7,10,"#34404b");
+pv_rect(-7,-3+(walk%2)*3,6,8,"#3d5362");
+pv_rect(2,-3-(walk%2)*3,6,8,"#3d5362");
+pv_rect(-12,-24,24,24,"#293c41");
+pv_rect(-10,-23,20,20,shirt);
+pv_rect(-13,-21,5,14,"#b88869");pv_rect(8,-21,5,14,"#b88869");
+pv_rect(-9,-43,18,21,"#a97459");
+pv_rect(-10,-46,20,9,hair);
+if(dir==="up")pv_rect(-8,-38,17,8,hair);
+else if(dir==="left")pv_rect(-8,-32,3,3,"#233339");
+else if(dir==="right")pv_rect(5,-32,3,3,"#233339");
+else{pv_rect(-5,-32,3,3,"#25323b");pv_rect(4,-32,3,3,"#25323b")}
+ctx.restore();
+}
+
+ function townDoorFocus(){
+   return pv_shops.find(b=>Math.abs(b.door-townPlayer.x)<65&&townPlayer.y<402&&townPlayer.y>330)||null;
+ }
+ function townMove(dir){
+   const d={up:[0,-10],down:[0,10],left:[-10,0],right:[10,0]}[dir];
+   if(!d)return;
+   townPlayer.dir=dir;
+   let nx=Math.max(27,Math.min(924,townPlayer.x+d[0]));
+   let ny=Math.max(353,Math.min(535,townPlayer.y+d[1]));
+   const cx=nx-535,cy=ny-409;
+   if(cx*cx/(95*95)+cy*cy/(44*44)<1.25)return;
+   townPlayer.x=nx;townPlayer.y=ny;townWalkStep=(townWalkStep+1)%4;
+ }
+ function drawTown25d(){
+   ctx.save();
+   ctx.scale(W/960,H/600);
+   const t=performance.now();
+   pv_horizon();pv_sidewalk();
+   pv_tree(54,301,1.15);pv_tree(905,297,1.06);
+   for(const b of pv_shops)pv_building(b);
+   pv_planter(120,370,76);pv_planter(815,377,92);
+   pv_bench(664,426);pv_bench(107,419);
+   pv_lamp(38,290);pv_lamp(897,292);
+   pv_fountain(t);
+   pv_tree(32,455,.66);pv_tree(917,453,.72);
+   pv_person(705,422,'#f5e6d3','#49343c','left',Math.floor(t/330)%2);
+   pv_person(806,467,'#b8c4e2','#3a302d','right',Math.floor(t/330)%2);
+   const f=townDoorFocus();
+   if(f){pv_rect(f.door-24,342,60,5,'#ffe4a7');pv_txt('E',f.door+5,324,18,'#fff0cb');}
+   const shirt=profiles[character]?.shirt||'#e7f0e7';
+   const hair=profiles[character]?.hair||'#243d44';
+   pv_person(townPlayer.x,townPlayer.y,shirt,hair,townPlayer.dir,townWalkStep);
+   ctx.restore();
+ }
+
+function legacyTownScene(){
  grassPattern();pavement();
  // A neat, welcoming pedestrian plaza, immediately recognizable from the camera.
  for(let y=12;y<19;y++)for(let x=12;x<=29;x++){
@@ -578,7 +770,7 @@ if(art.wood){for(let y=0;y<17;y+=2)for(let x=0;x<24;x+=2)artDraw('wood',x*T,y*T,
 }
 function camera(){let mapw=mode==='town'?39*T:24*T,maph=mode==='town'?24*T:17*T;
  return {x:Math.max(0,Math.min(mapw-W,player.x*T+16-W/2)),y:Math.max(0,Math.min(maph-H,player.y*T+16-H*(mode==='town'?.72:.56)))}}
-function draw(){ctx.save();const c=camera();ctx.translate(-Math.round(c.x),-Math.round(c.y));if(mode==='town')townScene();else storeScene();ctx.restore();requestAnimationFrame(draw)}
+function draw(){ctx.save();if(mode==='town')drawTown25d();else{const c=camera();ctx.translate(-Math.round(c.x),-Math.round(c.y));storeScene()}ctx.restore();requestAnimationFrame(draw)}
 function townSolid(x,y){if(x<1||x>=38||y<1||y>=23)return true;
  for(const b of buildings)if(x>=b.x&&x<b.x+b.w&&y>=b.y&&y<b.y+b.h)return true;
  if(x>=19&&x<=22&&y>=14&&y<=16)return true;
@@ -588,11 +780,11 @@ function storeSolid(x,y){if(x<2||x>21||y<3||y>14)return true;
  if(x>=20&&x<=21&&y===3)return true;
  return false}
 function step(dir){if(!started||activePanel!=='none')return;let now=Date.now();if(now-lastMove<95)return;lastMove=now;let delta={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]}[dir];if(!delta)return;
- player.dir=dir;let x=player.x+delta[0],y=player.y+delta[1];if(!(mode==='town'?townSolid(x,y):storeSolid(x,y))){player.x=x;player.y=y}refreshHud()}
+ if(mode==='town'){townMove(dir);refreshHud();return;}player.dir=dir;let x=player.x+delta[0],y=player.y+delta[1];if(!storeSolid(x,y)){player.x=x;player.y=y}refreshHud()}
 function closestToRect(r){let dx=Math.max(r.x-player.x,0,player.x-(r.x+r.w-1)),dy=Math.max(r.y-player.y,0,player.y-(r.y+r.h-1));return dx+dy}
 function findFocus(){if(!started)return null;
  if(mode==='town'){
- let nearby=buildings.map(b=>({kind:'building',item:b,d:Math.abs(player.x-b.doorX)+Math.abs(player.y-b.doorY)})).filter(z=>z.d<=2).sort((a,b)=>a.d-b.d);return nearby[0]||null;
+ const near=townDoorFocus();return near?{kind:'building',item:{id:near.name==='THE THREADS SHOP'?'boutique':near.name==='SOLE HOUSE'?'shoes':'cafe',name:near.name},d:0}:null;
  }
  let candidates=rackDefs.map(r=>({kind:'rack',item:r,d:closestToRect(r)})).filter(v=>v.d<=2);
  const npc=npcs[0];let nd=Math.abs(player.x-npc.x)+Math.abs(player.y-npc.y);if(nd<=2)candidates.push({kind:'npc',item:npc,d:nd});
@@ -607,7 +799,7 @@ function refreshHud(){let where=mode==='town'?'TOWN SQUARE':'THE THREADS SHOP';h
  hint.innerHTML=activePanel==='none'?`<kbd>E</kbd> ${msg}`:'Shopping experience paused';
 }
 function enterStore(){mode='store';player={x:12,y:13,dir:'up'};refreshHud();toast('Welcome to The Threads Shop!');}
-function leaveStore(){mode='town';player={x:8,y:9,dir:'down'};refreshHud()}
+function leaveStore(){mode='town';townPlayer.y=Math.max(382,townPlayer.y);townPlayer.dir='down';refreshHud();toast('Back in the shopping district!')}
 function interact(){if(activePanel!=='none'||!started)return;const f=findFocus();if(!f){toast('Move a little closer to a rack or doorway.');return}
  if(f.kind==='building'){if(f.item.id==='boutique')enterStore();else toast('This storefront is coming soon!')}
  if(f.kind==='rack')openProduct(f.item.id,0,false);
@@ -635,7 +827,7 @@ function renderCharacters(){let cards=profiles.map((_,i)=>`<button class="avatar
  let p=profiles[i],r=(x,y,w,h,color)=>{a.fillStyle=color;a.fillRect(x,y,w,h)};
  r(23,44,8,8,p.pants);r(33,44,8,8,p.pants);r(23,30,18,17,p.shirt);r(20,34,4,10,p.skin);r(41,34,4,10,p.skin);r(25,14,14,19,p.skin);r(24,12,16,7,p.hair);if(p.style===1)r(38,17,4,12,p.hair);if(p.style===2)r(21,18,5,15,p.hair);r(29,24,2,2,'#352a24');r(36,24,2,2,'#352a24')
  })}
-function startGame(){character=selection;started=true;mode='town';player={x:8,y:11,dir:'up'};activePanel='none';document.getElementById('gameWrap').classList.remove('modal-open');overlay.classList.add('hidden');overlay.innerHTML='';
+function startGame(){character=selection;started=true;mode='town';townPlayer={x:316,y:424,dir:'down'};player={x:8,y:11,dir:'up'};activePanel='none';document.getElementById('gameWrap').classList.remove('modal-open');overlay.classList.add('hidden');overlay.innerHTML='';
  for(const id of ['browseBtn','cartBtn','menuBtn','interactBtn'])document.getElementById(id).disabled=false;
  refreshHud();toast('Head toward the THREADS SHOP. Use E to enter.');}
 function authUnavailable(isSignup){openPanel('auth',`<button class="close close-corner" data-action="close" aria-label="Close">×</button><div class="eyebrow">Account features · next phase</div><h2>${isSignup?'Create an account':'Sign in'}</h2><p>Real accounts will be powered by Supabase so you can return with your saved character, location, cart and favorites.</p><div class="demo-note">This prototype does not collect emails or passwords. Registration and saving are not connected yet.</div><div style="height:18px"></div><button class="btn full" data-action="guest">Try the guest experience →</button>`)}
@@ -671,7 +863,18 @@ function showCart(){let total=bag.reduce((s,v)=>s+v.price,0);
  openPanel('cart',`<button class="close close-corner" data-action="close" aria-label="Close bag">×</button><div class="eyebrow">Sample checkout</div><h2>Your shopping bag</h2><div class="cartitems">${rows}</div><div class="carttotal"><span>Subtotal</span><span>$${total.toFixed(2)}</span></div><div class="demo-note">This is a demonstration bag. No payment or checkout is available until a real Shopify store is connected.</div><button class="btn secondary full" style="margin-top:16px" data-action="close">Keep exploring</button>`)}
 function addToBag(){const p=products.find(q=>q.rack===rackId&&q.id===products.filter(q=>q.rack===rackId)[productIndex].id);bag.push({...p,size:p.type==='bag'||p.type==='cap'?'One size':selectedSize});document.getElementById('cartCount').textContent=bag.length;
  const status=document.getElementById('itemStatus');if(status)status.textContent=`✓ Added ${p.name} to your demo bag`}
-function onCanvasClick(e){if(!started||activePanel!=='none')return;let b=canvas.getBoundingClientRect(),scX=W/b.width,scY=H/b.height,c=camera();let x=Math.floor(((e.clientX-b.left)*scX+c.x)/T),y=Math.floor(((e.clientY-b.top)*scY+c.y)/T);
+function onCanvasClick(e){if(!started||activePanel!=='none')return;
+ if(mode==='town'){
+  const bounds=canvas.getBoundingClientRect(),px=(e.clientX-bounds.left)*960/bounds.width,py=(e.clientY-bounds.top)*600/bounds.height;
+  const target=pv_shops.find(b=>px>=b.x&&px<=b.x+b.w+30&&py>=b.y-75&&py<=b.base+20);
+  if(target){
+   if(Math.abs(townPlayer.x-target.door)<65&&townPlayer.y>330&&townPlayer.y<402){
+    if(target.name==='THE THREADS SHOP')enterStore();else toast('This storefront is coming soon!');
+   }else toast('Walk closer to the entrance, then press E.');
+  }
+  return;
+ }
+let b=canvas.getBoundingClientRect(),scX=W/b.width,scY=H/b.height,c=camera();let x=Math.floor(((e.clientX-b.left)*scX+c.x)/T),y=Math.floor(((e.clientY-b.top)*scY+c.y)/T);
  if(mode==='store'){let r=rackDefs.find(r=>x>=r.x&&x<r.x+r.w&&y>=r.y-1&&y<r.y+r.h);if(r){if(closestToRect(r)<=2)openProduct(r.id,0,false);else toast('Walk closer to that rack, then click again.');return}
  if(Math.abs(x-21)+Math.abs(y-5)<=2&&Math.abs(player.x-21)+Math.abs(player.y-5)<=2){showNpc();return}}
  else{let bt=buildings.find(b=>x>=b.x&&x<b.x+b.w&&y>=b.y&&y<=b.y+b.h+1);if(bt){if(Math.abs(player.x-bt.doorX)+Math.abs(player.y-bt.doorY)<=2)bt.id==='boutique'?enterStore():toast('Coming soon!');else toast('Walk up to the storefront entrance.');return}}
