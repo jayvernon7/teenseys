@@ -89,7 +89,7 @@
 <div class="page">
   <div class="shell">
     <div class="topbar">
-      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 1.0</span></div><div class="sub">Michigan downtown shopping district</div></div>
+      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 1.1</span></div><div class="sub">Michigan downtown · redesigned buildings</div></div>
       <div class="top-actions">
         <button id="browseBtn" class="pill" type="button" disabled>Browse all</button>
         <button id="cartBtn" class="pill" type="button" disabled>Bag <span id="cartCount">0</span></button>
@@ -422,7 +422,20 @@ function bush(x,y){garden(x*T+3,y*T+5,28)}
 
  // 2.5D three-quarter world visually approved in the separate style preview.
  // These rendering methods are namespaced so boutique mechanics stay intact.
- const pv_shops=[
+ 
+ // Fully illustrated individual downtown facades. Door coordinates remain exactly the same.
+ const downtownArt={};
+ for(const [id,filename] of Object.entries({
+  "THE THREADS SHOP":"downtown-threads.svg",
+  "SOLE HOUSE":"downtown-sole-house.svg",
+  "CORNER CAFÉ":"downtown-corner-cafe.svg"
+ })){
+  const image=new Image();
+  downtownArt[id]=image;
+  image.src="assets/teenseys/"+filename;
+ }
+
+const pv_shops=[
  {name:"THE THREADS SHOP",x:100,w:250,y:149,base:336,door:228,wall:"#aa5f4f",side:"#7d443d",roof:"#525052",roofLight:"#756d67",trim:"#31505a",awn:"#3e746c",glass:"#9cc9c3",sign:"#f8e7c9",style:"redbrick"},
  {name:"SOLE HOUSE",x:398,w:229,y:136,base:336,door:498,wall:"#c8a27d",side:"#987556",roof:"#58636a",roofLight:"#828990",trim:"#334c59",awn:"#be8267",glass:"#abd0d1",sign:"#f7eddc",style:"limestone"},
  {name:"CORNER CAFÉ",x:673,w:182,y:166,base:336,door:751,wall:"#9f574f",side:"#784641",roof:"#51434d",roofLight:"#81717b",trim:"#594551",awn:"#ba826b",glass:"#abd0bd",sign:"#fff1da",style:"cafe"}
@@ -513,6 +526,14 @@ pv_rect(x-4,y+h,w+8,7,"#e7d9bd");
 function pv_roofTiles(x,y,w,h,c){
 for(let row=0;row<4;row++){let yy=y+row*10;for(let col=0;col<Math.ceil(w/23);col++){let xx=x+col*23+(row%2)*11;pv_rect(xx,yy,18,2,c)}}}
 function pv_building(b){
+ const img=downtownArt[b.name];
+ if(img&&img.complete&&img.naturalWidth>0){
+   // The original preview storefront ground and entrance positions are preserved.
+   // Each illustration includes its roof and offset side elevation in its own atlas.
+   ctx.drawImage(img,Math.round(b.x-24),Math.round(b.y-94),Math.round(b.w+64),Math.round(b.base-b.y+114));
+   return;
+ }
+
  const x=b.x,y=b.y,w=b.w,base=b.base,dep=27;
  const brick=b.style!=="limestone",top=y-93;
  const mortar=brick?"#d09987":"#f0d5b5";
