@@ -89,7 +89,7 @@
 <div class="page">
   <div class="shell">
     <div class="topbar">
-      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 1.1</span></div><div class="sub">Michigan downtown · redesigned buildings</div></div>
+      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 1.2</span></div><div class="sub">Night Plaza · flagship Blockbench building</div></div>
       <div class="top-actions">
         <button id="browseBtn" class="pill" type="button" disabled>Browse all</button>
         <button id="cartBtn" class="pill" type="button" disabled>Bag <span id="cartCount">0</span></button>
@@ -98,7 +98,7 @@
     </div>
     <div class="game-wrap" id="gameWrap">
       <canvas id="game" width="704" height="448" aria-label="Pixel-art shopping town game. Use arrow keys or WASD to move, E to interact."></canvas>
-      <div class="hud" id="hud">TOWN SQUARE <small>Explore the district</small></div>
+      <div class="hud" id="hud">NIGHT PLAZA <small>Explore the district</small></div>
       <div class="hint" id="hint">Choose a character to enter the town</div>
       <div id="overlay" class="overlay" aria-live="off"></div>
       <div id="toast" class="toast hidden" role="status"></div>
@@ -436,12 +436,17 @@ function bush(x,y){garden(x*T+3,y*T+5,28)}
  }
 
 const pv_shops=[
- {name:"THE THREADS SHOP",x:100,w:250,y:149,base:336,door:228,wall:"#aa5f4f",side:"#7d443d",roof:"#525052",roofLight:"#756d67",trim:"#31505a",awn:"#3e746c",glass:"#9cc9c3",sign:"#f8e7c9",style:"redbrick"},
- {name:"SOLE HOUSE",x:398,w:229,y:136,base:336,door:498,wall:"#c8a27d",side:"#987556",roof:"#58636a",roofLight:"#828990",trim:"#334c59",awn:"#be8267",glass:"#abd0d1",sign:"#f7eddc",style:"limestone"},
- {name:"CORNER CAFÉ",x:673,w:182,y:166,base:336,door:751,wall:"#9f574f",side:"#784641",roof:"#51434d",roofLight:"#81717b",trim:"#594551",awn:"#ba826b",glass:"#abd0bd",sign:"#fff1da",style:"cafe"}
+ {name:"SOLE HOUSE",id:"shoes",x:12,y:136,w:249,h:246,base:382,door:145,img:"sole",style:"shoes"},
+ {name:"THE THREADS SHOP",id:"boutique",x:261,y:24,w:438,h:349,base:373,door:483,img:"threads",style:"boutique"},
+ {name:"CORNER CAFÉ",id:"cafe",x:710,y:132,w:237,h:245,base:377,door:820,img:"cafe",style:"cafe"}
 ];
+const nightSprites={};
+for(const [k,file] of Object.entries({
+ threads:"threads-model.svg",sole:"sole-house-model.svg",cafe:"corner-cafe-model.svg"
+})){const im=new Image();im.src="assets/teenseys/night/"+file;nightSprites[k]=im;}
 
- let townPlayer={x:316,y:424,dir:'down'};
+
+ let townPlayer={x:485,y:555,dir:'up'};
  let townWalkStep=0;
  function pv_rect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));}
 function pv_poly(points,c){ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(points[0][0],points[0][1]);for(let i=1;i<points.length;i++)ctx.lineTo(points[i][0],points[i][1]);ctx.closePath();ctx.fill()}
@@ -653,18 +658,18 @@ ctx.restore();
 }
 
  function townDoorFocus(){
-   return pv_shops.find(b=>Math.abs(b.door-townPlayer.x)<65&&townPlayer.y<402&&townPlayer.y>330)||null;
- }
+ return pv_shops.find(b=>Math.abs(b.door-townPlayer.x)<76&&townPlayer.y>=366&&townPlayer.y<422)||null;
+}
  function townMove(dir){
-   const d={up:[0,-10],down:[0,10],left:[-10,0],right:[10,0]}[dir];
-   if(!d)return;
-   townPlayer.dir=dir;
-   let nx=Math.max(27,Math.min(924,townPlayer.x+d[0]));
-   let ny=Math.max(353,Math.min(535,townPlayer.y+d[1]));
-   const cx=nx-535,cy=ny-409;
-   if(cx*cx/(95*95)+cy*cy/(44*44)<1.25)return;
-   townPlayer.x=nx;townPlayer.y=ny;townWalkStep=(townWalkStep+1)%4;
- }
+ const d={up:[0,-10],down:[0,10],left:[-10,0],right:[10,0]}[dir];if(!d)return;
+ townPlayer.dir=dir;
+ const x=Math.max(28,Math.min(930,townPlayer.x+d[0]));
+ const y=Math.max(383,Math.min(561,townPlayer.y+d[1]));
+ const dx=(x-485)/79,dy=(y-469)/39;
+ if(dx*dx+dy*dy<1.13)return;
+ // Buildings, planters and the fountain are on the far side of the walkable area.
+ townPlayer.x=x;townPlayer.y=y;townWalkStep=(townWalkStep+1)%4;
+}
  function pv_michiganBanner(x,y,label){
  pv_rect(x+9,y+31,6,89,"#36474a");
  pv_rect(x+2,y+5,20,26,"#43545a");
@@ -702,32 +707,153 @@ function pv_chalkboard(x,y){
  pv_rect(x+5,y+36,5,15,"#785d4a");
  pv_rect(x+20,y+36,5,15,"#785d4a");
 }
-function drawTown25d(){
-   ctx.save();
-   ctx.scale(W/960,H/600);
-   const t=performance.now();
-   pv_horizon();pv_sidewalk();
-   // Michigan downtown storefront row with pedestrian-friendly Main Street details.
-   for(const b of pv_shops)pv_building(b);
-   pv_tree(54,304,1.08);pv_tree(899,294,1.0);
-   pv_planter(120,370,76);pv_planter(817,377,85);
-   pv_bench(664,426);pv_bench(107,419);
-   pv_michiganBanner(36,266,"SHOP");
-   pv_michiganBanner(894,262,"LOCAL");
-   pv_bikeRack(378,391);
-   pv_patio(826,415);
-   pv_chalkboard(778,354);
-   pv_fountain(t);
-   pv_tree(32,455,.66);pv_tree(917,453,.72);
-   pv_person(705,422,'#f5e6d3','#49343c','left',Math.floor(t/330)%2);
-   pv_person(806,467,'#b8c4e2','#3a302d','right',Math.floor(t/330)%2);
-   const f=townDoorFocus();
-   if(f){pv_rect(f.door-24,342,60,5,'#ffe4a7');pv_txt('E',f.door+5,324,18,'#fff0cb');}
-   const shirt=profiles[character]?.shirt||'#e7f0e7';
-   const hair=profiles[character]?.hair||'#243d44';
-   pv_person(townPlayer.x,townPlayer.y,shirt,hair,townPlayer.dir,townWalkStep);
-   ctx.restore();
+
+function nightGlow(x,y,r,color,alpha=0.4){
+ const grd=ctx.createRadialGradient(x,y,1,x,y,r);
+ grd.addColorStop(0,color.replace('ALPHA',String(alpha)));
+ grd.addColorStop(1,color.replace('ALPHA','0'));
+ ctx.fillStyle=grd;ctx.fillRect(x-r,y-r,r*2,r*2);
+}
+function nightSky(){
+ const sky=ctx.createLinearGradient(0,0,0,420);
+ sky.addColorStop(0,'#100e30');sky.addColorStop(.54,'#342653');sky.addColorStop(1,'#7d5078');
+ ctx.fillStyle=sky;ctx.fillRect(0,0,960,420);
+ for(let i=0;i<72;i++){
+  let x=(i*139+43)%959,y=(i*83+41)%225;
+  pv_rect(x,y,i%9===0?2:1,i%9===0?2:1,i%3===0?'#d5c8f5':'#8a8cb9');
  }
+ // Distant street skyline behind the plaza shops.
+ for(let i=0;i<20;i++){
+   const x=i*55-26,h=78+(i*37)%116;
+   pv_rect(x,352-h,46,h,'#212341');
+   pv_rect(x,350-h,46,5,i%3===0?'#60417b':'#343555');
+   for(let yy=360-h;yy<344;yy+=19)for(let xx=x+7;xx<x+44;xx+=13){
+    if((i*11+xx+yy)%5<3)pv_rect(xx,yy,5,9,(i+yy)%3?'#e2a17f':'#b980bd');
+   }
+ }
+}
+function nightGround(){
+ // Sidewalk plaza with pink-blue wet paving, no cars interrupting pedestrian space.
+ const bg=ctx.createLinearGradient(0,360,0,600);
+ bg.addColorStop(0,'#70517c');bg.addColorStop(.56,'#735876');bg.addColorStop(1,'#332d53');
+ ctx.fillStyle=bg;ctx.fillRect(0,357,960,243);
+ pv_rect(0,367,960,10,'#d1a0a0');
+ pv_rect(0,380,960,3,'#453a61');
+ for(let y=386;y<600;y+=27){
+   pv_rect(0,y,960,2,'#a588a488');
+   for(let x=(Math.floor(y/27)%2)*37;x<960;x+=74)pv_rect(x,y+2,2,25,'#a588a45d');
+ }
+ // Diagonal avenue of light from store signs towards the fountain.
+ ctx.fillStyle='#e9a9c514';ctx.beginPath();ctx.moveTo(300,382);ctx.lineTo(660,382);ctx.lineTo(818,600);ctx.lineTo(120,600);ctx.fill();
+ // Fountain and shop light pools are visual glow only.
+ nightGlow(485,381,180,'rgba(255,169,120,ALPHA)',.25);
+ nightGlow(490,467,170,'rgba(82,111,255,ALPHA)',.25);
+ nightGlow(766,431,130,'rgba(255,102,194,ALPHA)',.16);
+ // Attractive plaza paver entrance line.
+ pv_rect(0,571,960,12,'#463853');
+ pv_rect(0,575,960,2,'#97799a');
+}
+function nightShop(b){
+ const im=nightSprites[b.img];
+ if(im?.complete&&im.naturalWidth){
+  // Projected artwork comes from actual editable Blockbench cube geometry.
+  nightGlow(b.door,b.base-45,b.style==='boutique'?215:145,
+    'rgba(236,99,255,ALPHA)',b.style==='boutique'?.27:.16);
+  ctx.fillStyle='#130f2a66';ctx.beginPath();ctx.ellipse(b.x+b.w/2,b.base+4,b.w*.46,16,0,0,Math.PI*2);ctx.fill();
+  ctx.drawImage(im,Math.round(b.x),Math.round(b.y),Math.round(b.w),Math.round(b.h));
+ }else{
+  // Network/loading fallback drawn as a legible storefront rather than a blank area.
+  pv_rect(b.x,b.y,b.w,b.h,'#352b4e');
+  pv_rect(b.x+5,b.y+5,b.w-10,b.h-10,'#5a4668');
+  pv_rect(b.x+14,b.base-110,b.w-28,104,'#7c96a1');
+  pv_rect(b.x+20,b.base-106,b.w-40,92,'#bcb4ad');
+  pv_rect(b.x+25,b.base-88,b.w-50,73,'#403b56');
+  pv_txt(b.name,b.x+b.w/2,b.base-140,Math.min(24,b.w/11),'#ffe6b4');
+ }
+ // Night plaza lighting cues; independent of game hitboxes.
+ pv_rect(b.door-24,b.base-2,48,4,'#e0c5b7');
+}
+function nightLantern(x,y,purple=false){
+ const glow=purple?'rgba(166,91,255,ALPHA)':'rgba(255,185,119,ALPHA)';
+ nightGlow(x+6,y-80,63,glow,.26);
+ pv_rect(x,y-100,10,107,'#28283e');
+ pv_rect(x-7,y-106,24,13,'#40435c');
+ pv_rect(x-4,y-128,18,25,'#55465b');
+ pv_rect(x-2,y-125,14,18,purple?'#d9a2fc':'#ffe7b5');
+ pv_rect(x-6,y-134,22,6,'#24283f');
+ pv_rect(x-4,y+2,18,7,'#29273d');
+}
+function nightTree(x,y,scale=1,blossom=false){
+ ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
+ pv_rect(-8,-72,16,91,'#4b304e');
+ for(const [dx,dy,w,h] of [[-43,-112,57,45],[-11,-131,55,52],[14,-111,44,41],[-26,-90,48,31]]){
+  pv_rect(dx,dy,w,h,blossom?'#ad568f':'#245d50');
+  pv_rect(dx+4,dy+3,w-8,14,blossom?'#e49ac9':'#39856a');
+ }
+ for(let i=0;i<15;i++)pv_rect(-35+i*5,-116+(i*11)%50,4,4,blossom?(i%2?'#f9b4e0':'#ca75bc'):(i%2?'#78a97a':'#4f977c'));
+ ctx.restore();
+}
+function nightPlanter(x,y,w=75){
+ pv_rect(x,y,w,22,'#332a45');pv_rect(x+3,y+3,w-6,13,'#6b5369');
+ for(let i=0;i<8;i++){
+  const xx=x+4+i*(w-8)/8;
+  pv_rect(xx,y-14-(i%3)*5,16,17,i%2?'#336953':'#5a9472');
+  if(i%3===0)pv_rect(xx+6,y-20,6,5,'#f2a4c9');
+ }
+ pv_rect(x+5,y+19,w-10,4,'#b88a7a');
+}
+function nightBench(x,y){
+ pv_rect(x,y+23,89,5,'#27283a');
+ pv_rect(x,y+2,89,14,'#a66b65');pv_rect(x+4,y+3,81,4,'#d8a67a');
+ pv_rect(x+7,y+14,7,23,'#333243');pv_rect(x+75,y+14,7,23,'#333243');
+}
+function nightFountain(now){
+ // Central circular basin, water and luminous animated jets.
+ const x=486,y=474;
+ nightGlow(x,y,117,'rgba(49,189,255,ALPHA)',.28);
+ ctx.fillStyle='#201d3eb5';ctx.beginPath();ctx.ellipse(x,y+30,104,30,0,0,7);ctx.fill();
+ ctx.fillStyle='#383c68';ctx.beginPath();ctx.ellipse(x,y+10,94,33,0,0,7);ctx.fill();
+ ctx.fillStyle='#b4a0ae';ctx.beginPath();ctx.ellipse(x,y+4,91,29,0,0,7);ctx.fill();
+ ctx.fillStyle='#387ea9';ctx.beginPath();ctx.ellipse(x,y+3,81,23,0,0,7);ctx.fill();
+ ctx.fillStyle='#5cd5ef';ctx.beginPath();ctx.ellipse(x,y,75,18,0,0,7);ctx.fill();
+ for(let i=0;i<16;i++){
+  const a=i*Math.PI/8;
+  pv_rect(x+Math.cos(a)*68,y+Math.sin(a)*14,3,3,i%3?'#def9ff':'#a7d4ff');
+ }
+ pv_rect(x-16,y-16,32,17,'#a9bdcc');pv_rect(x-7,y-26,14,16,'#d8d4d6');
+ pv_rect(x-3,y-64,7,39,'#79dfff');pv_rect(x-7,y-59,3,28,'#c2faff');pv_rect(x+10,y-55,3,30,'#c2faff');
+ const pulse=Math.round(Math.sin(now/320)*5);
+ pv_rect(x-17,y-80+pulse,5,8,'#e6fbff');
+ pv_rect(x+12,y-82-pulse,4,7,'#e6fbff');
+}
+function nightPondWalkers(t){
+ pv_person(328,489,'#9db6db','#302336','right',Math.floor(t/390)%2);
+ pv_person(735,531,'#e1b9a2','#362637','left',Math.floor(t/390)%2);
+}
+
+function drawTown25d(){
+ ctx.save();ctx.scale(W/960,H/600);
+ const t=performance.now();
+ nightSky();nightGround();
+ for(const b of pv_shops)nightShop(b);
+ nightTree(70,393,.88,true);
+ nightTree(902,387,.95,false);
+ nightPlanter(258,390,76);nightPlanter(635,393,72);
+ nightLantern(70,487);nightLantern(884,496,true);
+ nightBench(105,512);nightBench(747,559);
+ nightPlanter(102,562,80);nightPlanter(782,448,85);
+ nightFountain(t);
+ nightPondWalkers(t);
+ const f=townDoorFocus();
+ if(f){
+  pv_rect(f.door-25,382,50,4,'#ffe1a0');
+  pv_txt('E',f.door,367,19,'#fff6d1');
+ }
+ const shirt=profiles[character]?.shirt||'#eee7e1';
+ const hair=profiles[character]?.hair||'#2e2b36';
+ pv_person(townPlayer.x,townPlayer.y,shirt,hair,townPlayer.dir,townWalkStep);
+ ctx.restore();
+}
 
 function legacyTownScene(){
  grassPattern();pavement();
@@ -910,14 +1036,14 @@ function findFocus(){if(!started)return null;
  candidates.sort((a,b)=>a.d-b.d);return candidates[0]||null;
 }
 function refreshHud(){let where=mode==='town'?'TOWN SQUARE':'THE THREADS SHOP';hud.innerHTML=`${where}<small>${mode==='town'?'Explore the shopping district':'Browse a rack, or choose Browse all'}</small>`;
- const f=findFocus();let msg=mode==='town'?'Walk to THE THREADS SHOP to enter':'Walk to a rack to inspect its items';
+ const f=findFocus();let msg=mode==='town'?'Explore the night plaza · visit THE THREADS SHOP':'Walk to a rack to inspect its items';
  if(f){if(f.kind==='building')msg=f.item.id==='boutique'?'Press E to enter THE THREADS SHOP':`Press E to check ${f.item.name}`;
  else if(f.kind==='rack')msg=`Press E to browse ${f.item.label}`;
  else if(f.kind==='npc')msg='Press E to talk to the store assistant';else if(f.kind==='exit')msg='Press E to leave the store';}
  hint.innerHTML=activePanel==='none'?`<kbd>E</kbd> ${msg}`:'Shopping experience paused';
 }
 function enterStore(){mode='store';player={x:12,y:13,dir:'up'};refreshHud();toast('Welcome to The Threads Shop!');}
-function leaveStore(){mode='town';townPlayer.y=Math.max(382,townPlayer.y);townPlayer.dir='down';refreshHud();toast('Back in the shopping district!')}
+function leaveStore(){mode='town';townPlayer.x=483;townPlayer.y=397;townPlayer.dir='down';refreshHud();toast('Back in the shopping district!')}
 function interact(){if(activePanel!=='none'||!started)return;const f=findFocus();if(!f){toast('Move a little closer to a rack or doorway.');return}
  if(f.kind==='building'){if(f.item.id==='boutique')enterStore();else toast('This storefront is coming soon!')}
  if(f.kind==='rack')openProduct(f.item.id,0,false);
@@ -984,9 +1110,9 @@ function addToBag(){const p=products.find(q=>q.rack===rackId&&q.id===products.fi
 function onCanvasClick(e){if(!started||activePanel!=='none')return;
  if(mode==='town'){
   const bounds=canvas.getBoundingClientRect(),px=(e.clientX-bounds.left)*960/bounds.width,py=(e.clientY-bounds.top)*600/bounds.height;
-  const target=pv_shops.find(b=>px>=b.x&&px<=b.x+b.w+30&&py>=b.y-75&&py<=b.base+20);
+  const target=pv_shops.find(b=>px>=b.x&&px<=b.x+b.w&&py>=b.y&&py<=b.base+14);
   if(target){
-   if(Math.abs(townPlayer.x-target.door)<65&&townPlayer.y>330&&townPlayer.y<402){
+   if(Math.abs(townPlayer.x-target.door)<76&&townPlayer.y>=366&&townPlayer.y<422){
     if(target.name==='THE THREADS SHOP')enterStore();else toast('This storefront is coming soon!');
    }else toast('Walk closer to the entrance, then press E.');
   }
