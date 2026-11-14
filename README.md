@@ -1,6 +1,6 @@
 # Teenseys' — interactive shopping town starter
 
-This is a working **front-end prototype** (v1.1), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
+This is a working **front-end prototype** (v1.2), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
 
 ## Run it
 
@@ -96,3 +96,14 @@ The approved three-quarter-view shopping town now uses a Michigan-inspired downt
 ## Version 1.1 — Distinct Michigan downtown storefronts
 
 Three original detailed SVG illustrations now replace the procedural storefronts in the live main canvas. `assets/teenseys/downtown-threads.svg` is a heritage red-brick Italianate-style clothing shop with arched upper windows, dentil cornice, displays and a recessed entrance. `downtown-sole-house.svg` is a buff-brick/stone Art Deco-inspired shoe store with stepped parapet and footwear windows. `downtown-corner-cafe.svg` is a warm brick café with a decorative medallion, projecting café sign and coffee-shop display. All have 2.5D side-wall depth, brickwork, awnings, glass reflections, and sidewalk thresholds. The artwork is fictional and loosely inspired by Ann Arbor/Ypsilanti downtown architecture, not an exact recreation or use of specific brands or locations. When assets fail to load, the earlier procedural storefronts remain as fallback. Existing store triggers, guest choice, navigation, rack shopping and bag are left intact. JavaScript syntax validation was performed; browser gameplay and visual rendering should be verified after deployment.
+
+
+## Version 1.2 — Blockbench Night Plaza on the main Teenseys site
+
+The main `index.html` displays a night shopping plaza composed around the actual user-approved editable historic brick **The Threads Shop** Blockbench building, with supporting Sole House and Corner Café models. We generated textured, depth-sorted SVG projections directly from the model's cubes and embedded material images, rather than replacing the model with a generic storefront drawing. Rendered assets:
+
+- `assets/teenseys/night/threads-model.svg` — projected from `TEENSEYS_Historic_Brick_Boutique_Editable.bbmodel`.
+- `assets/teenseys/night/sole-house-model.svg` and `corner-cafe-model.svg` — projected from the prior NightCity editable Blockbench storefronts.
+- `assets/teenseys/night/threads-source.bbmodel` — editable source of the flagship.
+
+The outdoor plaza is a night scene with skyline, paved pedestrian paths, foliage and flower planters, atmospheric lamps, glow effects, benches, a central animated fountain, and pixel-art visitors. The main game's keyboard/touch controls, guest entry, shop entrance to The Threads Shop, product racks, catalog, cards and demo bag are preserved. Sole House and Corner Café remain coming soon. The SVG projections are rasterized by the browser when drawn to the 2D canvas, so the outdoor scene preserves the simpler 2D engine rather than adding real-time 3D. The older `night-plaza.html` prototype remains available as a separate experimentation editor; its layouts are not synchronized with the main site. JavaScript syntax and GitHub Pages deployment passed; interactive browser QA on the released version is still advised.
