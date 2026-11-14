@@ -127,7 +127,7 @@
 <div class="page">
   <div class="shell">
     <div class="topbar">
-      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 1.5</span></div><div class="sub">REFINED 3D RETAIL PLAZA · PIXEL SHOPPERS</div></div>
+      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 1.6</span></div><div class="sub">ONE 3D FLAGSHIP STORE · PIXEL SHOPPERS</div></div>
       <div class="top-actions">
         <button id="browseBtn" class="pill" type="button" disabled>Browse all</button>
         <button id="cartBtn" class="pill" type="button" disabled>Bag <span id="cartCount">0</span></button>
@@ -475,9 +475,7 @@ function bush(x,y){garden(x*T+3,y*T+5,28)}
  }
 
 const pv_shops=[
- {name:"SOLE HOUSE",id:"shoes",x:12,y:136,w:249,h:246,base:382,door:145,img:"sole",style:"shoes"},
- {name:"THE THREADS SHOP",id:"boutique",x:261,y:24,w:438,h:349,base:373,door:483,img:"threads",style:"boutique"},
- {name:"CORNER CAFÉ",id:"cafe",x:710,y:132,w:237,h:245,base:377,door:820,img:"cafe",style:"cafe"}
+ {name:"THE THREADS SHOP",displayName:"TEENSEYS' FLAGSHIP",id:"boutique",x:82,y:22,w:796,h:362,base:384,door:480,img:"threads",style:"boutique"}
 ];
 const nightSprites={};
 for(const [k,file] of Object.entries({
@@ -1074,15 +1072,15 @@ function findFocus(){if(!started)return null;
  let ed=Math.abs(player.x-12)+Math.abs(player.y-15);if(ed<=2)candidates.push({kind:'exit',d:ed});
  candidates.sort((a,b)=>a.d-b.d);return candidates[0]||null;
 }
-function refreshHud(){let where=mode==='town'?'TOWN SQUARE':'THE THREADS SHOP';hud.innerHTML=`${where}<small>${mode==='town'?'Explore the shopping district':'Browse a rack, or choose Browse all'}</small>`;
- const f=findFocus();let msg=mode==='town'?'Explore the night plaza · visit THE THREADS SHOP':'Walk to a rack to inspect its items';
+function refreshHud(){let where=mode==='town'?'FLAGSHIP PLAZA':'THE THREADS SHOP';hud.innerHTML=`${where}<small>${mode==='town'?'Explore the shopping district':'Browse a rack, or choose Browse all'}</small>`;
+ const f=findFocus();let msg=mode==='town'?'Explore the plaza · visit the flagship':'Walk to a rack to inspect its items';
  if(f){if(f.kind==='building')msg=f.item.id==='boutique'?'Press E to enter THE THREADS SHOP':`Press E to check ${f.item.name}`;
  else if(f.kind==='rack')msg=`Press E to browse ${f.item.label}`;
  else if(f.kind==='npc')msg='Press E to talk to the store assistant';else if(f.kind==='exit')msg='Press E to leave the store';}
  hint.innerHTML=activePanel==='none'?`<kbd>E</kbd> ${msg}`:'Shopping experience paused';
 }
 function enterStore(){mode='store';player={x:12,y:13,dir:'up'};refreshHud();toast('Welcome to The Threads Shop!');}
-function leaveStore(){mode='town';townPlayer.x=483;townPlayer.y=397;townPlayer.dir='down';refreshHud();toast('Back in the shopping district!')}
+function leaveStore(){mode='town';townPlayer.x=480;townPlayer.y=397;townPlayer.dir='down';refreshHud();toast('Back in the shopping district!')}
 function interact(){if(activePanel!=='none'||!started)return;const f=findFocus();if(!f){toast('Move a little closer to a rack or doorway.');return}
  if(f.kind==='building'){if(f.item.id==='boutique')enterStore();else toast('This storefront is coming soon!')}
  if(f.kind==='rack')openProduct(f.item.id,0,false);
@@ -1110,7 +1108,7 @@ function renderCharacters(){let cards=profiles.map((_,i)=>`<button class="avatar
  let p=profiles[i],r=(x,y,w,h,color)=>{a.fillStyle=color;a.fillRect(x,y,w,h)};
  r(23,44,8,8,p.pants);r(33,44,8,8,p.pants);r(23,30,18,17,p.shirt);r(20,34,4,10,p.skin);r(41,34,4,10,p.skin);r(25,14,14,19,p.skin);r(24,12,16,7,p.hair);if(p.style===1)r(38,17,4,12,p.hair);if(p.style===2)r(21,18,5,15,p.hair);r(29,24,2,2,'#352a24');r(36,24,2,2,'#352a24')
  })}
-function startGame(){character=selection;started=true;mode='town';townPlayer={x:316,y:424,dir:'down'};player={x:8,y:11,dir:'up'};activePanel='none';document.getElementById('gameWrap').classList.remove('modal-open');overlay.classList.add('hidden');overlay.innerHTML='';
+function startGame(){character=selection;started=true;mode='town';townPlayer={x:480,y:553,dir:'up'};player={x:8,y:11,dir:'up'};activePanel='none';document.getElementById('gameWrap').classList.remove('modal-open');overlay.classList.add('hidden');overlay.innerHTML='';
  for(const id of ['browseBtn','cartBtn','menuBtn','interactBtn'])document.getElementById(id).disabled=false;
  refreshHud();toast('Head toward the THREADS SHOP. Use E to enter.');}
 function authUnavailable(isSignup){openPanel('auth',`<button class="close close-corner" data-action="close" aria-label="Close">×</button><div class="eyebrow">Account features · next phase</div><h2>${isSignup?'Create an account':'Sign in'}</h2><p>Real accounts will be powered by Supabase so you can return with your saved character, location, cart and favorites.</p><div class="demo-note">This prototype does not collect emails or passwords. Registration and saving are not connected yet.</div><div style="height:18px"></div><button class="btn full" data-action="guest">Try the guest experience →</button>`)}
@@ -1203,6 +1201,6 @@ window.teenseys3DToast=(message)=>toast(message);
 openWelcome();requestAnimationFrame(draw);
 })();
 </script>
-<script type="module" src="assets/teenseys/hybrid-town.js?v=1.5"></script>
+<script type="module" src="assets/teenseys/hybrid-town.js?v=1.6"></script>
 </body>
 </html>
