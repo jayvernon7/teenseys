@@ -2,7 +2,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.m
 import {loadBlockbench} from "./blockbench-loader.js?v=1.8";
 
 /*
- * Teenseys' hybrid scene v2.0
+ * Teenseys' hybrid scene v2.1
  * Actual 3D: environment, architecture, plaza, fountain, lighting.
  * 2D: pixel character sprite sheets drawn on camera-facing planes.
  * The existing shopping/store UI and 2D boutique engine stay untouched.
@@ -634,27 +634,32 @@ function drawBillboard(o,direction,frame){
 }
 for(const s of [...sprites,...npcs.map(n=>n.data)])s.img.onload=()=>{s.lastFrame=-1;};
 const destination=new THREE.Vector3();
-// Camera follows the player's world position but retains the same 2.5D angle.
-// Smooth damping makes stepping feel fluid; entering/leaving the shop snaps the
-// camera to the new player's position so it never sweeps through another scene.
-const trackingPoint=new THREE.Vector3();
+// Interpolate the displayed character position, then put the camera at the exact
+// same position plus a fixed offset. This keeps the player centered, prevents
+// camera rotation/wobble, and moves the world smoothly underneath the player.
+const displayPosition=new THREE.Vector3();
 const trackingOffsetTown=new THREE.Vector3(0,97,-116);
 const trackingOffsetShop=new THREE.Vector3(0,105,-144);
-const trackingDesiredPosition=new THREE.Vector3();
+const lookAtPoint=new THREE.Vector3();
 let cameraMode=null;
 let previousFrameTime=0;
-function followAvatar(target,inside,now){
- const cam=inside?shopCamera:camera;
+function followAvatar(target,inside,now,sprite){
+ const nextMode=inside?"store":"town";
+ const switched=cameraMode!==nextMode;
+ const dt=previousFrameTime?Math.max(0,Math.min(.05,(now-previousFrameTime)/1000)):1/60;
+ const smoothing=1-Math.exp(-19*dt);
+ if(switched)displayPosition.copy(target);
+ else displayPosition.lerp(target,smoothing);
  const offset=inside?trackingOffsetShop:trackingOffsetTown;
- trackingPoint.copy(target);
- trackingPoint.y+=6.5;
- trackingDesiredPosition.copy(trackingPoint).add(offset);
- const elapsed=previousFrameTime?Math.min(.055,Math.max(0,(now-previousFrameTime)/1000)):1/60;
- // At each mode switch snap to player center; otherwise ease toward position.
- const alpha=(cameraMode!==(inside?"store":"town"))?1:1-Math.exp(-10*elapsed);
- cam.position.lerp(trackingDesiredPosition,alpha);
- cam.lookAt(trackingPoint);
- cameraMode=inside?"store":"town";
+ const cam=inside?shopCamera:camera;
+ // No separate camera animation and no per-frame change in camera pitch.
+ // Both the camera and the on-screen 2D player use the same smoothed location.
+ sprite.position.copy(displayPosition);
+ cam.position.copy(displayPosition).add(offset);
+ lookAtPoint.copy(cam.position).sub(offset);
+ lookAtPoint.y+=6.5;
+ cam.lookAt(lookAtPoint);
+ cameraMode=nextMode;
 }
 let running=true;
 function animate(time){
@@ -674,8 +679,7 @@ function animate(time){
   // Existing movement and E-to-enter logic remain in the shopping game.
   if(inShop)destination.set(shopMapX(p.x),.3,shopMapZ(p.y));
   else destination.set(-(p.x-480)*.27,.5,-54-(p.y-380)*.52);
-  sprite.sprite.position.copy(destination);
-  followAvatar(destination,inShop,time);
+  followAvatar(destination,inShop,time,sprite.sprite);
   drawBillboard(sprite,p.dir,walking?Math.floor(time/130)%4:0);
   for(const npc of npcs){npc.data.sprite.visible=!inShop; npc.data.sprite.position.set(npc.x,.5,npc.z);
    if(!inShop)drawBillboard(npc.data,npc.dir,Math.floor(time/900)%4);}
