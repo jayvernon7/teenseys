@@ -1,6 +1,6 @@
 # Teenseys' — interactive shopping town starter
 
-This is a working **front-end prototype** (v1.6), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
+This is a working **front-end prototype** (v1.7), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
 
 ## Run it
 
@@ -129,3 +129,8 @@ Replaced the flat-colored retail façades with procedural brick and limestone te
 ## Version 1.6 — One unified flagship building
 
 Replaced the three independently placed retail storefronts with one **large, continuous Teenseys' flagship shopping hall**: a 226-unit-wide 3D facade, broad glazed display bays, a central entrance, roof parapet, continuous limestone and dark-metal cornices, illuminated window arcades, planted areas and shop banners. No separate Sole House and Corner Café buildings are rendered in the current active 3D plaza. The original models remain stored as editable sources in the repo for potential reuse, and the existing single Threads Shop shopping interior is still accessed through the flagship entrance. The large building is centered behind the existing animated fountain and retains the nighttime pedestrian plaza, 2D characters, camera, WASD controls, merchandise interaction, and bag. The fallback 2D scene and E-to-enter focus are synchronized to one central storefront. Browser-rendered QA remains advisable.
+
+
+## Version 1.7 — Clear the site for a new building
+
+At the user's request, the previous large modular flagship store has been removed from the **active main Teenseys' 3D plaza** (no retail building instances are created). The placeholder skyline building meshes were cleared as well. The nighttime 3D plaza, glowing animated fountain, ground materials, trees, seating, lights, fixed camera and 2D pixel characters remain intact. The 2D fallback town scene also shows no retail building. The former flagship's entrance is disabled so visitors cannot accidentally enter a store with no exterior; the Browse All catalog and bag remain available through the website's buttons. Building-template functions and the 3D shop interior implementation remain in source code for future use; older building source assets and historical prototype pages are kept, not permanently deleted. This is a clean starting point for a new structure, and the user has not yet selected its design.
