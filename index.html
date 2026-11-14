@@ -105,13 +105,29 @@
     .hybrid-badge{background:#321a55ed;border-color:#9768dd}
     .badge{background:#603b8b;color:#f5e2ff}
     /* White modal cards are intentionally retained for readable product details. */
+
+    /* v1.5 restrained storefront presentation and polished UI */
+    .shell{border:1px solid #635478;border-radius:22px;overflow:hidden}
+    .topbar{padding:17px 22px;background:linear-gradient(115deg,#1b1c2c,#29233c)}
+    .brand{letter-spacing:-.045em;font-size:23px}
+    .game-wrap{border-top:1px solid #594a77}
+    .game-wrap .teenseys-3d-canvas{filter:saturate(1.02)}
+    .controls{background:#202137;box-shadow:inset 0 1px #524765}
+    .control-group{gap:10px}
+    .pill{transition:background .15s,border-color .15s;min-height:38px}
+    .pill:hover{background:#3b3557;border-color:#9a7cbe}
+    .hint{backdrop-filter:blur(9px);border:1px solid #9380ab}
+    .hud{backdrop-filter:blur(7px);box-shadow:0 8px 23px #100d20aa}
+    .hybrid-badge{box-shadow:0 5px 21px #24143b7a}
+    .footnote{font-size:12px;letter-spacing:.01em}
+    @media(max-width:440px){.shell{border-radius:0}.topbar{padding:12px}.brand{font-size:19px}.game-wrap .teenseys-3d-canvas{filter:none}}
   </style>
 </head>
 <body>
 <div class="page">
   <div class="shell">
     <div class="topbar">
-      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 1.4</span></div><div class="sub">3D CITY + 3D STORES · 2D PIXEL SHOPPERS</div></div>
+      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 1.5</span></div><div class="sub">REFINED 3D RETAIL PLAZA · PIXEL SHOPPERS</div></div>
       <div class="top-actions">
         <button id="browseBtn" class="pill" type="button" disabled>Browse all</button>
         <button id="cartBtn" class="pill" type="button" disabled>Bag <span id="cartCount">0</span></button>
@@ -1187,6 +1203,6 @@ window.teenseys3DToast=(message)=>toast(message);
 openWelcome();requestAnimationFrame(draw);
 })();
 </script>
-<script type="module" src="assets/teenseys/hybrid-town.js?v=1.4"></script>
+<script type="module" src="assets/teenseys/hybrid-town.js?v=1.5"></script>
 </body>
 </html>
