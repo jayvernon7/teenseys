@@ -1,6 +1,6 @@
 # Teenseys' — interactive shopping town starter
 
-This is a working **front-end prototype** (v2.0), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
+This is a working **front-end prototype** (v2.1), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
 
 ## Run it
 
@@ -155,3 +155,8 @@ On touch/mobile-size displays, a translucent **D-pad is fixed bottom-left** and 
 ## Version 2.0 — Character follow camera and translucent gamepad D-pad
 
 The main site now uses a character-centered Three.js camera in both the outdoor plaza and the boutique. It preserves the same orthographic three-quarter pitch and follows the selected 2D sprite's actual world coordinate with eased transitions; on switching between town and store, the view jumps directly to the player in the new scene rather than panning through empty space. The scene, character controls, and Blockbench model remain unchanged. Mobile controls feature a semi-transparent Xbox-inspired cross-shaped four-way D-pad at bottom-left and retained green A/red B actions at bottom-right. The persistent 'Explore the plaza' hint beneath the game has been removed, while the HUD title, functional A/E interactions, and in-store contextual guidance are retained. Syntax of HTML game and Three.js module was validated; on-device testing remains necessary.
+
+
+## Version 2.1 — Stable player-centered follow camera and fullscreen mobile layout
+
+The camera and displayed 2D sprite now use exactly the **same smoothly interpolated position**. The Three.js orthographic camera offset and pitch stay constant while the environment scrolls behind the player, eliminating the old wobble from independently lerping the camera position while instantly rotating toward the player. Switching between outside and inside snaps the camera to the new player location. The fullscreen site is pinned to the browser's currently usable viewport via CSS dynamic viewport units and a `visualViewport` height update for iOS/Android address bar changes, with `viewport-fit=cover` for modern phones. The green A, red B and translucent Xbox-inspired D-pad remain in place. Changes passed JavaScript syntax validation; real-device browser testing is advisable.
