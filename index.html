@@ -127,7 +127,7 @@
 <div class="page">
   <div class="shell">
     <div class="topbar">
-      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 1.7</span></div><div class="sub">OPEN 3D PLAZA · NEW BUILDING NEXT</div></div>
+      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 1.8</span></div><div class="sub">REAL BLOCKBENCH BUILDING + INTERIOR · 2D SHOPPERS</div></div>
       <div class="top-actions">
         <button id="browseBtn" class="pill" type="button" disabled>Browse all</button>
         <button id="cartBtn" class="pill" type="button" disabled>Bag <span id="cartCount">0</span></button>
@@ -475,7 +475,10 @@ function bush(x,y){garden(x*T+3,y*T+5,28)}
  }
 
 // Old flagship removed; outdoor building footprint is intentionally empty.
-const pv_shops=[];
+const pv_shops=[
+ {name:"THE THREADS SHOP",displayName:"TEENSEYS' BOUTIQUE",id:"boutique",
+  x:104,y:42,w:752,h:349,base:391,door:480,img:"threads",style:"boutique"}
+];
 const nightSprites={};
 for(const [k,file] of Object.entries({
  threads:"threads-model.svg",sole:"sole-house-model.svg",cafe:"corner-cafe-model.svg"
@@ -1071,8 +1074,8 @@ function findFocus(){if(!started)return null;
  let ed=Math.abs(player.x-12)+Math.abs(player.y-15);if(ed<=2)candidates.push({kind:'exit',d:ed});
  candidates.sort((a,b)=>a.d-b.d);return candidates[0]||null;
 }
-function refreshHud(){let where=mode==='town'?'TEENSEYS’ OPEN PLAZA':'THE THREADS SHOP';hud.innerHTML=`${where}<small>${mode==='town'?'New flagship building coming next':'Browse a rack, or choose Browse all'}</small>`;
- const f=findFocus();let msg=mode==='town'?'Explore the open plaza · Browse all to see merchandise':'Walk to a rack to inspect its items';
+function refreshHud(){let where=mode==='town'?'TEENSEYS’ BOUTIQUE PLAZA':'THE THREADS SHOP';hud.innerHTML=`${where}<small>${mode==='town'?'Explore the new 3D boutique':'Browse a rack, or choose Browse all'}</small>`;
+ const f=findFocus();let msg=mode==='town'?'Explore the plaza · press E to enter the boutique':'Walk to a rack to inspect its items';
  if(f){if(f.kind==='building')msg=f.item.id==='boutique'?'Press E to enter THE THREADS SHOP':`Press E to check ${f.item.name}`;
  else if(f.kind==='rack')msg=`Press E to browse ${f.item.label}`;
  else if(f.kind==='npc')msg='Press E to talk to the store assistant';else if(f.kind==='exit')msg='Press E to leave the store';}
@@ -1109,7 +1112,7 @@ function renderCharacters(){let cards=profiles.map((_,i)=>`<button class="avatar
  })}
 function startGame(){character=selection;started=true;mode='town';townPlayer={x:480,y:553,dir:'up'};player={x:8,y:11,dir:'up'};activePanel='none';document.getElementById('gameWrap').classList.remove('modal-open');overlay.classList.add('hidden');overlay.innerHTML='';
  for(const id of ['browseBtn','cartBtn','menuBtn','interactBtn'])document.getElementById(id).disabled=false;
- refreshHud();toast('The plaza is ready for a new building. Browse All is still available.');}
+ refreshHud();toast('Explore the plaza, then press E at the boutique doors.');}
 function authUnavailable(isSignup){openPanel('auth',`<button class="close close-corner" data-action="close" aria-label="Close">×</button><div class="eyebrow">Account features · next phase</div><h2>${isSignup?'Create an account':'Sign in'}</h2><p>Real accounts will be powered by Supabase so you can return with your saved character, location, cart and favorites.</p><div class="demo-note">This prototype does not collect emails or passwords. Registration and saving are not connected yet.</div><div style="height:18px"></div><button class="btn full" data-action="guest">Try the guest experience →</button>`)}
 function showMenu(){openPanel('menu',`<button class="close close-corner" data-action="close" aria-label="Close">×</button><div class="eyebrow">Your visit</div><h2>Menu</h2><p>Explore freely. Guest mode does not save this visit after you close the page.</p><div class="dialogue-options"><button class="btn light" data-action="characters">Change character</button><button class="btn light" data-action="catalog">Browse all merchandise</button><button class="btn light" data-action="cart">View shopping bag</button><button class="btn light" data-action="restart">Return to welcome screen</button></div>`)}
 function showNpc(){openPanel('npc',`<button class="close close-corner" data-action="close" aria-label="Close">×</button><div class="eyebrow">Store assistant · NPC</div><h2>Welcome to Threads!</h2><p>Hey! Happy you're here. Looking for something specific?</p><div class="dialogue-options"><button class="btn light" data-npc="white">Show me white shirts</button><button class="btn light" data-npc="black">Show me black shirts</button><button class="btn light" data-action="catalog">Browse everything</button><button class="btn secondary" data-action="close">Just looking, thanks!</button></div>`)}
@@ -1200,6 +1203,6 @@ window.teenseys3DToast=(message)=>toast(message);
 openWelcome();requestAnimationFrame(draw);
 })();
 </script>
-<script type="module" src="assets/teenseys/hybrid-town.js?v=1.7"></script>
+<script type="module" src="assets/teenseys/hybrid-town.js?v=1.8"></script>
 </body>
 </html>
