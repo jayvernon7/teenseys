@@ -1,7 +1,8 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js";
+import {loadBlockbench} from "./blockbench-loader.js?v=1.8";
 
 /*
- * Teenseys' hybrid scene v1.7
+ * Teenseys' hybrid scene v1.8
  * Actual 3D: environment, architecture, plaza, fountain, lighting.
  * 2D: pixel character sprite sheets drawn on camera-facing planes.
  * The existing shopping/store UI and 2D boutique engine stay untouched.
@@ -494,8 +495,8 @@ const shopRacks=[
  {id:"accessories",x:16,y:10,w:3,h:2,color:"#cda77b"}
 ];
 const shopHitObjects=[];
-const shopMapX=tileX=>(tileX-12)*6.5;
-const shopMapZ=tileY=>-128+tileY*6.5;
+const shopMapX=tileX=>(tileX-12)*7.25;
+const shopMapZ=tileY=>18-(tileY-2)*4.35;
 for(const r of shopRacks){
  const x=shopMapX(r.x+r.w/2),z=shopMapZ(r.y+r.h/2);
  const g=new THREE.Group();g.position.set(x,0,z);shopScene.add(g);
@@ -547,6 +548,50 @@ gameCanvas.addEventListener("click",e=>{
  }
 },true);
 
+
+
+// The exact user-approved, fully furnished .bbmodel — no substitute architecture.
+const approvedSource="assets/teenseys/models/teenseys-lattice-boutique-interior.bbmodel";
+const approvedModel=loadBlockbench({THREE,url:approvedSource}).then(({root,elementCount,meshCount})=>{
+ root.name="Teenseys original modern lattice boutique";
+ root.position.set(0,0,-7);scene.add(root);
+ const indoor=root.clone(true);indoor.position.set(0,0,0);
+ indoor.name="Teenseys furnished boutique, roof-off view";
+ // The steel canopy and side masses are cut away only in the interior view.
+ for(const g of indoor.children)
+  if(["00 | ROOF","06 | SIGNED","05 | MONUMENTAL","02 | FACETED","07 | RIGHT MATT"]
+    .some(name=>g.name.startsWith(name)))g.visible=false;
+ const prior=[];shopScene.traverse(o=>{if(o.isMesh)prior.push(o)});
+ for(const o of prior)o.visible=false;
+ shopScene.add(indoor);
+ shopScene.background=new THREE.Color(0x282b38);
+ shopCamera.left=-118;shopCamera.right=118;shopCamera.top=74;shopCamera.bottom=-74;
+ shopCamera.position.set(0,118,-145);shopCamera.lookAt(0,13,-1);
+ shopCamera.updateProjectionMatrix();
+ shopScene.add(new THREE.HemisphereLight(0xffedd7,0x383544,1.6));
+ for(const x of [-55,-17,26,64]){
+  const l=new THREE.PointLight(0xffe2b6,24,65,2);
+  l.position.set(x,32,-1);shopScene.add(l);
+ }
+ // Invisible interaction zones align with real storefront racks and tables.
+ shopHitObjects.length=0;
+ for(const [id,x,z,w,d] of [
+  ["white",-65,7,22,21],["black",-20,10,26,18],
+  ["brown",27,9,25,18],["hoodies",-78,-13,20,19],
+  ["pants",13,-4,30,22],["accessories",61,-4,30,22]
+ ]){
+  const hit=new THREE.Mesh(new THREE.BoxGeometry(w,20,d),
+   new THREE.MeshBasicMaterial({visible:false,side:THREE.DoubleSide}));
+  hit.position.set(x,11,z);hit.userData.rackId=id;
+  shopScene.add(hit);shopHitObjects.push(hit);
+ }
+ window.teenseysBoutique3DReady=true;
+ if(statusBadge)statusBadge.textContent="3D BLOCKBENCH BOUTIQUE";
+ console.info("Approved Blockbench Teenseys shop loaded",elementCount,meshCount);
+}).catch(e=>{
+ console.error("Could not load approved building model",e);
+ if(statusBadge)statusBadge.textContent="3D BUILDING LOAD ERROR";
+});
 
 const npcs=[{data:makeBillboard(1),x:-96,z:-118,dir:"right"},{data:makeBillboard(4),x:94,z:-132,dir:"left"}];
 let wasTown=false;
