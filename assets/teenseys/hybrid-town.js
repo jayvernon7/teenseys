@@ -338,19 +338,10 @@ const retailBuildings=[
 // Hide the legacy Blockbench façade after 3D modular storefronts are ready;
 // the original model source remains in the repository and can be re-used.
 
-const sceneLoaded=Promise.all(models.map(async m=>{
- const r=await fetch(m.path,{cache:"force-cache"});
- if(!r.ok)throw Error(m.path+" returned HTTP "+r.status);
- const data=await r.json();
- const meshCount=modelFromBlockbench(data,m); const legacy=scene.children.at(-1); if(legacy?.isGroup)legacy.visible=false; return {id:m.id,cubes:meshCount};
-}));
-sceneLoaded.then(items=>{
- if(statusBadge)statusBadge.textContent="3D ENVIRONMENT · 2D CHARACTERS";
- console.info("Teenseys' 3D buildings loaded",items);
-}).catch(error=>{
- console.error("Unable to load a Blockbench building",error);
- if(statusBadge)statusBadge.textContent="3D LOADING ISSUE";
-});
+// Original editable Blockbench sources remain in /assets/teenseys/night/. 
+// The lightweight reusable shop modules are rendered directly as 3D meshes;
+// we avoid loading several hundred unused model cubes on every page visit.
+if(statusBadge)statusBadge.textContent="3D PLAZA · 3D BOUTIQUE";
 // All visitors and the controllable character remain 2D billboard sprites.
 function makeBillboard(index,w=10,h=15){
  const cvs=document.createElement("canvas");cvs.width=32;cvs.height=44;
@@ -555,5 +546,6 @@ function animate(time){
   previousPX=null;previousPY=null;
  }
 }
+window.teenseys3DReady=true;
 requestAnimationFrame(animate);
 window.addEventListener("pagehide",()=>{running=false;renderer.dispose();for(const s of [...sprites,...npcs.map(n=>n.data),cashier])s.texture.dispose()},{once:true});
