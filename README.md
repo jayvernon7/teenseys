@@ -1,6 +1,6 @@
 # Teenseys' — interactive shopping town starter
 
-This is a working **front-end prototype** (v1.7), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
+This is a working **front-end prototype** (v1.8), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
 
 ## Run it
 
@@ -134,3 +134,12 @@ Replaced the three independently placed retail storefronts with one **large, con
 ## Version 1.7 — Clear the site for a new building
 
 At the user's request, the previous large modular flagship store has been removed from the **active main Teenseys' 3D plaza** (no retail building instances are created). The placeholder skyline building meshes were cleared as well. The nighttime 3D plaza, glowing animated fountain, ground materials, trees, seating, lights, fixed camera and 2D pixel characters remain intact. The 2D fallback town scene also shows no retail building. The former flagship's entrance is disabled so visitors cannot accidentally enter a store with no exterior; the Browse All catalog and bag remain available through the website's buttons. Building-template functions and the 3D shop interior implementation remain in source code for future use; older building source assets and historical prototype pages are kept, not permanently deleted. This is a clean starting point for a new structure, and the user has not yet selected its design.
+
+
+## Version 1.8 — User-approved Blockbench Lattice Boutique + full interior
+
+The main site now loads the **exact approved editable Blockbench model** from `assets/teenseys/models/teenseys-lattice-boutique-interior.bbmodel` (589 cube elements, 41 embedded textures). It includes the North Face-inspired faceted steel exterior with the user-customized sign and the newer furnished Teenseys boutique interior in the same source. No substitute building is reconstructed in code. `assets/teenseys/blockbench-loader.js` converts rotated, individually UV-textured cubes into material-batched 3D geometry and retains transparent glazing, signs and artwork. The actual model appears as the single storefront in the 3D fountain plaza.
+
+Approaching its central entrance and pressing E opens a dedicated 3D **roof-open view of the same exact interior geometry**: apparel rails, shelving, folded-merchandise displays, checkout, fitting rooms and mannequins. The roof and front lattice canopy are hidden in that interior camera view only; the street exterior remains intact. The player uses the existing 2D pixel sprite sheet, keyboard/mobile controls and 2D shopping product modal, bag and Browse All. Six invisible raycast regions are mapped over real shop display fixtures to keep product clicking possible. The previous generic interior meshes are hidden only if the approved model loads successfully, so the old 3D interior remains a fallback if a fetch or parsing error occurs. Source model assets are preserved for future edits.
+
+Changes were validated for JavaScript syntax and checked in GitHub. Browser/WebGL integration testing is still required on the hosted site, especially on lower-power mobile graphics.
