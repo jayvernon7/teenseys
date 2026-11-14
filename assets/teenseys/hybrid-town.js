@@ -2,7 +2,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.m
 import {loadBlockbench} from "./blockbench-loader.js?v=1.8";
 
 /*
- * Teenseys' hybrid scene v1.8
+ * Teenseys' hybrid scene v1.9
  * Actual 3D: environment, architecture, plaza, fountain, lighting.
  * 2D: pixel character sprite sheets drawn on camera-facing planes.
  * The existing shopping/store UI and 2D boutique engine stay untouched.
@@ -495,7 +495,7 @@ const shopRacks=[
  {id:"accessories",x:16,y:10,w:3,h:2,color:"#cda77b"}
 ];
 const shopHitObjects=[];
-const shopMapX=tileX=>(tileX-12)*7.25;
+const shopMapX=tileX=>-(tileX-12)*7.25;
 const shopMapZ=tileY=>18-(tileY-2)*4.35;
 for(const r of shopRacks){
  const x=shopMapX(r.x+r.w/2),z=shopMapZ(r.y+r.h/2);
@@ -630,7 +630,7 @@ function animate(time){
   for(const s of sprites)s.sprite.visible=s===sprite;
   // Existing movement and E-to-enter logic remain in the shopping game.
   if(inShop)destination.set(shopMapX(p.x),.3,shopMapZ(p.y));
-  else destination.set((p.x-480)*.27,.5,-54-(p.y-380)*.52);
+  else destination.set(-(p.x-480)*.27,.5,-54-(p.y-380)*.52);
   sprite.sprite.position.copy(destination);
   drawBillboard(sprite,p.dir,walking?Math.floor(time/130)%4:0);
   for(const npc of npcs){npc.data.sprite.visible=!inShop; npc.data.sprite.position.set(npc.x,.5,npc.z);
