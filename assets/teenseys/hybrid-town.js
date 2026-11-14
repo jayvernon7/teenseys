@@ -369,7 +369,136 @@ function makeBillboard(index,w=10,h=15){
  img.src="assets/teenseys/avatars/shopper-"+(index+1)+".svg";
  return {index,img,sprite,cc,texture,lastFrame:-1,lastDirection:-1};
 }
+
 const sprites=Array.from({length:6},(_,i)=>makeBillboard(i));
+// Full 3D Threads Shop interior — shopping UI remains regular HTML for readability.
+const shopScene=new THREE.Scene();
+shopScene.background=new THREE.Color(0x29343a);
+const shopCamera=new THREE.OrthographicCamera(-99,99,64,-64,.1,650);
+shopCamera.position.set(0,105,95);shopCamera.lookAt(0,12,-75);
+shopScene.add(new THREE.HemisphereLight(0xfff3dc,0x4b5154,2.3));
+const shopAmbient=new THREE.DirectionalLight(0xffe7be,2.5);
+shopAmbient.position.set(-30,85,30);shopScene.add(shopAmbient);
+const shopMat={
+ floor:colorMaterial(0xb8a18a,{roughness:.67}),
+ wall:colorMaterial(0xe6dfd1,{roughness:.93}),
+ trim:colorMaterial(0x263c42,{roughness:.55}),
+ wood:colorMaterial(0x906a4f),
+ warm:colorMaterial(0xefdbb9,{emissive:0xb48a57,emissiveIntensity:.24}),
+ dark:colorMaterial(0x26323a),
+ cream:colorMaterial(0xf5e9d2),
+ slate:colorMaterial(0x798c91),
+ gold:colorMaterial(0xc4a36b,{metalness:.2,roughness:.32})
+};
+const sr=(x,y,z,w,h,d,mat)=>box(x,y,z,w,h,d,mat,shopScene,false);
+sr(0,-.65,-74,153,1.3,110,shopMat.floor);
+const woodPanel=box(0,-.025,-74,151,.05,108,shopMat.floor,shopScene,false);
+const floorCanvas=document.createElement("canvas");floorCanvas.width=floorCanvas.height=256;
+const fc=floorCanvas.getContext("2d");fc.fillStyle="#b3a18b";fc.fillRect(0,0,256,256);
+for(let y=0;y<256;y+=24)for(let x=(Math.floor(y/24)%2)*24;x<256;x+=48){
+ fc.fillStyle="#907b6b";fc.fillRect(x,y,46,1);
+ fc.fillStyle="#dfcdb4";fc.fillRect(x+2,y+2,2,18);
+}
+const floorTexture=new THREE.CanvasTexture(floorCanvas);floorTexture.colorSpace=THREE.SRGBColorSpace;
+floorTexture.wrapS=floorTexture.wrapT=THREE.RepeatWrapping;floorTexture.repeat.set(3,3);
+woodPanel.material=new THREE.MeshStandardMaterial({map:floorTexture,roughness:.68});
+sr(0,24,-129,155,49,2,shopMat.wall);
+sr(-77,24,-75,2,49,111,shopMat.wall);
+sr(77,24,-75,2,49,111,shopMat.wall);
+sr(0,46,-129,155,5,3,shopMat.trim);
+for(let i=0;i<8;i++)sr(-69+i*20,40,-127,14,6,1.5,shopMat.slate);
+for(let i=0;i<4;i++){
+ const light=new THREE.PointLight(0xffe7b7,45,68,2);
+ light.position.set(-53+i*36,40,-75);shopScene.add(light);
+ sr(-53+i*36,42,-75,9,.7,7,shopMat.warm);
+}
+// Center brand on a rear three-dimensional sign.
+const storeSignTex=canvasLabel("THE THREADS SHOP","EXPLORE · SHOP · BE YOU","#fff4e1","#a98cba");
+const storeSign=new THREE.Mesh(new THREE.PlaneGeometry(91,25),
+ new THREE.MeshBasicMaterial({map:storeSignTex}));
+storeSign.position.set(0,31,-127.35);shopScene.add(storeSign);
+// Backlit window-display mannequins and feature shelving.
+for(const [x,shirt,pants] of [[-62,0xf4e6d1,0x34465b],[-44,0x323940,0x5b493e],
+ [44,0xf2e0d3,0x4a4744],[62,0x9c849f,0x2e343b]]){
+ const group=new THREE.Group();group.position.set(0,1.2,-119);shopScene.add(group);
+ addMannequin(group,x,0,shirt,pants);
+}
+function shopRail(x,z,w,color=shopMat.trim){
+ sr(x,10,z,w,1.6,1.6,color);
+ for(const xx of [x-w/2+3,x+w/2-3])sr(xx,5.3,z,1.3,9,1.4,shopMat.gold);
+ for(let i=0;i<Math.floor(w/7);i++){
+  const xx=x-w/2+4+i*7;
+  sr(xx,6.5,z+1.3,5,7.7,1.7,i%3===0?shopMat.cream:i%3===1?shopMat.dark:shopMat.slate);
+  sr(xx,10.4,z+1.5,.9,1.2,.7,shopMat.gold);
+ }
+}
+for(const x of [-70,70]){
+ sr(x,12,-91,9,24,48,shopMat.wood);
+ for(const z of [-112,-96,-80])shopRail(x,z,8);
+}
+const shopRacks=[
+ {id:"white",x:4,y:5,w:3,h:2,color:"#f7f4e9"},
+ {id:"black",x:10,y:5,w:3,h:2,color:"#252a34"},
+ {id:"brown",x:16,y:5,w:3,h:2,color:"#8c6750"},
+ {id:"hoodies",x:4,y:10,w:3,h:2,color:"#d6be9c"},
+ {id:"pants",x:10,y:10,w:3,h:2,color:"#617188"},
+ {id:"accessories",x:16,y:10,w:3,h:2,color:"#cda77b"}
+];
+const shopHitObjects=[];
+const shopMapX=tileX=>(tileX-12)*6.5;
+const shopMapZ=tileY=>-128+tileY*6.5;
+for(const r of shopRacks){
+ const x=shopMapX(r.x+r.w/2),z=shopMapZ(r.y+r.h/2);
+ const g=new THREE.Group();g.position.set(x,0,z);shopScene.add(g);
+ const mat=colorMaterial(r.color);
+ box(0,1.2,0,16,2.2,9.6,shopMat.wood,g);
+ box(0,3.2,0,17,1.2,10.5,shopMat.trim,g);
+ box(0,9.6,0,16,1.15,1.2,shopMat.gold,g);
+ for(const xx of [-7,7]){
+  box(xx,6.5,0,1.1,10,.95,shopMat.trim,g);
+ }
+ for(const xx of [-4,0,4]){
+  box(xx,6.8,1,3.4,7,4,mat,g);
+ }
+ const labelTexture=canvasLabel(r.id.toUpperCase(),"THE THREADS SHOP","#fff7e2","#9e87bc");
+ const signMesh=new THREE.Mesh(new THREE.PlaneGeometry(18,4.5),
+   new THREE.MeshBasicMaterial({map:labelTexture,side:THREE.DoubleSide}));
+ signMesh.position.set(0,12.6,-.9);g.add(signMesh);
+ g.traverse(obj=>{if(obj.isMesh){obj.userData.rackId=r.id;shopHitObjects.push(obj)}});
+}
+const register=sr(65,6.3,-104,18,13,9,shopMat.dark);
+sr(65,13.3,-104,20,1.4,10,shopMat.wood);
+sr(66,15.1,-104,8,3,3,shopMat.slate);
+sr(0,.02,-28,32,.09,6,shopMat.dark);
+const doorwayLabel=new THREE.Mesh(new THREE.PlaneGeometry(26,6),
+ new THREE.MeshBasicMaterial({map:canvasLabel("EXIT","TO NIGHT PLAZA","#fff8e9","#ac97c4"),side:THREE.DoubleSide}));
+doorwayLabel.position.set(0,19,-25);shopScene.add(doorwayLabel);
+const cashier=makeBillboard(4);
+cashier.sprite.position.set(shopMapX(21),.25,shopMapZ(5));
+shopScene.add(cashier.sprite);
+const rackRaycaster=new THREE.Raycaster();
+const clickCoord=new THREE.Vector2();
+gameCanvas.addEventListener("click",e=>{
+ const state=window.teenseysTownState?.();
+ if(!state?.started||state.mode!=="store"||state.activePanel!=="none")return;
+ const rect=gameCanvas.getBoundingClientRect();
+ clickCoord.set((e.clientX-rect.left)/rect.width*2-1,-((e.clientY-rect.top)/rect.height*2-1));
+ rackRaycaster.setFromCamera(clickCoord,shopCamera);
+ const hit=rackRaycaster.intersectObjects(shopHitObjects,false).find(v=>v.object.userData.rackId);
+ if(!hit)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ const id=hit.object.userData.rackId;
+ const r=shopRacks.find(v=>v.id===id);
+ const p=state.player;
+ if(p&&r){
+  const dx=Math.max(r.x-p.x,0,p.x-(r.x+r.w-1));
+  const dy=Math.max(r.y-p.y,0,p.y-(r.y+r.h-1));
+  if(dx+dy<=2)window.teenseysOpenRack?.(id);
+  else window.teenseys3DToast?.("Walk closer to the "+id+" rack, then click again.");
+ }
+},true);
+
+
 const npcs=[{data:makeBillboard(1),x:-96,z:-118,dir:"right"},{data:makeBillboard(4),x:94,z:-132,dir:"left"}];
 let wasTown=false;
 let previousPX=null,previousPY=null;
@@ -395,28 +524,36 @@ function animate(time){
  if(!running)return;
  requestAnimationFrame(animate);
  const bridge=window.teenseysTownState?.();
- const show=!!bridge?.started&&bridge.mode==="town";
+ const show=!!bridge?.started&&(bridge.mode==="town"||bridge.mode==="store");
  renderer.domElement.style.display=show?"block":"none";
  if(show){
-  const p=bridge.townPlayer;
+  const inShop=bridge.mode==="store";
+  const p=inShop?bridge.player:bridge.townPlayer;
   const dx=previousPX===null?0:p.x-previousPX,dy=previousPY===null?0:p.y-previousPY;
   const walking=Math.abs(dx)+Math.abs(dy)>.01;
   previousPX=p.x;previousPY=p.y;
   const sprite=sprites[Math.max(0,Math.min(5,bridge.character||0))];
   for(const s of sprites)s.sprite.visible=s===sprite;
   // Existing movement and E-to-enter logic remain in the shopping game.
-  destination.set((p.x-480)*.27,.5,-54-(p.y-380)*.52);
+  if(inShop)destination.set(shopMapX(p.x),.3,shopMapZ(p.y));
+  else destination.set((p.x-480)*.27,.5,-54-(p.y-380)*.52);
   sprite.sprite.position.copy(destination);
   drawBillboard(sprite,p.dir,walking?Math.floor(time/130)%4:0);
-  for(const npc of npcs){npc.data.sprite.visible=true;npc.data.sprite.position.set(npc.x,.5,npc.z);
-   drawBillboard(npc.data,npc.dir,Math.floor(time/900)%4);}
+  for(const npc of npcs){npc.data.sprite.visible=!inShop; npc.data.sprite.position.set(npc.x,.5,npc.z);
+   if(!inShop)drawBillboard(npc.data,npc.dir,Math.floor(time/900)%4);}
+  cashier.sprite.visible=inShop;
+  if(inShop)drawBillboard(cashier,"down",0);
+  if(sprite.sprite.parent!== (inShop?shopScene:scene)){
+   sprite.sprite.parent?.remove(sprite.sprite);
+   (inShop?shopScene:scene).add(sprite.sprite);
+  }
   const pulse=1+Math.sin(time/320)*.12;
   for(let i=0;i<jets.length;i++)jets[i].scale.y=pulse+Math.sin(time/480+i)*.12;
   fountainGlow.intensity=85+Math.sin(time/500)*12;
-  renderer.render(scene,camera);
+  renderer.render(inShop?shopScene:scene,inShop?shopCamera:camera);
  }else{
   previousPX=null;previousPY=null;
  }
 }
 requestAnimationFrame(animate);
-window.addEventListener("pagehide",()=>{running=false;renderer.dispose();for(const s of [...sprites,...npcs.map(n=>n.data)])s.texture.dispose()},{once:true});
+window.addEventListener("pagehide",()=>{running=false;renderer.dispose();for(const s of [...sprites,...npcs.map(n=>n.data),cashier])s.texture.dispose()},{once:true});
