@@ -1,6 +1,6 @@
 # Teenseys' — interactive shopping town starter
 
-This is a working **front-end prototype** (v1.3), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
+This is a working **front-end prototype** (v1.4), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
 
 ## Run it
 
@@ -112,3 +112,10 @@ The outdoor plaza is a night scene with skyline, paved pedestrian paths, foliage
 ## Version 1.3 — Live 3D plaza and 2D pixel-art characters
 
 The main town uses Three.js to render a real 3D environment, with a fixed orthographic camera. All three storefronts load cube geometry and textures from their original editable Blockbench .bbmodel source files: Threads Shop, Sole House and Corner Cafe. The plaza has 3D paving, foliage, raised planters, benches, lamps, lighting, skyline and an animated 3D fountain. Characters remain 2D camera-facing pixel sprites (original shopper sprites and animations). Existing WASD / arrow controls and E-to-enter remain in the main game code; when visitors enter the Threads Shop, its original 2D clothing store and product-card/bag features render instead. A 2D town fallback remains if the Three.js CDN cannot load. The buildings use 3D meshes rather than previous flattened SVG images. The full live-browser rendering has not yet been validated.
+
+
+## Version 1.4 — Modular storefronts and a fully 3D shopping interior
+
+The user selected a 3D modular retail aesthetic inspired by real retail architecture and the NBA 2K22 SEWN storefront reference. The live Three.js main-page environment now assembles **three complete new retail storefronts from reusable 3D architectural parts**: shop body, dark structural piers, cream façade panels, canopy awnings, real transparent window panes, display mannequins, warm shop lighting, branded sign textures, glass doors, and planter modules. The original Blockbench source model files are retained in the repository as editable assets, but are no longer loaded as hidden geometry on every visit; the new shop modules are directly rendered as 3D geometry for better performance. The nighttime plaza, elevated orthographic camera, 3D fountain, landscaping, shop placements, and original 2D pixel avatars are preserved.
+
+**The Threads Shop interior is now rendered in 3D as well.** When a player presses E at the building, the scene switches to a dedicated Three.js boutique with lit walls, textured wooden floor, branded sign, 3D clothing racks, window mannequins, clothes, checkout and a 2D character billboard. WASD and touch pad continue to drive the original tile-based movement and collision rules; the 3D room reads that state. Clicking nearby 3D racks performs raycasting and opens the original HTML merchandise card. The original products, sizes, Browse All and bag remain usable in the HTML overlay; unlike the world, these interfaces intentionally remain 2D for legibility/accessibility. Sole House and Corner Café remain non-enterable prototypes. The old canvas scene remains as fallback when the external Three.js module/WebGL is unavailable. Visual/gameplay QA on the public live site is still required.
