@@ -1,6 +1,6 @@
 # Teenseys' — interactive shopping town starter
 
-This is a working **front-end prototype** (v2.1), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
+This is a working **front-end prototype** (v2.2), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
 
 ## Run it
 
@@ -160,3 +160,8 @@ The main site now uses a character-centered Three.js camera in both the outdoor 
 ## Version 2.1 — Stable player-centered follow camera and fullscreen mobile layout
 
 The camera and displayed 2D sprite now use exactly the **same smoothly interpolated position**. The Three.js orthographic camera offset and pitch stay constant while the environment scrolls behind the player, eliminating the old wobble from independently lerping the camera position while instantly rotating toward the player. Switching between outside and inside snaps the camera to the new player location. The fullscreen site is pinned to the browser's currently usable viewport via CSS dynamic viewport units and a `visualViewport` height update for iOS/Android address bar changes, with `viewport-fit=cover` for modern phones. The green A, red B and translucent Xbox-inspired D-pad remain in place. Changes passed JavaScript syntax validation; real-device browser testing is advisable.
+
+
+## Version 2.2 — Portrait-first mobile shopping
+
+Teenseys' main mobile screen now explicitly targets **vertical/portrait phone use** rather than expecting users to rotate the phone. The game canvas and Three.js layer fill the dynamic mobile viewport while keeping the character centered with the stable following camera from v2.1. Portrait cameras are framed separately for outside (205 orthographic height) and inside (183), and their aspect ratio updates with rotation or browser toolbar changes. The translucent Xbox-style movement D-pad remains bottom left, A/B buttons remain bottom right, both respect phone safe areas; the top navigation, HUD, character selection and shopping overlays are tighter on narrow screens. Desktop / landscape styles remain available. Changes passed JS syntax checks; real-device UI QA remains to be checked.
