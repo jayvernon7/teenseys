@@ -1,6 +1,6 @@
 # Teenseys' — interactive shopping town starter
 
-This is a working **front-end prototype** (v1.8), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
+This is a working **front-end prototype** (v1.9), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
 
 ## Run it
 
@@ -143,3 +143,10 @@ The main site now loads the **exact approved editable Blockbench model** from `a
 Approaching its central entrance and pressing E opens a dedicated 3D **roof-open view of the same exact interior geometry**: apparel rails, shelving, folded-merchandise displays, checkout, fitting rooms and mannequins. The roof and front lattice canopy are hidden in that interior camera view only; the street exterior remains intact. The player uses the existing 2D pixel sprite sheet, keyboard/mobile controls and 2D shopping product modal, bag and Browse All. Six invisible raycast regions are mapped over real shop display fixtures to keep product clicking possible. The previous generic interior meshes are hidden only if the approved model loads successfully, so the old 3D interior remains a fallback if a fetch or parsing error occurs. Source model assets are preserved for future edits.
 
 Changes were validated for JavaScript syntax and checked in GitHub. Browser/WebGL integration testing is still required on the hosted site, especially on lower-power mobile graphics.
+
+
+## Version 1.9 — Fullscreen and mobile handheld controls
+
+Teenseys now uses a **full-window immersive game view** instead of the previous centered fixed-width card layout. The header floats over the world, and the Three.js renderer plus the orthographic cameras resize to match the viewport aspect ratio without stretching the scene. Both town and shop world-to-screen **X coordinate mappings** were corrected for the camera facing direction: pressing right moves the character to the right of the screen, and pressing left moves left. The WASD/arrow bindings themselves remain unchanged.
+
+On touch/mobile-size displays, a translucent **D-pad is fixed bottom-left** and green **A** plus red **B** buttons float bottom-right, with safe-area padding. D-pad press/hold repeats movement; A interacts (equivalent to E) and B closes an open shopping modal or opens the menu while exploring. Product cards, entry controls, catalog and bag remain unchanged. New styling uses full-screen mobile viewport layout and adjusts smaller/landscape screens. All site and module scripts passed syntax checks. Real-device touch and 3D/WebGL QA is still recommended.
