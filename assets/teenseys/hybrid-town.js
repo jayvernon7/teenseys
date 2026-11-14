@@ -2,7 +2,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.m
 import {loadBlockbench} from "./blockbench-loader.js?v=1.8";
 
 /*
- * Teenseys' hybrid scene v2.1
+ * Teenseys' hybrid scene v2.2
  * Actual 3D: environment, architecture, plaza, fountain, lighting.
  * 2D: pixel character sprite sheets drawn on camera-facing planes.
  * The existing shopping/store UI and 2D boutique engine stay untouched.
@@ -37,13 +37,17 @@ function resizeWorld(){
  if(!width||!height)return;
  renderer.setSize(width,height,false);
  const aspect=width/height;
- const visibleHeight=185;
+ const portrait=aspect<.85;
+ // Portrait-first framing: show the world in a tall, uncropped viewport.
+ // Keep the player at the exact camera center. On narrow phones the slightly
+ // larger vertical span lets visitors see the building ahead and the path below.
+ const visibleHeight=portrait?205:185;
  camera.top=visibleHeight/2;camera.bottom=-visibleHeight/2;
  camera.left=-visibleHeight*aspect/2;camera.right=visibleHeight*aspect/2;
  camera.updateProjectionMatrix();
- // Indoor camera size adjusted in its setup using the same viewport aspect.
+ // Each room maintains the same orthographic camera pitch and independent framing.
  if(typeof shopCamera!=="undefined"&&shopCamera){
-  const shopVisibleHeight=148;
+  const shopVisibleHeight=portrait?183:148;
   shopCamera.top=shopVisibleHeight/2;shopCamera.bottom=-shopVisibleHeight/2;
   shopCamera.left=-shopVisibleHeight*aspect/2;
   shopCamera.right=shopVisibleHeight*aspect/2;
