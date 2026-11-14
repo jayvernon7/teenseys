@@ -208,13 +208,61 @@
       .game-wrap .hud,.game-wrap .hybrid-badge{top:53px}
     }
 
+
+    /* v2.0 — Xbox-inspired, translucent four-way cross D-pad. */
+    @media (pointer:coarse), (max-width:820px) {
+      .mobile-pad{
+        position:relative;display:grid;isolation:isolate;
+        grid-template-columns:repeat(3,46px);grid-template-rows:repeat(3,46px);
+        gap:0;padding:5px;border:0;border-radius:0;
+        background:transparent!important;box-shadow:none!important;
+        touch-action:none;user-select:none;-webkit-user-select:none;
+        width:148px;height:148px;place-content:center;
+      }
+      .mobile-pad::before{
+        content:"";position:absolute;inset:5px;
+        background:rgba(23,27,37,.37);
+        border:1px solid rgba(218,230,250,.32);
+        clip-path:polygon(33.33% 0,66.66% 0,66.66% 33.33%,100% 33.33%,
+          100% 66.66%,66.66% 66.66%,66.66% 100%,33.33% 100%,
+          33.33% 66.66%,0 66.66%,0 33.33%,33.33% 33.33%);
+        filter:drop-shadow(0 5px 8px rgba(0,0,0,.25));
+        z-index:-1;pointer-events:none;
+      }
+      .mobile-pad button{
+        width:46px;height:46px;border:0;border-radius:7px;
+        background:rgba(54,61,77,.13);color:rgba(248,250,255,.95);
+        box-shadow:inset 0 1px rgba(255,255,255,.13);
+        font-size:17px;line-height:1;cursor:pointer;
+        touch-action:none;user-select:none;-webkit-user-select:none;
+      }
+      .mobile-pad button:active,.mobile-pad button.pressed{
+        background:rgba(134,153,190,.52);color:white;
+      }
+      .mobile-pad .up{border-radius:12px 12px 4px 4px}
+      .mobile-pad .down{border-radius:4px 4px 12px 12px}
+      .mobile-pad .left{border-radius:12px 4px 4px 12px}
+      .mobile-pad .right{border-radius:4px 12px 12px 4px}
+      .game-wrap .hint{display:none!important}
+    }
+    @media (max-width:420px){
+      .mobile-pad{grid-template-columns:repeat(3,40px);grid-template-rows:repeat(3,40px);
+        width:130px;height:130px}
+      .mobile-pad button{width:40px;height:40px}
+    }
+    @media (max-height:480px) and (pointer:coarse){
+      .mobile-pad{grid-template-columns:repeat(3,34px);grid-template-rows:repeat(3,34px);
+        width:112px;height:112px}
+      .mobile-pad button{width:34px;height:34px}
+    }
+
   </style>
 </head>
 <body>
 <div class="page">
   <div class="shell">
     <div class="topbar">
-      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 1.9</span></div><div class="sub">FULL-SCREEN 3D SHOPPING · 2D SHOPPERS</div></div>
+      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 2.0</span></div><div class="sub">FULL-SCREEN 3D SHOPPING · 2D SHOPPERS</div></div>
       <div class="top-actions">
         <button id="browseBtn" class="pill" type="button" disabled>Browse all</button>
         <button id="cartBtn" class="pill" type="button" disabled>Bag <span id="cartCount">0</span></button>
@@ -1161,12 +1209,20 @@ function findFocus(){if(!started)return null;
  let ed=Math.abs(player.x-12)+Math.abs(player.y-15);if(ed<=2)candidates.push({kind:'exit',d:ed});
  candidates.sort((a,b)=>a.d-b.d);return candidates[0]||null;
 }
-function refreshHud(){let where=mode==='town'?'TEENSEYS’ BOUTIQUE PLAZA':'THE THREADS SHOP';hud.innerHTML=`${where}<small>${mode==='town'?'Explore the new 3D boutique':'Browse a rack, or choose Browse all'}</small>`;
- const f=findFocus();let msg=mode==='town'?'Explore the plaza · press E to enter the boutique':'Walk to a rack to inspect its items';
- if(f){if(f.kind==='building')msg=f.item.id==='boutique'?'Press E to enter THE THREADS SHOP':`Press E to check ${f.item.name}`;
- else if(f.kind==='rack')msg=`Press E to browse ${f.item.label}`;
- else if(f.kind==='npc')msg='Press E to talk to the store assistant';else if(f.kind==='exit')msg='Press E to leave the store';}
- hint.innerHTML=activePanel==='none'?`<kbd>E</kbd> ${msg}`:'Shopping experience paused';
+function refreshHud(){
+ const where=mode==='town'?'TEENSEYS’ BOUTIQUE PLAZA':'THE THREADS SHOP';
+ hud.innerHTML=`${where}<small>${mode==='town'?'Night shopping plaza':'Browse clothing and accessories'}</small>`;
+ const f=findFocus();
+ let msg=mode==='town'?'':'Walk to a rack to inspect its items';
+ if(f){
+  if(f.kind==='building')msg='Press E or A to enter THE THREADS SHOP';
+  else if(f.kind==='rack')msg=`Press E or A to browse ${f.item.label}`;
+  else if(f.kind==='npc')msg='Press E or A to talk to the store assistant';
+  else if(f.kind==='exit')msg='Press E or A to leave the store';
+ }
+ // No persistent "Explore the plaza" prompt below the viewport.
+ hint.classList.toggle('hidden',mode==='town');
+ hint.innerHTML=activePanel==='none'?(msg?`<kbd>E</kbd> ${msg}`:''):'Shopping experience paused';
 }
 function enterStore(){mode='store';player={x:12,y:13,dir:'up'};refreshHud();toast('Welcome to The Threads Shop!');}
 function leaveStore(){mode='town';townPlayer.x=480;townPlayer.y=397;townPlayer.dir='down';refreshHud();toast('Back in the shopping district!')}
@@ -1314,6 +1370,6 @@ window.teenseys3DToast=(message)=>toast(message);
 openWelcome();requestAnimationFrame(draw);
 })();
 </script>
-<script type="module" src="assets/teenseys/hybrid-town.js?v=1.9"></script>
+<script type="module" src="assets/teenseys/hybrid-town.js?v=2.0"></script>
 </body>
 </html>
