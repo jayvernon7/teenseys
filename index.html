@@ -326,7 +326,7 @@
 <div class="page">
   <div class="shell">
     <div class="topbar">
-      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 2.2</span></div><div class="sub">FULL-SCREEN 3D SHOPPING · 2D SHOPPERS</div></div>
+      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 2.3</span></div><div class="sub">FULL-SCREEN 3D SHOPPING · 2D SHOPPERS</div></div>
       <div class="top-actions">
         <button id="browseBtn" class="pill" type="button" disabled>Browse all</button>
         <button id="cartBtn" class="pill" type="button" disabled>Bag <span id="cartCount">0</span></button>
@@ -901,8 +901,11 @@ ctx.restore();
  function townMove(dir){
  const d={up:[0,-10],down:[0,10],left:[-10,0],right:[10,0]}[dir];if(!d)return;
  townPlayer.dir=dir;
- const x=Math.max(28,Math.min(930,townPlayer.x+d[0]));
- const y=Math.max(383,Math.min(561,townPlayer.y+d[1]));
+ // The 3D shopping district is now larger than the original 960×600 demo.
+ // Keep the old coordinate limits as a fallback when WebGL isn't available.
+ const fullWorld=window.teenseys3DReady===true;
+ const x=Math.max(fullWorld?-120:28,Math.min(fullWorld?1080:930,townPlayer.x+d[0]));
+ const y=Math.max(383,Math.min(fullWorld?1050:561,townPlayer.y+d[1]));
  const dx=(x-485)/79,dy=(y-469)/39;
  if(dx*dx+dy*dy<1.13)return;
  // Buildings, planters and the fountain are on the far side of the walkable area.
@@ -1445,6 +1448,6 @@ window.visualViewport?.addEventListener('resize',syncMobileViewport,{passive:tru
 openWelcome();requestAnimationFrame(draw);
 })();
 </script>
-<script type="module" src="assets/teenseys/hybrid-town.js?v=2.2"></script>
+<script type="module" src="assets/teenseys/hybrid-town.js?v=2.3"></script>
 </body>
 </html>
