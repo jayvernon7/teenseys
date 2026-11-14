@@ -1,7 +1,7 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js";
 
 /*
- * Teenseys' hybrid scene v1.6
+ * Teenseys' hybrid scene v1.7
  * Actual 3D: environment, architecture, plaza, fountain, lighting.
  * 2D: pixel character sprite sheets drawn on camera-facing planes.
  * The existing shopping/store UI and 2D boutique engine stay untouched.
@@ -90,17 +90,7 @@ for(const x of [-145,145])for(const z of [-20,-92,-150]){
   cyl(x-5+k*2,3.3+((k%2)*.5),z+((k%3)-1)*2,1.8,1.2,2.4,k%3?mats.leaves:mats.pink,6);
  }
 }
-// Simple 3D nighttime skyline behind the shopping plaza.
-const skylineMat=[0x232441,0x303052,0x28223c,0x362747].map(c=>colorMaterial(c,{roughness:1}));
-const windowMat=colorMaterial(0xf2b887,{emissive:0xd58c52,emissiveIntensity:.65});
-for(let i=0;i<31;i++){
- const x=-225+i*15.5,hh=30+(i*27)%72;
- const building=box(x,hh/2,-8,12,hh,15,skylineMat[i%4],scene,false);
- building.castShadow=false;
- for(let y=12;y<hh-7;y+=10)for(let wx=-4;wx<=4;wx+=8){
-  if((i+y+wx)%4!==0)box(x+wx,y,-16.4,3,5,.65,windowMat,scene,false);
- }
-}
+// Clear backdrop: no extra placeholder buildings while the new shop is planned.
 // Decor for three dimensions rather than flat compositing.
 function makeTree(x,z,blossom=false){
  cyl(x,8,z,1.8,2.4,16,mats.wood,8);
@@ -405,65 +395,11 @@ function makeStoreTemplate({id,label,subtitle,x,z,width,height,tint,accent}){
  return {id,g,sign,tex};
 }
 // One unified flagship shopping building replaces all three earlier retail exteriors.
-const retailBuildings=[
- makeStoreTemplate({
-  id:"threads",label:"TEENSEYS'",subtitle:"FLAGSHIP SHOPPING HALL  ·  FASHION  ·  STYLE",
-  x:0,z:-4,width:226,height:67,tint:0x4e4954,accent:0x9d76cd
- })
-];
-// Hide the legacy Blockbench façade after 3D modular storefronts are ready;
-// the original model source remains in the repository and can be re-used.
-
-// Original editable Blockbench sources remain in /assets/teenseys/night/. 
-// The lightweight reusable shop modules are rendered directly as 3D meshes;
-// we avoid loading several hundred unused model cubes on every page visit.
-// Architectural additions for the new wide flagship shopping hall.
-const flagship=retailBuildings[0].g;
-const fstone=facadeMats.stone,fbrick=facadeMats.brick,fmetal=facadeMats.metal;
-function flagshipPlanter(x,z){
- box(x,2.4,z,15,4.8,10,fmetal,flagship);
- box(x,5,z,13,1.5,8,mats.grass,flagship);
- for(let i=0;i<7;i++){
-  cyl(x-5+i*1.7,6.7+(i%2),z+(i%3-1)*2,2.0,1.9,2.5,mats.leaves,7,flagship);
-  if(i%2===0)box(x-4+i*1.7,9,z,1.5,1.5,1.5,mats.flowers,flagship,false);
- }
-}
-// Repeated bays make the entire façade read as one connected shopping center.
-for(const x of [-100,-70,-42,42,70,100]){
- box(x,42,-29.6,2.5,19,3.3,fstone,flagship);
- box(x,53,-30.4,5,2.4,5.4,fstone,flagship);
- box(x,35,-30.4,5,1.3,5.4,fmetal,flagship);
-}
-// One continuous, layered roofline; the crown sign is the central architectural focus.
-box(0,68.8,-26,234,2.5,6,fmetal,flagship);
-box(0,66.7,-27.9,232,1.4,5,fstone,flagship);
-box(0,36,-30.2,228,2.4,5,fstone,flagship);
-box(0,33.8,-30.3,225,1.2,5,fmetal,flagship);
-box(0,70.5,-25,64,4.5,8,fbrick,flagship);
-box(0,73.4,-26.1,69,1.5,8,fstone,flagship);
-// Soft evening lighting under the arcade.
-for(const x of [-92,-58,-23,23,58,92]){
- box(x,26,-42,12,.35,3,facadeMats.lamp,flagship,false);
-}
-flagshipPlanter(-100,-47);
-flagshipPlanter(100,-47);
-for(const x of [-60,60]){
- box(x,1.8,-54,21,3.6,8,fstone,flagship);
- for(let j=0;j<4;j++){
-  const xx=x-7+j*4.5;
-  cyl(xx,5.1,-54+(j%2?1:-1),2.9,2.2,4,mats.leaves,8,flagship);
- }
-}
-// Branded decorative banners, each attached to the same flagship exterior.
-function banner(x){
- box(x,43,-37,1,14,1,fmetal,flagship);
- const signTex=canvasLabel("T","SHOP · EXPLORE","#fff1ff","#b785e0");
- const bannerMesh=new THREE.Mesh(new THREE.PlaneGeometry(10,16),
-   new THREE.MeshBasicMaterial({map:signTex,side:THREE.DoubleSide}));
- bannerMesh.position.set(x,44,-38);flagship.add(bannerMesh);
-}
-banner(-112);banner(112);
-if(statusBadge)statusBadge.textContent="ONE 3D FLAGSHIP · 2D SHOPPERS";
+// Teenseys' plaza is deliberately cleared for a completely new building design.
+// Keep the 3D paving, lighting, trees, planters, fountain, camera and 2D shoppers.
+// Building templates remain defined above for future use, but NO storefront is placed.
+const retailBuildings=[];
+if(statusBadge)statusBadge.textContent="OPEN PLAZA · NEW BUILDING COMING";
 // All visitors and the controllable character remain 2D billboard sprites.
 function makeBillboard(index,w=10,h=15){
  const cvs=document.createElement("canvas");cvs.width=32;cvs.height=44;
