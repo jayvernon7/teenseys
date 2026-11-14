@@ -15,7 +15,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
 renderer.setSize(960,600,false);
 renderer.outputColorSpace=THREE.SRGBColorSpace;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure=1.35;
+renderer.toneMappingExposure=1.12;
 renderer.shadowMap.enabled=true;
 renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.domElement.className="teenseys-3d-canvas";
@@ -29,16 +29,16 @@ const camera=new THREE.OrthographicCamera(-148,148,92.5,-92.5,0.1,1000);
 camera.position.set(0,114,-183);
 camera.lookAt(0,17,-67);
 const clock=new THREE.Clock();
-const hemi=new THREE.HemisphereLight(0x9799ff,0x302333,2.05);
+const hemi=new THREE.HemisphereLight(0xb4bfdf,0x332b41,1.55);
 scene.add(hemi);
-const moon=new THREE.DirectionalLight(0x8d9dff,2.1);
+const moon=new THREE.DirectionalLight(0xa3b1de,1.6);
 moon.position.set(-85,125,-60);
 moon.castShadow=true;
 moon.shadow.mapSize.set(1024,1024);
 moon.shadow.camera.left=-180;moon.shadow.camera.right=180;
 moon.shadow.camera.top=150;moon.shadow.camera.bottom=-150;
 scene.add(moon);
-const warm=new THREE.DirectionalLight(0xffc38f,1.6);warm.position.set(40,90,80);scene.add(warm);
+const warm=new THREE.DirectionalLight(0xffc9a1,.94);warm.position.set(40,90,80);scene.add(warm);
 const colorMaterial=(color,extras={})=>new THREE.MeshStandardMaterial({color,roughness:.7,metalness:.08,...extras});
 const mats={
  pavement:colorMaterial(0x7c657e,{roughness:.35,metalness:.13}),
@@ -232,9 +232,50 @@ function canvasLabel(text,subline,color="#fff6e9",accent="#be8bef"){
  const tex=new THREE.CanvasTexture(cv);tex.colorSpace=THREE.SRGBColorSpace;
  tex.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),4);return tex;
 }
+
+function architectureTexture(type,base,secondary){
+ const c=document.createElement("canvas");c.width=c.height=512;
+ const g=c.getContext("2d");g.fillStyle=base;g.fillRect(0,0,512,512);
+ if(type==="brick"){
+  for(let row=0;row<17;row++)for(let col=-1;col<7;col++){
+   const x=col*104+(row%2)*52,y=row*31;
+   g.fillStyle=secondary;g.globalAlpha=.12+Math.abs((row*17+col*7)%8-4)*.023;
+   g.fillRect(x+2,y+3,100,26);g.globalAlpha=1;
+   g.fillStyle="#171d24";g.globalAlpha=.27;
+   g.fillRect(x,y,104,2);g.fillRect(x,y,2,31);g.globalAlpha=1;
+   g.fillStyle="#fff5e9";g.globalAlpha=.08;g.fillRect(x+4,y+4,95,2);g.globalAlpha=1;
+  }
+ }else{
+  for(let y=0;y<512;y+=44){g.fillStyle="#29303b";g.globalAlpha=.15;g.fillRect(0,y,512,2);g.globalAlpha=1;}
+  for(let i=0;i<700;i++){const x=(i*137)%512,y=(i*79)%512;
+    g.fillStyle=i%2?"#fffaf0":"#2b2a3b";g.globalAlpha=.045;g.fillRect(x,y,9,4);}
+  g.globalAlpha=1;
+ }
+ const t=new THREE.CanvasTexture(c);
+ t.wrapS=t.wrapT=THREE.RepeatWrapping;t.colorSpace=THREE.SRGBColorSpace;
+ t.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());return t;
+}
+const facadeTextures={
+ charcoal:architectureTexture("brick","#68616e","#aaa1b0"),
+ blue:architectureTexture("brick","#5b6472","#a1b6c5"),
+ clay:architectureTexture("brick","#9e7772","#d2a48e"),
+ stone:architectureTexture("stone","#ddd1c2","#f7e3ce")
+};
+const facadeMats={
+ brick:new THREE.MeshStandardMaterial({map:facadeTextures.charcoal,roughness:.95}),
+ blue:new THREE.MeshStandardMaterial({map:facadeTextures.blue,roughness:.95}),
+ clay:new THREE.MeshStandardMaterial({map:facadeTextures.clay,roughness:.94}),
+ stone:new THREE.MeshStandardMaterial({map:facadeTextures.stone,roughness:.81}),
+ metal:colorMaterial(0x252b35,{roughness:.37,metalness:.56}),
+ interior:colorMaterial(0xc4ab98,{roughness:.85}),
+ oak:colorMaterial(0x9e8069,{roughness:.56}),
+ display:colorMaterial(0xe0cbaf,{roughness:.72}),
+ accent:colorMaterial(0x9c759e,{metalness:.22,roughness:.46}),
+ lamp:colorMaterial(0xffd4a6,{emissive:0xffa760,emissiveIntensity:.92})
+};
 const facadeGlass=new THREE.MeshPhysicalMaterial({
- color:0xa2b6d4,roughness:.07,metalness:.09,transparent:true,opacity:.24,
- depthWrite:false,side:THREE.DoubleSide
+ color:0xc2d4df,roughness:.1,metalness:0,transparent:true,opacity:.19,
+ depthWrite:false,side:THREE.DoubleSide,clearcoat:1,clearcoatRoughness:.06
 });
 const creamPanel=colorMaterial(0xd5c6b6,{roughness:.88});
 const darkStone=colorMaterial(0x292b36,{roughness:.74});
@@ -259,72 +300,96 @@ function litBox(x,y,z,w,h,d,material,parent,glowColor=0xffc58d){
  bulb.position.set(x,y-2,z-2);parent.add(bulb);
 }
 function storeWindow(parent,x,w,z,accent,tone){
- // Mannequins sit behind transparent real glass. Frame sections are modular.
- const sash=facadeGlass.clone();
- box(x,12.6,z,w,24,.16,sash,parent,false);
- box(x-w/2,12.8,z-.16,1.15,25,.7,frameMetal,parent);
- box(x+w/2,12.8,z-.16,1.15,25,.7,frameMetal,parent);
- box(x,1,z-.3,w,1.6,1,frameMetal,parent);
- box(x,24.6,z-.3,w,1.55,1,frameMetal,parent);
- box(x,14.7,z-.3,w,.48,.6,frameMetal,parent);
- box(x,12.7,z+3,w-1,23,.2,warmGlassGlow,parent,false);
- box(x,2,z+2,w-1,.8,5,paleStone,parent,false);
- addMannequin(parent,x-w*.21,z+1.2,tone,0x262b35);
- if(w>18)addMannequin(parent,x+w*.21,z+1.2,accent,0x4e4350);
+ const m=facadeMats,metal=m.metal;
+ // Transparent glass sits in FRONT of a hollow, furnished display recess.
+ box(x,12.7,z,w,24,.13,facadeGlass,parent,false);
+ box(x,12.5,z+21,w-2,24,.5,m.interior,parent,false);
+ box(x,1.1,z+11,w-2,2,23,m.oak,parent,false);
+ box(x,1.8,z+8,w-5,2.5,13,m.display,parent,false);
+ // The storefront's storefront window framing is fully three-dimensional.
+ for(const xx of [x-w/2,x+w/2])box(xx,12.7,z-.2,1.25,25,.85,metal,parent);
+ for(const yy of [.75,14.5,25])box(x,yy,z-.3,w+.9,1,.85,metal,parent);
+ box(x,12.7,z-.4,.85,24,.8,metal,parent);
+ // Hanging showroom lights and simple merchandise displays behind the pane.
+ box(x,23,z+11,w-3,.5,6,m.lamp,parent,false);
+ box(x,12,z+19,w-8,.75,3,m.oak,parent,false);
+ box(x,7,z+19,w-8,.75,3,m.oak,parent,false);
+ for(let i=0;i<Math.floor(w/9);i++){
+  box(x-w/2+6+i*9,8.8,z+19,5,3.2,3,i%2?m.accent:m.display,parent,false);
+ }
+ addMannequin(parent,x-w*.22,z+5,tone,0x2a3039);
+ if(w>18)addMannequin(parent,x+w*.22,z+5,accent,0x483e47);
 }
-function makeStoreTemplate({id,label,subtitle,x,z,width,height,tint,accent,poster}){
- const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
- const half=width/2,front=-26,back=17;
- // Long body extends backwards and has real side depth.
- box(0,height*.52,back-2,width-1,height,40,colorMaterial(tint),g);
- box(0,height-.75,-2,width+2,1.6,45,frameMetal,g);
- box(0,height*.75,front+3,width-2,height*.43,4,creamPanel,g);
- box(0,height*.64,front+.6,width-2,5.3,4,paleStone,g);
- box(-half+3.5,height*.52,front-.7,7,height,7,darkStone,g);
- box(half-3.5,height*.52,front-.7,7,height,7,darkStone,g);
- // Reinforced store columns and horizontals like the reference.
- for(const xx of [-half+10,half-10])box(xx,height*.74,front-2.3,3.4,height*.45,4,frameMetal,g);
- box(0,29,front-3,width-15,4.7,2.4,darkStone,g);
- const leftW=(width-26)/2;
- const glassZ=front-4.6;
- storeWindow(g,-width*.29,leftW,glassZ,accent,0xd4c9c3);
- storeWindow(g,width*.29,leftW,glassZ,0xc1b8aa,accent);
- // Door vestibule: actual transparent glazing, metal mullions, handles.
- box(0,12.5,glassZ-1,15,24,.22,facadeGlass.clone(),g,false);
- for(const xx of [-7.8,0,7.8])box(xx,12.8,glassZ-1.4,.8,25,1,frameMetal,g);
- box(0,24.8,glassZ-1.5,17,1.6,1,frameMetal,g);
- box(-.9,11.2,glassZ-2.5,.7,6,1,creamPanel,g);
- box(.9,11.2,glassZ-2.5,.7,6,1,creamPanel,g);
- // Three awnings protrude, with underlighting and clean fascia edges.
- for(const xx of [-width*.29,0,width*.29]){
-  const w=xx===0?20:leftW+5;
-  box(xx,27,glassZ-5.3,w,1.1,11,paleStone,g);
-  box(xx,26,glassZ-10,w,1.05,1.3,frameMetal,g);
-  litBox(xx,25.5,glassZ-8,w*.78,.3,.75,mats.gold,g);
+function makeStoreTemplate({id,label,subtitle,x,z,width,height,tint,accent}){
+ const g=new THREE.Group();g.name=id+"-retail";g.position.set(x,0,z);scene.add(g);
+ const m=facadeMats,half=width/2,front=-26,windowZ=-30,back=17;
+ const brick=id==="threads"?m.brick:id==="sole"?m.blue:m.clay;
+ const bayW=(width-26)/2,bayX=width*.29;
+ // Hollow architecture means glass windows genuinely reveal interior displays.
+ box(0,height-11,-3,width,22,45,brick,g);
+ box(0,height*.51,back,width-3,height,2.5,m.interior,g);
+ box(-half+2.4,height*.50,-3,4.8,height,42,brick,g);
+ box(half-2.4,height*.50,-3,4.8,height,42,brick,g);
+ box(0,.4,-5,width-2,.8,45,m.oak,g);
+ box(0,27,0,width-8,1,34,m.stone,g);
+ // Upper architectural mass, parapet, cornice, projecting limestone bands.
+ box(0,height-18,front+.8,width-8,26,3,brick,g);
+ for(const [yy,ww,dep,h] of [[height+1,width+4,6,2.8],[height-4,width+1,5,2.7],[height-30,width+1,5,2.6]]){
+  box(0,yy,front,ww,h,dep,m.stone,g);
  }
- // Customizable store sign using a real 3D plane carrying a 2D brand texture.
- const tex=canvasLabel(label,subtitle,"#fff4e8",typeof accent==='number'?'#'+accent.toString(16).padStart(6,'0'):accent);
- const sign=new THREE.Mesh(
-  new THREE.PlaneGeometry(width*.72,Math.min(18,height*.27)),
-  new THREE.MeshBasicMaterial({map:tex,transparent:false,side:THREE.DoubleSide}));
- sign.position.set(0,height-10,front-4.3);g.add(sign);
- box(0,height-20,front-3,width*.77,1.6,1,frameMetal,g);
- // Modular horizontal top cornice and vertical detail bands.
- box(0,height+1,front-1,width+4,2.6,5,frameMetal,g);
- box(0,height-3,front+2,width+2,3,5,paleStone,g);
- for(const side of [-1,1])for(const yy of [height*.42,height*.68,height*.90])
-  box(side*(half-3.5),yy,front-4,9,1.2,5,paleStone,g);
- // Sidewalk merchandising planters.
- for(const xx of [-half+9,half-9]){
-  box(xx,2.7,glassZ-10,9,5.4,9,darkStone,g);
-  cyl(xx,6.6,glassZ-10,5.7,5.1,4.8,mats.leaves,7,g);
+ box(0,height+3,front+2,width+6,1.2,7,m.metal,g);
+ // Individual reinforced storefront piers with capitals and plinths.
+ for(const xx of [-half+3.6,-width*.115,width*.115,half-3.6]){
+  box(xx,15,front-2.6,4.6,30,5,brick,g);
+  box(xx,29,front-3.1,6.2,2.2,5.4,m.stone,g);
+  box(xx,2.7,front-3.2,6.1,5.4,5.4,m.stone,g);
  }
- // Exterior sconce lighting on the columns.
- for(const xx of [-half+4.2,half-4.2]){
-  litBox(xx,28.5,front-5,2.6,6,1,mats.gold,g);
+ // Actual showroom: windows are panes in open bays, not opaque printed wall panels.
+ storeWindow(g,-bayX,bayW,windowZ,accent,0xe9d6c8);
+ storeWindow(g,bayX,bayW,windowZ,0xe9dac9,accent);
+ box(0,12.5,windowZ-1,15,24,.14,facadeGlass,g,false);
+ for(const xx of [-7.8,0,7.8])box(xx,12.5,windowZ-1.3,.8,25,.9,m.metal,g);
+ box(0,25.1,windowZ-1.3,16.8,1.2,1,m.metal,g);
+ box(0,.8,windowZ-1.3,16.8,1.5,1,m.metal,g);
+ for(const xx of [-1.3,1.3])box(xx,11,windowZ-2,.6,5,1,m.stone,g,false);
+ box(0,.19,windowZ-8,17,.38,10,m.metal,g,false);
+ // Inner wall and shelving visible through double door.
+ box(0,13,7,23,24,.7,m.interior,g,false);
+ for(const xx of [-10,10]){
+  box(xx,7,-3,3,14,4,m.metal,g,false);
+  box(xx,7,0,2,6,3,m.accent,g,false);
  }
- const frontLight=new THREE.PointLight(0xffba91,90,70,2);
- frontLight.position.set(0,20,front-17);g.add(frontLight);
+ for(const xx of [-bayX,0,bayX]){
+  const ww=xx===0?20:bayW+2;
+  box(xx,27,windowZ-5.5,ww,1.4,13,m.stone,g);
+  box(xx,26.1,windowZ-11.5,ww,.7,1.5,m.metal,g);
+  box(xx,26,windowZ-7,ww-3,.18,5,m.lamp,g,false);
+ }
+ const tex=canvasLabel(label,subtitle,"#fff6eb",
+   typeof accent==="number"?"#"+accent.toString(16).padStart(6,"0"):accent);
+ const sign=new THREE.Mesh(new THREE.PlaneGeometry(width*.74,Math.min(18,height*.26)),
+   new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide}));
+ sign.position.set(0,height-16,front-1.1);g.add(sign);
+ box(0,height-25,front,width*.78,.8,2,m.stone,g);
+ // Boutique center tower, sneaker stepped parapet, cafe period cornice.
+ if(id==="threads"){
+  box(0,height+3.5,front+2,width*.38,5.5,7,brick,g);
+  box(0,height+6.5,front+2,width*.42,.9,7,m.stone,g);
+ }else if(id==="sole"){
+  for(const xx of [-half*.5,half*.5])box(xx,height+2.5,front+2,9,4.8,6,m.metal,g);
+ }else{
+  for(let i=0;i<6;i++)box(-half+12+i*(width-24)/5,height+1.2,front+1,3.5,2.5,4,m.stone,g);
+ }
+ for(const xx of [-half+8,half-8]){
+  box(xx,27,windowZ-2,2,5.5,1.4,m.lamp,g,false);
+  box(xx,2.1,windowZ-13,8.5,4.2,8,m.metal,g);
+  cyl(xx,6.1,windowZ-13,5,4.5,5,mats.leaves,8,g);
+ }
+ // A modest number of physically motivated sources keeps performance predictable.
+ const insideLight=new THREE.PointLight(0xffd4ae,36,62,2);
+ insideLight.position.set(0,20,front+12);g.add(insideLight);
+ const entranceLight=new THREE.PointLight(0xffc79d,30,60,2);
+ entranceLight.position.set(0,27,windowZ-10);g.add(entranceLight);
  return {id,g,sign,tex};
 }
 const retailBuildings=[
@@ -367,8 +432,8 @@ const shopScene=new THREE.Scene();
 shopScene.background=new THREE.Color(0x29343a);
 const shopCamera=new THREE.OrthographicCamera(-99,99,64,-64,.1,650);
 shopCamera.position.set(0,105,95);shopCamera.lookAt(0,12,-75);
-shopScene.add(new THREE.HemisphereLight(0xfff3dc,0x4b5154,2.3));
-const shopAmbient=new THREE.DirectionalLight(0xffe7be,2.5);
+shopScene.add(new THREE.HemisphereLight(0xfff3de,0x4d4853,1.65));
+const shopAmbient=new THREE.DirectionalLight(0xffead2,1.9);
 shopAmbient.position.set(-30,85,30);shopScene.add(shopAmbient);
 const shopMat={
  floor:colorMaterial(0xb8a18a,{roughness:.67}),
@@ -392,14 +457,14 @@ for(let y=0;y<256;y+=24)for(let x=(Math.floor(y/24)%2)*24;x<256;x+=48){
 }
 const floorTexture=new THREE.CanvasTexture(floorCanvas);floorTexture.colorSpace=THREE.SRGBColorSpace;
 floorTexture.wrapS=floorTexture.wrapT=THREE.RepeatWrapping;floorTexture.repeat.set(3,3);
-woodPanel.material=new THREE.MeshStandardMaterial({map:floorTexture,roughness:.68});
+woodPanel.material=new THREE.MeshStandardMaterial({map:floorTexture,roughness:.6});
 sr(0,24,-129,155,49,2,shopMat.wall);
 sr(-77,24,-75,2,49,111,shopMat.wall);
 sr(77,24,-75,2,49,111,shopMat.wall);
 sr(0,46,-129,155,5,3,shopMat.trim);
 for(let i=0;i<8;i++)sr(-69+i*20,40,-127,14,6,1.5,shopMat.slate);
 for(let i=0;i<4;i++){
- const light=new THREE.PointLight(0xffe7b7,45,68,2);
+ const light=new THREE.PointLight(0xffe7b7,29,57,2);
  light.position.set(-53+i*36,40,-75);shopScene.add(light);
  sr(-53+i*36,42,-75,9,.7,7,shopMat.warm);
 }
