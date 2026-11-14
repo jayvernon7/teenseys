@@ -141,13 +141,25 @@ cyl(0,1.1,0,22,23,2.2,mats.white,48,fountain);
 cyl(0,2.2,0,20.2,20.2,.55,mats.water,48,fountain);
 cyl(0,3.3,0,7,9,2.1,mats.brick,24,fountain);
 cyl(0,5.5,0,3,4,2.6,mats.white,20,fountain);
+// Inset metallic rim, lit ripples, and tiered water in the central plaza.
+const fountainRimMat=colorMaterial(0xbcb1c3,{metalness:.48,roughness:.3});
+for(const [radius,y,opacity] of [[21.3,2.6,.75],[17.5,2.85,.36],[12.3,3,.47]]){
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(radius,.36,9,64),
+  new THREE.MeshStandardMaterial({color:radius>20?0xf1d6de:0x7cddf6,
+   transparent:true,opacity,emissive:radius>20?0x6f647b:0x1d9ec7,emissiveIntensity:.6}));
+ ring.rotation.x=Math.PI/2;ring.position.y=y;fountain.add(ring);
+}
+for(const radius of [6.5,3.9]){
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(radius,.7,8,32),fountainRimMat);
+ ring.rotation.x=Math.PI/2;ring.position.y=5.3;fountain.add(ring);
+}
 const jets=[];
 for(let i=0;i<9;i++){
  const angle=2*Math.PI*i/9,rad=i===0?0:10;
  const jet=cyl(Math.cos(angle)*rad,5.9,Math.sin(angle)*rad,.55,.9,4.8,mats.teal,8,fountain);
  jets.push(jet);
 }
-const fountainGlow=new THREE.PointLight(0x4bdcff,85,75,2);
+const fountainGlow=new THREE.PointLight(0x4bdcff,66,66,2);
 fountainGlow.position.set(0,8,-99);scene.add(fountainGlow);
 function makeFlowers(x,z){
  box(x,1.4,z,17,2.8,7,mats.brick);
@@ -605,7 +617,7 @@ function animate(time){
   }
   const pulse=1+Math.sin(time/320)*.12;
   for(let i=0;i<jets.length;i++)jets[i].scale.y=pulse+Math.sin(time/480+i)*.12;
-  fountainGlow.intensity=85+Math.sin(time/500)*12;
+  fountainGlow.intensity=66+Math.sin(time/650)*7;
   renderer.render(inShop?shopScene:scene,inShop?shopCamera:camera);
  }else{
   previousPX=null;previousPY=null;
