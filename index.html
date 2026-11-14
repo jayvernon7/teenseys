@@ -21,6 +21,7 @@
     .pill:hover{background:#f1f8f4}.pill.primary{background:#184c4b;border-color:#184c4b;color:#fff}
     .badge{font-size:11px;background:#e1f3e8;color:#216657;border-radius:99px;padding:5px 8px;font-weight:800}
     .game-wrap{position:relative;background:#afd2ad;min-height:350px;isolation:isolate}
+    .game-wrap .hud,.game-wrap .hint{z-index:2}.game-wrap .overlay{z-index:5}.game-wrap .teenseys-3d-canvas{display:none}.hybrid-badge{position:absolute;top:13px;right:12px;z-index:2;padding:7px 10px;background:#211b42ed;color:#f3dfff;font-size:10px;letter-spacing:.08em;font-weight:900;border:1px solid #9673c8;border-radius:9px;pointer-events:none}@media(max-width:600px){.hybrid-badge{top:50px;right:8px;font-size:8px;padding:5px}}
     #game{display:block;width:100%;aspect-ratio:22/14;max-height:650px;object-fit:contain;image-rendering:pixelated;background:#9ccf9a;touch-action:manipulation}
     .hud{position:absolute;left:15px;top:13px;background:rgba(255,255,250,.95);border:1px solid #ffffff99;border-radius:11px;padding:8px 12px;box-shadow:0 4px 20px #154c4b21;font-size:12px;font-weight:850;max-width:70%;pointer-events:none}
     .hud small{display:block;color:#698078;font-size:11px;font-weight:650;margin-top:2px}
@@ -89,7 +90,7 @@
 <div class="page">
   <div class="shell">
     <div class="topbar">
-      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 1.2</span></div><div class="sub">Night Plaza · flagship Blockbench building</div></div>
+      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 1.3</span></div><div class="sub">HYBRID NIGHT PLAZA · 3D TOWN + 2D SHOPPERS</div></div>
       <div class="top-actions">
         <button id="browseBtn" class="pill" type="button" disabled>Browse all</button>
         <button id="cartBtn" class="pill" type="button" disabled>Bag <span id="cartCount">0</span></button>
@@ -99,6 +100,7 @@
     <div class="game-wrap" id="gameWrap">
       <canvas id="game" width="704" height="448" aria-label="Pixel-art shopping town game. Use arrow keys or WASD to move, E to interact."></canvas>
       <div class="hud" id="hud">NIGHT PLAZA <small>Explore the district</small></div>
+      <div id="hybridSceneBadge" class="hybrid-badge">LOADING 3D PLAZA…</div>
       <div class="hint" id="hint">Choose a character to enter the town</div>
       <div id="overlay" class="overlay" aria-live="off"></div>
       <div id="toast" class="toast hidden" role="status"></div>
@@ -1153,8 +1155,10 @@ overlay.addEventListener('click',e=>{let b=e.target.closest('button');if(!b)retu
 });
 // Decorative demo shoppers move only within safe, predetermined paths. They are not real online users.
 setInterval(()=>{if(!started)return;for(let i=0;i<shoppers.length;i++){const s=shoppers[i];s.step++;s.x+=(s.step%3===0?.25:-.12);if(s.x>29)s.x=23;if(s.x<13)s.x=18}},900);
+window.teenseysTownState=()=>({started,mode,activePanel,character,townPlayer:{...townPlayer}});
 openWelcome();requestAnimationFrame(draw);
 })();
 </script>
+<script type="module" src="assets/teenseys/hybrid-town.js?v=1.3"></script>
 </body>
 </html>
