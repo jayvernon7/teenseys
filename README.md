@@ -1,6 +1,6 @@
 # Teenseys' — interactive shopping town starter
 
-This is a working **front-end prototype** (v1.5), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
+This is a working **front-end prototype** (v1.6), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
 
 ## Run it
 
@@ -124,3 +124,8 @@ The user selected a 3D modular retail aesthetic inspired by real retail architec
 ## Version 1.5 — Material, glass, storefront and lighting polish
 
 Replaced the flat-colored retail façades with procedural brick and limestone texture maps, real architectural courses and contrasting stone trims, a stepped flagship parapet, and cleaner shop signs. Store structures are now **hollow**: transparent physical glass panels with dark metal mullions reveal separately constructed and illuminated mannequin displays, shelving, display plinths and inner walls. Previously the façades used an opaque block directly behind their windows, preventing a believable view inside. Tuned the ambient/night lighting, warm display and entrance lights, tone-mapping, and shop interior bounce lighting to avoid the overly bright, flat look. Added reflective 3D fountain rims and subtle luminous ripples. The page UI also has tighter, cleaner night-plaza styling. Three.js rendering and 2D character billboards remain, as do the WASD controls, Threads Shop 3D interior and 2D product/card/bag overlays. The new art uses generated procedural textures (no additional purchased pack). JavaScript syntax was validated; final browser/WebGL visual QA still needs to be checked on the deployed page.
+
+
+## Version 1.6 — One unified flagship building
+
+Replaced the three independently placed retail storefronts with one **large, continuous Teenseys' flagship shopping hall**: a 226-unit-wide 3D facade, broad glazed display bays, a central entrance, roof parapet, continuous limestone and dark-metal cornices, illuminated window arcades, planted areas and shop banners. No separate Sole House and Corner Café buildings are rendered in the current active 3D plaza. The original models remain stored as editable sources in the repo for potential reuse, and the existing single Threads Shop shopping interior is still accessed through the flagship entrance. The large building is centered behind the existing animated fountain and retains the nighttime pedestrian plaza, 2D characters, camera, WASD controls, merchandise interaction, and bag. The fallback 2D scene and E-to-enter focus are synchronized to one central storefront. Browser-rendered QA remains advisable.
