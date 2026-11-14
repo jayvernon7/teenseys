@@ -219,11 +219,130 @@ function modelFromBlockbench(data,position){
  scene.add(group);
  return count;
 }
+
+// MODULAR STORE KIT v1.4 — inspired by realistic outdoor shopping storefronts.
+// Each store is assembled from re-usable architectural modules, not 2D façades.
+function canvasLabel(text,subline,color="#fff6e9",accent="#be8bef"){
+ const cv=document.createElement("canvas");cv.width=1024;cv.height=256;
+ const cx=cv.getContext("2d");cx.fillStyle="#171a2a";cx.fillRect(0,0,1024,256);
+ cx.fillStyle=accent;cx.fillRect(0,0,1024,8);
+ cx.fillStyle=color;cx.textAlign="center";cx.font="bold 91px Arial, sans-serif";
+ cx.fillText(text,512,139,940);
+ cx.font="32px Arial, sans-serif";cx.fillStyle="#bbaacb";cx.fillText(subline,512,199,900);
+ const tex=new THREE.CanvasTexture(cv);tex.colorSpace=THREE.SRGBColorSpace;
+ tex.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),4);return tex;
+}
+const facadeGlass=new THREE.MeshPhysicalMaterial({
+ color:0xa2b6d4,roughness:.07,metalness:.09,transparent:true,opacity:.24,
+ depthWrite:false,side:THREE.DoubleSide
+});
+const creamPanel=colorMaterial(0xd5c6b6,{roughness:.88});
+const darkStone=colorMaterial(0x292b36,{roughness:.74});
+const paleStone=colorMaterial(0xccc4bd,{roughness:.7});
+const frameMetal=colorMaterial(0x171e2a,{roughness:.37,metalness:.53});
+const warmGlassGlow=colorMaterial(0x9a7b6f,{emissive:0xaf7359,emissiveIntensity:.33});
+const shopFloor=colorMaterial(0x9e8a7a,{roughness:.52});
+function addMannequin(parent,x,z,shirt,pants){
+ const skin=colorMaterial(0xc7b9a9),shirtMat=colorMaterial(shirt),pantMat=colorMaterial(pants);
+ box(x,1.05,z,4.6,1.1,3.6,frameMetal,parent);
+ box(x,4.1,z,1.2,5.4,1.2,darkStone,parent);
+ box(x,10,z,4.1,8.2,2.7,shirtMat,parent);
+ box(x-3.5,9.8,z,2,7.1,2.2,shirtMat,parent);
+ box(x+3.5,9.8,z,2,7.1,2.2,shirtMat,parent);
+ box(x-1.15,3.95,z,1.65,6,2,pantMat,parent);
+ box(x+1.15,3.95,z,1.65,6,2,pantMat,parent);
+ cyl(x,15.2,z,2.15,2.1,2,skin,9,parent);
+}
+function litBox(x,y,z,w,h,d,material,parent,glowColor=0xffc58d){
+ box(x,y,z,w,h,d,material,parent,false);
+ const bulb=new THREE.PointLight(glowColor,15,24,2);
+ bulb.position.set(x,y-2,z-2);parent.add(bulb);
+}
+function storeWindow(parent,x,w,z,accent,tone){
+ // Mannequins sit behind transparent real glass. Frame sections are modular.
+ const sash=facadeGlass.clone();
+ box(x,12.6,z,w,24,.16,sash,parent,false);
+ box(x-w/2,12.8,z-.16,1.15,25,.7,frameMetal,parent);
+ box(x+w/2,12.8,z-.16,1.15,25,.7,frameMetal,parent);
+ box(x,1,z-.3,w,1.6,1,frameMetal,parent);
+ box(x,24.6,z-.3,w,1.55,1,frameMetal,parent);
+ box(x,14.7,z-.3,w,.48,.6,frameMetal,parent);
+ box(x,12.7,z+3,w-1,23,.2,warmGlassGlow,parent,false);
+ box(x,2,z+2,w-1,.8,5,paleStone,parent,false);
+ addMannequin(parent,x-w*.21,z+1.2,tone,0x262b35);
+ if(w>18)addMannequin(parent,x+w*.21,z+1.2,accent,0x4e4350);
+}
+function makeStoreTemplate({id,label,subtitle,x,z,width,height,tint,accent,poster}){
+ const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
+ const half=width/2,front=-26,back=17;
+ // Long body extends backwards and has real side depth.
+ box(0,height*.52,back-2,width-1,height,40,colorMaterial(tint),g);
+ box(0,height-.75,-2,width+2,1.6,45,frameMetal,g);
+ box(0,height*.75,front+3,width-2,height*.43,4,creamPanel,g);
+ box(0,height*.64,front+.6,width-2,5.3,4,paleStone,g);
+ box(-half+3.5,height*.52,front-.7,7,height,7,darkStone,g);
+ box(half-3.5,height*.52,front-.7,7,height,7,darkStone,g);
+ // Reinforced store columns and horizontals like the reference.
+ for(const xx of [-half+10,half-10])box(xx,height*.74,front-2.3,3.4,height*.45,4,frameMetal,g);
+ box(0,29,front-3,width-15,4.7,2.4,darkStone,g);
+ const leftW=(width-26)/2;
+ const glassZ=front-4.6;
+ storeWindow(g,-width*.29,leftW,glassZ,accent,0xd4c9c3);
+ storeWindow(g,width*.29,leftW,glassZ,0xc1b8aa,accent);
+ // Door vestibule: actual transparent glazing, metal mullions, handles.
+ box(0,12.5,glassZ-1,15,24,.22,facadeGlass.clone(),g,false);
+ for(const xx of [-7.8,0,7.8])box(xx,12.8,glassZ-1.4,.8,25,1,frameMetal,g);
+ box(0,24.8,glassZ-1.5,17,1.6,1,frameMetal,g);
+ box(-.9,11.2,glassZ-2.5,.7,6,1,creamPanel,g);
+ box(.9,11.2,glassZ-2.5,.7,6,1,creamPanel,g);
+ // Three awnings protrude, with underlighting and clean fascia edges.
+ for(const xx of [-width*.29,0,width*.29]){
+  const w=xx===0?20:leftW+5;
+  box(xx,27,glassZ-5.3,w,1.1,11,paleStone,g);
+  box(xx,26,glassZ-10,w,1.05,1.3,frameMetal,g);
+  litBox(xx,25.5,glassZ-8,w*.78,.3,.75,mats.gold,g);
+ }
+ // Customizable store sign using a real 3D plane carrying a 2D brand texture.
+ const tex=canvasLabel(label,subtitle,"#fff4e8",accent);
+ const sign=new THREE.Mesh(
+  new THREE.PlaneGeometry(width*.72,Math.min(18,height*.27)),
+  new THREE.MeshBasicMaterial({map:tex,transparent:false,side:THREE.DoubleSide}));
+ sign.position.set(0,height-10,front-4.3);g.add(sign);
+ box(0,height-20,front-3,width*.77,1.6,1,frameMetal,g);
+ // Modular horizontal top cornice and vertical detail bands.
+ box(0,height+1,front-1,width+4,2.6,5,frameMetal,g);
+ box(0,height-3,front+2,width+2,3,5,paleStone,g);
+ for(const side of [-1,1])for(const yy of [height*.42,height*.68,height*.90])
+  box(side*(half-3.5),yy,front-4,9,1.2,5,paleStone,g);
+ // Sidewalk merchandising planters.
+ for(const xx of [-half+9,half-9]){
+  box(xx,2.7,glassZ-10,9,5.4,9,darkStone,g);
+  cyl(xx,6.6,glassZ-10,5.7,5.1,4.8,mats.leaves,7,g);
+ }
+ // Exterior sconce lighting on the columns.
+ for(const xx of [-half+4.2,half-4.2]){
+  litBox(xx,28.5,front-5,2.6,6,1,mats.gold,g);
+ }
+ const frontLight=new THREE.PointLight(0xffba91,90,70,2);
+ frontLight.position.set(0,20,front-17);g.add(frontLight);
+ return {id,g,sign,tex};
+}
+const retailBuildings=[
+ makeStoreTemplate({id:"threads",label:"THE THREADS SHOP",subtitle:"TEENSEYS' · FASHION & STREETWEAR",
+   x:0,z:-5,width:94,height:58,tint:0x4e4954,accent:0x8a6ad4}),
+ makeStoreTemplate({id:"sole",label:"SOLE HOUSE",subtitle:"SNEAKERS · NEW RELEASES",
+   x:-89,z:-5,width:72,height:57,tint:0x535767,accent:0x9da7ca}),
+ makeStoreTemplate({id:"cafe",label:"CORNER CAFÉ",subtitle:"COFFEE · PASTRIES · GOOD COMPANY",
+   x:89,z:-5,width:72,height:56,tint:0x755f61,accent:0xb98a74})
+];
+// Hide the legacy Blockbench façade after 3D modular storefronts are ready;
+// the original model source remains in the repository and can be re-used.
+
 const sceneLoaded=Promise.all(models.map(async m=>{
  const r=await fetch(m.path,{cache:"force-cache"});
  if(!r.ok)throw Error(m.path+" returned HTTP "+r.status);
  const data=await r.json();
- return {id:m.id,cubes:modelFromBlockbench(data,m)};
+ const meshCount=modelFromBlockbench(data,m); const legacy=scene.children.at(-1); if(legacy?.isGroup)legacy.visible=false; return {id:m.id,cubes:meshCount};
 }));
 sceneLoaded.then(items=>{
  if(statusBadge)statusBadge.textContent="3D ENVIRONMENT · 2D CHARACTERS";
