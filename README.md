@@ -1,6 +1,6 @@
 # Teenseys' — interactive shopping town starter
 
-This is a working **front-end prototype** (v1.9), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
+This is a working **front-end prototype** (v2.0), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
 
 ## Run it
 
@@ -150,3 +150,8 @@ Changes were validated for JavaScript syntax and checked in GitHub. Browser/WebG
 Teenseys now uses a **full-window immersive game view** instead of the previous centered fixed-width card layout. The header floats over the world, and the Three.js renderer plus the orthographic cameras resize to match the viewport aspect ratio without stretching the scene. Both town and shop world-to-screen **X coordinate mappings** were corrected for the camera facing direction: pressing right moves the character to the right of the screen, and pressing left moves left. The WASD/arrow bindings themselves remain unchanged.
 
 On touch/mobile-size displays, a translucent **D-pad is fixed bottom-left** and green **A** plus red **B** buttons float bottom-right, with safe-area padding. D-pad press/hold repeats movement; A interacts (equivalent to E) and B closes an open shopping modal or opens the menu while exploring. Product cards, entry controls, catalog and bag remain unchanged. New styling uses full-screen mobile viewport layout and adjusts smaller/landscape screens. All site and module scripts passed syntax checks. Real-device touch and 3D/WebGL QA is still recommended.
+
+
+## Version 2.0 — Character follow camera and translucent gamepad D-pad
+
+The main site now uses a character-centered Three.js camera in both the outdoor plaza and the boutique. It preserves the same orthographic three-quarter pitch and follows the selected 2D sprite's actual world coordinate with eased transitions; on switching between town and store, the view jumps directly to the player in the new scene rather than panning through empty space. The scene, character controls, and Blockbench model remain unchanged. Mobile controls feature a semi-transparent Xbox-inspired cross-shaped four-way D-pad at bottom-left and retained green A/red B actions at bottom-right. The persistent 'Explore the plaza' hint beneath the game has been removed, while the HUD title, functional A/E interactions, and in-store contextual guidance are retained. Syntax of HTML game and Three.js module was validated; on-device testing remains necessary.
