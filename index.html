@@ -84,13 +84,34 @@
     @media(max-width:750px){.game-wrap.modal-open{min-height:680px}.welcome{grid-template-columns:1fr;padding:32px 22px 22px}.welcome-art{min-height:150px}.welcome-actions{max-width:none}.product-layout{grid-template-columns:1fr}.viewer{min-height:240px;padding:18px}.shirt-display{min-height:165px}.shirt-display svg{height:165px}.details{padding:20px}.product-grid{grid-template-columns:repeat(2,minmax(0,1fr));max-height:290px}.product-thumb{height:104px}.catalog{padding:22px 14px}.controls{align-items:center}.instructions{max-width:195px}.topbar{padding:11px 13px}.sub{display:none}.brand{font-size:18px}.badge{display:none}}
     @media(max-width:440px){.page{width:100%;margin:0}.shell{border-radius:0;border:0}.top-actions{gap:5px}.pill{padding:8px 9px;font-size:11px}.game-wrap{min-height:235px}.hint{font-size:11px;bottom:8px}.controls{padding:9px 12px}.instructions{font-size:11px;max-width:128px}.mobile-pad{grid-template-columns:repeat(3,38px);grid-template-rows:repeat(2,36px)}.mobile-pad button{width:38px;height:36px}.btn{padding:11px 12px;font-size:12px}.overlay{padding:8px}.small-card{padding:22px 16px}.avatar-grid{gap:6px}.avatar-choice{padding:10px 3px}.details h2{font-size:24px}.viewer{min-height:210px}.shirt-display svg{height:150px}.topbar .pill:last-child{display:none}}
     @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+    /* v1.4: the retail world is 3D, while accessible shopping UI stays crisp HTML. */
+    body{background:radial-gradient(circle at 50% 0%,#363051,#111627 71%);color:#e6dfed}
+    .shell{border-color:#383449;background:#222438;box-shadow:0 24px 80px #0c071f9c}
+    .topbar{background:#1c2032;color:#f7f4ff;border-bottom-color:#3e3d58}
+    .logo{background:#a77be5;color:#1c1631}
+    .sub{color:#c0a9d8}
+    .pill{background:#292e45;border-color:#53516e;color:#eee8f8}
+    .pill:hover{background:#3a3c58}
+    .pill.primary{background:#875bbf;border-color:#875bbf;color:#fff}
+    .game-wrap{background:#17152b}
+    #game{background:#17152b}
+    .controls{background:#24273b;border-top-color:#4b425d}
+    .instructions{color:#cbc3d6}.instructions b{color:#efd1ff}
+    .mobile-pad button{background:#35364f;border-color:#696285;color:#eee2ff}
+    .footnote{color:#b8a4cf}
+    .hud{background:#241b3ddf;color:#fff;border-color:#665784}
+    .hud small{color:#c9b7df}
+    .hint{background:#211934ee;border:1px solid #715c9a}
+    .hybrid-badge{background:#321a55ed;border-color:#9768dd}
+    .badge{background:#603b8b;color:#f5e2ff}
+    /* White modal cards are intentionally retained for readable product details. */
   </style>
 </head>
 <body>
 <div class="page">
   <div class="shell">
     <div class="topbar">
-      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 1.3</span></div><div class="sub">HYBRID NIGHT PLAZA · 3D TOWN + 2D SHOPPERS</div></div>
+      <div><div class="brand"><span class="logo">▦</span> TEENSEYS' <span class="badge">DEMO 1.4</span></div><div class="sub">3D CITY + 3D STORES · 2D PIXEL SHOPPERS</div></div>
       <div class="top-actions">
         <button id="browseBtn" class="pill" type="button" disabled>Browse all</button>
         <button id="cartBtn" class="pill" type="button" disabled>Bag <span id="cartCount">0</span></button>
@@ -1110,6 +1131,8 @@ function showCart(){let total=bag.reduce((s,v)=>s+v.price,0);
 function addToBag(){const p=products.find(q=>q.rack===rackId&&q.id===products.filter(q=>q.rack===rackId)[productIndex].id);bag.push({...p,size:p.type==='bag'||p.type==='cap'?'One size':selectedSize});document.getElementById('cartCount').textContent=bag.length;
  const status=document.getElementById('itemStatus');if(status)status.textContent=`✓ Added ${p.name} to your demo bag`}
 function onCanvasClick(e){if(!started||activePanel!=='none')return;
+ // The 3D renderer performs accurate ray-casting against clothing racks.
+ if(window.teenseys3DReady&&mode==='store')return;
  if(mode==='town'){
   const bounds=canvas.getBoundingClientRect(),px=(e.clientX-bounds.left)*960/bounds.width,py=(e.clientY-bounds.top)*600/bounds.height;
   const target=pv_shops.find(b=>px>=b.x&&px<=b.x+b.w&&py>=b.y&&py<=b.base+14);
@@ -1155,10 +1178,15 @@ overlay.addEventListener('click',e=>{let b=e.target.closest('button');if(!b)retu
 });
 // Decorative demo shoppers move only within safe, predetermined paths. They are not real online users.
 setInterval(()=>{if(!started)return;for(let i=0;i<shoppers.length;i++){const s=shoppers[i];s.step++;s.x+=(s.step%3===0?.25:-.12);if(s.x>29)s.x=23;if(s.x<13)s.x=18}},900);
-window.teenseysTownState=()=>({started,mode,activePanel,character,townPlayer:{...townPlayer}});
+window.teenseysTownState=()=>({started,mode,activePanel,character,player:{...player},townPlayer:{...townPlayer}});
+window.teenseysOpenRack=(id)=>{if(!started||mode!=='store'||activePanel!=='none')return;
+ const r=rackDefs.find(r=>r.id===id);if(!r)return;
+ if(closestToRect(r)<=2)openProduct(id,0,false);else toast('Walk closer to that clothing rack.');
+};
+window.teenseys3DToast=(message)=>toast(message);
 openWelcome();requestAnimationFrame(draw);
 })();
 </script>
-<script type="module" src="assets/teenseys/hybrid-town.js?v=1.3"></script>
+<script type="module" src="assets/teenseys/hybrid-town.js?v=1.4"></script>
 </body>
 </html>
