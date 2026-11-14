@@ -1,6 +1,6 @@
 # Teenseys' — interactive shopping town starter
 
-This is a working **front-end prototype** (v1.2), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
+This is a working **front-end prototype** (v1.3), built as a single self-contained `index.html` file. The project is branded as **Teenseys'**. This name appears in the title and website header.
 
 ## Run it
 
@@ -107,3 +107,8 @@ The main `index.html` displays a night shopping plaza composed around the actual
 - `assets/teenseys/night/threads-source.bbmodel` — editable source of the flagship.
 
 The outdoor plaza is a night scene with skyline, paved pedestrian paths, foliage and flower planters, atmospheric lamps, glow effects, benches, a central animated fountain, and pixel-art visitors. The main game's keyboard/touch controls, guest entry, shop entrance to The Threads Shop, product racks, catalog, cards and demo bag are preserved. Sole House and Corner Café remain coming soon. The SVG projections are rasterized by the browser when drawn to the 2D canvas, so the outdoor scene preserves the simpler 2D engine rather than adding real-time 3D. The older `night-plaza.html` prototype remains available as a separate experimentation editor; its layouts are not synchronized with the main site. JavaScript syntax and GitHub Pages deployment passed; interactive browser QA on the released version is still advised.
+
+
+## Version 1.3 — Live 3D plaza and 2D pixel-art characters
+
+The main town uses Three.js to render a real 3D environment, with a fixed orthographic camera. All three storefronts load cube geometry and textures from their original editable Blockbench .bbmodel source files: Threads Shop, Sole House and Corner Cafe. The plaza has 3D paving, foliage, raised planters, benches, lamps, lighting, skyline and an animated 3D fountain. Characters remain 2D camera-facing pixel sprites (original shopper sprites and animations). Existing WASD / arrow controls and E-to-enter remain in the main game code; when visitors enter the Threads Shop, its original 2D clothing store and product-card/bag features render instead. A 2D town fallback remains if the Three.js CDN cannot load. The buildings use 3D meshes rather than previous flattened SVG images. The full live-browser rendering has not yet been validated.
