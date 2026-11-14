@@ -29,6 +29,27 @@ scene.fog=new THREE.FogExp2(0x18132d,0.0021);
 const camera=new THREE.OrthographicCamera(-148,148,92.5,-92.5,0.1,1000);
 camera.position.set(0,114,-183);
 camera.lookAt(0,17,-67);
+// Keep the three-dimensional world proportional at any browser/mobile aspect ratio.
+function resizeWorld(){
+ const rect=gameWrap.getBoundingClientRect();
+ const width=Math.max(1,Math.round(rect.width));
+ const height=Math.max(1,Math.round(rect.height));
+ if(!width||!height)return;
+ renderer.setSize(width,height,false);
+ const aspect=width/height;
+ const visibleHeight=185;
+ camera.top=visibleHeight/2;camera.bottom=-visibleHeight/2;
+ camera.left=-visibleHeight*aspect/2;camera.right=visibleHeight*aspect/2;
+ camera.updateProjectionMatrix();
+ // Indoor camera size adjusted in its setup using the same viewport aspect.
+ if(typeof shopCamera!=="undefined"&&shopCamera){
+  const shopVisibleHeight=148;
+  shopCamera.top=shopVisibleHeight/2;shopCamera.bottom=-shopVisibleHeight/2;
+  shopCamera.left=-shopVisibleHeight*aspect/2;
+  shopCamera.right=shopVisibleHeight*aspect/2;
+  shopCamera.updateProjectionMatrix();
+ }
+}
 const clock=new THREE.Clock();
 const hemi=new THREE.HemisphereLight(0xb4bfdf,0x332b41,1.55);
 scene.add(hemi);
@@ -650,5 +671,9 @@ function animate(time){
  }
 }
 window.teenseys3DReady=true;
+const resizeObserver=new ResizeObserver(resizeWorld);
+resizeObserver.observe(gameWrap);
+window.addEventListener("resize",resizeWorld,{passive:true});
+resizeWorld();
 requestAnimationFrame(animate);
-window.addEventListener("pagehide",()=>{running=false;renderer.dispose();for(const s of [...sprites,...npcs.map(n=>n.data),cashier])s.texture.dispose()},{once:true});
+window.addEventListener("pagehide",()=>{running=false;resizeObserver.disconnect();renderer.dispose();for(const s of [...sprites,...npcs.map(n=>n.data),cashier])s.texture.dispose()},{once:true});
