@@ -303,7 +303,7 @@ function makeStoreTemplate({id,label,subtitle,x,z,width,height,tint,accent,poste
   litBox(xx,25.5,glassZ-8,w*.78,.3,.75,mats.gold,g);
  }
  // Customizable store sign using a real 3D plane carrying a 2D brand texture.
- const tex=canvasLabel(label,subtitle,"#fff4e8",accent);
+ const tex=canvasLabel(label,subtitle,"#fff4e8",typeof accent==='number'?'#'+accent.toString(16).padStart(6,'0'):accent);
  const sign=new THREE.Mesh(
   new THREE.PlaneGeometry(width*.72,Math.min(18,height*.27)),
   new THREE.MeshBasicMaterial({map:tex,transparent:false,side:THREE.DoubleSide}));
