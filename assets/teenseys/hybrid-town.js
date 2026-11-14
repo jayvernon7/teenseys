@@ -2,7 +2,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.m
 import {loadBlockbench} from "./blockbench-loader.js?v=1.8";
 
 /*
- * Teenseys' hybrid scene v2.2
+ * Teenseys' hybrid scene v2.3
  * Actual 3D: environment, architecture, plaza, fountain, lighting.
  * 2D: pixel character sprite sheets drawn on camera-facing planes.
  * The existing shopping/store UI and 2D boutique engine stay untouched.
@@ -98,11 +98,11 @@ for(let j=0;j<16;j++)for(let i=0;i<16;i++){
 }
 const pavingTex=new THREE.CanvasTexture(pavementCanvas);
 pavingTex.wrapS=pavingTex.wrapT=THREE.RepeatWrapping;
-pavingTex.repeat.set(4,3);pavingTex.colorSpace=THREE.SRGBColorSpace;
+pavingTex.repeat.set(13,16);pavingTex.colorSpace=THREE.SRGBColorSpace;
 pavingTex.anisotropy=Math.min(renderer.capabilities.getMaxAnisotropy(),4);
-const paving=new THREE.Mesh(new THREE.PlaneGeometry(340,255),
+const paving=new THREE.Mesh(new THREE.PlaneGeometry(1100,1200),
  new THREE.MeshStandardMaterial({map:pavingTex,roughness:.33,metalness:.12}));
-paving.rotation.x=-Math.PI/2;paving.position.set(0,-.23,-65);
+paving.rotation.x=-Math.PI/2;paving.position.set(0,-.23,-165);
 paving.receiveShadow=true;scene.add(paving);
 // A pedestrian shopping mall, with raised planters along both aisles.
 for(const x of [-151,151]){
@@ -133,6 +133,31 @@ function makeTree(x,z,blossom=false){
 }
 makeTree(-139,-112,true);makeTree(137,-114,false);
 makeTree(-135,-40,false);makeTree(140,-42,true);
+// Continuous extra pedestrian district extending beyond the original tiny plaza.
+// All elements are real 3D geometry on the same ground, not stretched images.
+const edgePaver=colorMaterial(0x53516a,{roughness:.65});
+const darkSoil=colorMaterial(0x343d46,{roughness:.96});
+for(const z of [-230,-330,-435,-545]){
+ for(const side of [-1,1]){
+  const x=side*225;
+  box(x,.02,z,64,.28,75,edgePaver,scene,false);
+  box(x,1.1,z,50,2.2,63,darkSoil,scene,false);
+  for(const dx of [-15,15]){
+   makeTree(x+dx,z+((dx+15)/30-.5)*17,((Math.abs(z)+dx)%3)===0);
+  }
+ }
+}
+// Extra destination details spread along the length of the portrait screen.
+const distantBenchMat=colorMaterial(0x8b706d,{roughness:.75});
+for(const z of [-230,-330,-435,-545]){
+ for(const side of [-1,1]){
+  const x=side*142;
+  box(x,2.7,z,19,2.5,5,distantBenchMat);
+  box(x,5,z+2.5,19,5,1.9,distantBenchMat);
+  for(const xx of [x-7,x+7])box(xx,1.2,z,1.7,2.4,4,mats.dark);
+ }
+}
+
 function makeLamp(x,z){
  cyl(x,9,z,.65,.9,18,mats.dark,8);
  box(x,18.8,z,4,2,4,mats.gold);
@@ -142,6 +167,7 @@ function makeLamp(x,z){
  l.position.set(x,19,z);scene.add(l);
 }
 for(const x of [-120,120])for(const z of [-64,-139])makeLamp(x,z);
+for(const x of [-165,165])for(const z of [-230,-330,-435,-545])makeLamp(x,z);
 function makeBench(x,z){
  box(x,3.2,z,19,2,5,mats.wood);
  box(x,6.5,z+2,19,6,1.8,mats.wood);
