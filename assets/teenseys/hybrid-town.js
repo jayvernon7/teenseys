@@ -132,6 +132,10 @@ function makeBench(x,z){
  for(const xx of [x-7,x+7])box(xx,1.4,z,1.6,3,5,mats.dark);
 }
 makeBench(-109,-123);makeBench(106,-126);
+for(const [x,z,color] of [[0,-65,0xb960ff],[-91,-58,0x89b8ff],[91,-58,0xffb575]]){
+ const lamp=new THREE.PointLight(color,100,95,1.5);
+ lamp.position.set(x,20,z);scene.add(lamp);
+}
 const fountain=new THREE.Group();fountain.position.set(0,0,-99);scene.add(fountain);
 cyl(0,1.1,0,22,23,2.2,mats.white,48,fountain);
 cyl(0,2.2,0,20.2,20.2,.55,mats.water,48,fountain);
@@ -247,7 +251,7 @@ function makeBillboard(index,w=10,h=15){
  return {index,img,sprite,cc,texture,lastFrame:-1,lastDirection:-1};
 }
 const sprites=Array.from({length:6},(_,i)=>makeBillboard(i));
-const npcs=[{data:sprites[1],x:-96,z:-118,dir:"right"},{data:sprites[4],x:94,z:-132,dir:"left"}];
+const npcs=[{data:makeBillboard(1),x:-96,z:-118,dir:"right"},{data:makeBillboard(4),x:94,z:-132,dir:"left"}];
 let wasTown=false;
 let previousPX=null,previousPY=null;
 function drawBillboard(o,direction,frame){
@@ -265,7 +269,7 @@ function drawBillboard(o,direction,frame){
  }
  o.texture.needsUpdate=true;
 }
-for(const s of sprites)s.img.onload=()=>{s.lastFrame=-1;};
+for(const s of [...sprites,...npcs.map(n=>n.data)])s.img.onload=()=>{s.lastFrame=-1;};
 const destination=new THREE.Vector3();
 let running=true;
 function animate(time){
@@ -296,4 +300,4 @@ function animate(time){
  }
 }
 requestAnimationFrame(animate);
-window.addEventListener("pagehide",()=>{running=false;renderer.dispose();for(const s of sprites)s.texture.dispose()},{once:true});
+window.addEventListener("pagehide",()=>{running=false;renderer.dispose();for(const s of [...sprites,...npcs.map(n=>n.data)])s.texture.dispose()},{once:true});
